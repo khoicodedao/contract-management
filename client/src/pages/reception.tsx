@@ -1,0 +1,628 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Edit, Plus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import Sidebar from "@/components/layout/sidebar";
+import Header from "@/components/layout/header";
+
+interface TiepNhan {
+  id: number;
+  hopDongId: number;
+  tenHang: string;
+  soToKhai?: string;
+  soVanDon?: string;
+  soPhieuDongGoi?: string;
+  soHoaDon?: string;
+  soBaoHiem?: string;
+  diaDiemThongQuanId?: number;
+  diaDiemThongQuanTuDo?: string;
+  ngayThucHien: string;
+}
+
+interface DiaDiemThongQuan {
+  id: number;
+  ten: string;
+  chiCuc: string;
+}
+
+interface HopDong {
+  id: number;
+  ten: string;
+}
+
+export default function Reception() {
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingReception, setEditingReception] = useState<TiepNhan | null>(
+    null
+  );
+  const [useCustomLocation, setUseCustomLocation] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: receptions = [] } = useQuery<TiepNhan[]>({
+    queryKey: ["/api/tiep-nhan"],
+  });
+
+  const { data: locations = [] } = useQuery<DiaDiemThongQuan[]>({
+    queryKey: ["/api/dia-diem-thong-quan"],
+  });
+
+  const { data: contracts = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/hop-dong"],
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: Omit<TiepNhan, "id">) => {
+      await apiRequest("POST", "/api/tiep-nhan", data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tiep-nhan"] });
+      setIsCreateOpen(false);
+      toast({ description: "Đã tạo bản ghi tiếp nhận thành công" });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        description: "Lỗi khi tạo bản ghi tiếp nhận",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: TiepNhan) => {
+      await apiRequest("PUT", `/api/tiep-nhan/${data.id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tiep-nhan"] });
+      setIsEditOpen(false);
+      setEditingReception(null);
+      toast({ description: "Đã cập nhật bản ghi tiếp nhận thành công" });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        description: "Lỗi khi cập nhật bản ghi tiếp nhận",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/tiep-nhan/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/tiep-nhan"] });
+      toast({ description: "Đã xóa bản ghi tiếp nhận thành công" });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        description: "Lỗi khi xóa bản ghi tiếp nhận",
+      });
+    },
+  });
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+
+    const data = {
+      hopDongId: parseInt(formData.get("hopDongId") as string),
+      tenHang: formData.get("tenHang") as string,
+      soToKhai: (formData.get("soToKhai") as string) || undefined,
+      soVanDon: (formData.get("soVanDon") as string) || undefined,
+      soPhieuDongGoi: (formData.get("soPhieuDongGoi") as string) || undefined,
+      soHoaDon: (formData.get("soHoaDon") as string) || undefined,
+      soBaoHiem: (formData.get("soBaoHiem") as string) || undefined,
+      diaDiemThongQuanId: useCustomLocation
+        ? undefined
+        : parseInt(formData.get("diaDiemThongQuanId") as string) || undefined,
+      diaDiemThongQuanTuDo: useCustomLocation
+        ? (formData.get("diaDiemThongQuanTuDo") as string) || undefined
+        : undefined,
+      ngayThucHien: formData.get("ngayThucHien") as string,
+    };
+
+    if (editingReception) {
+      updateMutation.mutate({ ...data, id: editingReception.id });
+    } else {
+      createMutation.mutate(data);
+    }
+  };
+
+  const getContractName = (hopDongId: number) => {
+    const contract = contracts.find((c) => c.id === hopDongId);
+    return contract?.ten || `Hợp đồng #${hopDongId}`;
+  };
+
+  const getLocationName = (reception: TiepNhan) => {
+    if (reception.diaDiemThongQuanTuDo) {
+      return reception.diaDiemThongQuanTuDo;
+    }
+    if (reception.diaDiemThongQuanId) {
+      const location = locations.find(
+        (l) => l.id === reception.diaDiemThongQuanId
+      );
+      return location
+        ? `${location.ten} - ${location.chiCuc}`
+        : `Location #${reception.diaDiemThongQuanId}`;
+    }
+    return "Chưa xác định";
+  };
+
+  const openEditDialog = (reception: TiepNhan) => {
+    setEditingReception(reception);
+    setUseCustomLocation(!!reception.diaDiemThongQuanTuDo);
+    setIsEditOpen(true);
+  };
+
+  const openCreateDialog = () => {
+    setEditingReception(null);
+    setUseCustomLocation(false);
+    setIsCreateOpen(true);
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <Header
+          title="Quản lý tiếp nhận"
+          subtitle="Quản lý tiếp nhận hàng hóa và thông tin thông quan"
+          onCreateContract={() => {}}
+        />
+        <main className="flex-1 overflow-auto p-6">
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="space-y-8">
+              <div className="flex justify-between items-center">
+                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                  <DialogTrigger asChild>
+                    <Button onClick={openCreateDialog}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Thêm tiếp nhận
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Thêm bản ghi tiếp nhận mới</DialogTitle>
+                      <DialogDescription>
+                        Nhập thông tin tiếp nhận hàng hóa và tài liệu thông quan
+                      </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="hopDongId">Hợp đồng</Label>
+                          <Select name="hopDongId" required>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn hợp đồng" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {contracts.map((contract) => (
+                                <SelectItem
+                                  key={contract.id}
+                                  value={contract.id.toString()}
+                                >
+                                  {contract.ten}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="tenHang">Tên hàng</Label>
+                          <Input id="tenHang" name="tenHang" required />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="soToKhai">Số tờ khai</Label>
+                          <Input id="soToKhai" name="soToKhai" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soVanDon">Số vận đơn</Label>
+                          <Input id="soVanDon" name="soVanDon" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="soPhieuDongGoi">
+                            Số phiếu đóng gói
+                          </Label>
+                          <Input id="soPhieuDongGoi" name="soPhieuDongGoi" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soHoaDon">Số hóa đơn</Label>
+                          <Input id="soHoaDon" name="soHoaDon" />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="soBaoHiem">Số bảo hiểm</Label>
+                          <Input id="soBaoHiem" name="soBaoHiem" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="ngayThucHien">Ngày thực hiện</Label>
+                          <Input
+                            id="ngayThucHien"
+                            name="ngayThucHien"
+                            type="date"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="useCustomLocation"
+                            checked={useCustomLocation}
+                            onChange={(e) =>
+                              setUseCustomLocation(e.target.checked)
+                            }
+                          />
+                          <Label htmlFor="useCustomLocation">
+                            Nhập tay địa điểm thông quan
+                          </Label>
+                        </div>
+
+                        {useCustomLocation ? (
+                          <div className="space-y-2">
+                            <Label htmlFor="diaDiemThongQuanTuDo">
+                              Địa điểm thông quan
+                            </Label>
+                            <Input
+                              id="diaDiemThongQuanTuDo"
+                              name="diaDiemThongQuanTuDo"
+                              placeholder="Nhập địa điểm thông quan tự do"
+                            />
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <Label htmlFor="diaDiemThongQuanId">
+                              Địa điểm thông quan
+                            </Label>
+                            <Select name="diaDiemThongQuanId">
+                              <SelectTrigger>
+                                <SelectValue placeholder="Chọn địa điểm thông quan" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {locations.map((location) => (
+                                  <SelectItem
+                                    key={location.id}
+                                    value={location.id.toString()}
+                                  >
+                                    {location.ten} - {location.chiCuc}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsCreateOpen(false)}
+                        >
+                          Hủy
+                        </Button>
+                        <Button type="submit">Tạo</Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Danh sách tiếp nhận</CardTitle>
+                  <CardDescription>
+                    Tổng cộng: {receptions.length} bản ghi tiếp nhận
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Hợp đồng</TableHead>
+                        <TableHead>Tên hàng</TableHead>
+                        <TableHead>Số tờ khai</TableHead>
+                        <TableHead>Số vận đơn</TableHead>
+                        <TableHead>Địa điểm thông quan</TableHead>
+                        <TableHead>Ngày thực hiện</TableHead>
+                        <TableHead>Thao tác</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {receptions.map((reception) => (
+                        <TableRow key={reception.id}>
+                          <TableCell>
+                            {getContractName(reception.hopDongId)}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {reception.tenHang}
+                          </TableCell>
+                          <TableCell>
+                            {reception.soToKhai && (
+                              <Badge variant="outline">
+                                {reception.soToKhai}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {reception.soVanDon && (
+                              <Badge variant="outline">
+                                {reception.soVanDon}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                reception.diaDiemThongQuanTuDo
+                                  ? "secondary"
+                                  : "default"
+                              }
+                            >
+                              {getLocationName(reception)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {new Date(
+                              reception.ngayThucHien
+                            ).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => openEditDialog(reception)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  deleteMutation.mutate(reception.id)
+                                }
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+
+              {/* Edit Dialog */}
+              <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Chỉnh sửa bản ghi tiếp nhận</DialogTitle>
+                    <DialogDescription>
+                      Cập nhật thông tin tiếp nhận hàng hóa và tài liệu thông
+                      quan
+                    </DialogDescription>
+                  </DialogHeader>
+                  {editingReception && (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="hopDongId">Hợp đồng</Label>
+                          <Select
+                            name="hopDongId"
+                            defaultValue={editingReception.hopDongId.toString()}
+                            required
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn hợp đồng" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {contracts.map((contract) => (
+                                <SelectItem
+                                  key={contract.id}
+                                  value={contract.id.toString()}
+                                >
+                                  {contract.ten}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="tenHang">Tên hàng</Label>
+                          <Input
+                            id="tenHang"
+                            name="tenHang"
+                            defaultValue={editingReception.tenHang}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="soToKhai">Số tờ khai</Label>
+                          <Input
+                            id="soToKhai"
+                            name="soToKhai"
+                            defaultValue={editingReception.soToKhai || ""}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soVanDon">Số vận đơn</Label>
+                          <Input
+                            id="soVanDon"
+                            name="soVanDon"
+                            defaultValue={editingReception.soVanDon || ""}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="soPhieuDongGoi">
+                            Số phiếu đóng gói
+                          </Label>
+                          <Input
+                            id="soPhieuDongGoi"
+                            name="soPhieuDongGoi"
+                            defaultValue={editingReception.soPhieuDongGoi || ""}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soHoaDon">Số hóa đơn</Label>
+                          <Input
+                            id="soHoaDon"
+                            name="soHoaDon"
+                            defaultValue={editingReception.soHoaDon || ""}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="soBaoHiem">Số bảo hiểm</Label>
+                          <Input
+                            id="soBaoHiem"
+                            name="soBaoHiem"
+                            defaultValue={editingReception.soBaoHiem || ""}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="ngayThucHien">Ngày thực hiện</Label>
+                          <Input
+                            id="ngayThucHien"
+                            name="ngayThucHien"
+                            type="date"
+                            defaultValue={editingReception.ngayThucHien}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="useCustomLocation"
+                            checked={useCustomLocation}
+                            onChange={(e) =>
+                              setUseCustomLocation(e.target.checked)
+                            }
+                          />
+                          <Label htmlFor="useCustomLocation">
+                            Nhập tay địa điểm thông quan
+                          </Label>
+                        </div>
+
+                        {useCustomLocation ? (
+                          <div className="space-y-2">
+                            <Label htmlFor="diaDiemThongQuanTuDo">
+                              Địa điểm thông quan
+                            </Label>
+                            <Input
+                              id="diaDiemThongQuanTuDo"
+                              name="diaDiemThongQuanTuDo"
+                              defaultValue={
+                                editingReception.diaDiemThongQuanTuDo || ""
+                              }
+                              placeholder="Nhập địa điểm thông quan tự do"
+                            />
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <Label htmlFor="diaDiemThongQuanId">
+                              Địa điểm thông quan
+                            </Label>
+                            <Select
+                              name="diaDiemThongQuanId"
+                              defaultValue={editingReception.diaDiemThongQuanId?.toString()}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Chọn địa điểm thông quan" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {locations.map((location) => (
+                                  <SelectItem
+                                    key={location.id}
+                                    value={location.id.toString()}
+                                  >
+                                    {location.ten} - {location.chiCuc}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setIsEditOpen(false)}
+                        >
+                          Hủy
+                        </Button>
+                        <Button type="submit">Cập nhật</Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
