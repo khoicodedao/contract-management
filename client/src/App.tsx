@@ -17,6 +17,7 @@ import Documents from "@/pages/documents";
 import NotFound from "@/pages/not-found";
 
 function Router() {
+  console.log("Current pathname:", window.location.hash); // 👈 debug ở đây
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
@@ -36,6 +37,7 @@ function Router() {
 }
 
 function App() {
+  console.log("App component loaded");
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

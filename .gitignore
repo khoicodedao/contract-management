@@ -4,3 +4,17 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+# Thư mục release và đóng gói Electron
+/out
+/build
+/release
+/dist/*.exe
+/dist/*.dmg
+/dist/*.AppImage
+/dist/*.msi
+/dist/*.zip
+/dist/*.7z
+/dist/*.tar.gz
+/dist/win-unpacked
+/dist/linux-unpacked
+/dist/mac
