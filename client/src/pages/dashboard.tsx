@@ -2,12 +2,36 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { FileText, Package, CreditCard, Clock, Globe } from "lucide-react";
 import WorldMap from "@/components/charts/world-map";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D'];
+const COLORS = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884D8",
+  "#82CA9D",
+];
 
 export default function Dashboard() {
   const { data: stats, isLoading } = useQuery({
@@ -18,8 +42,8 @@ export default function Dashboard() {
     queryKey: ["/api/dashboard/charts"],
   });
 
-  console.log('Dashboard Stats:', stats);
-  console.log('Chart Data:', chartData);
+  console.log("Dashboard Stats:", stats);
+  console.log("Chart Data:", chartData);
 
   if (isLoading) {
     return (
@@ -59,7 +83,9 @@ export default function Dashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-600">Tổng hợp đồng</p>
+                      <p className="text-sm font-medium text-slate-600">
+                        Tổng hợp đồng
+                      </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
                         {stats?.totalContracts || 0}
                       </p>
@@ -80,7 +106,9 @@ export default function Dashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-600">Tổng thanh toán</p>
+                      <p className="text-sm font-medium text-slate-600">
+                        Tổng thanh toán
+                      </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
                         {stats?.totalPayments || 0}
                       </p>
@@ -101,7 +129,9 @@ export default function Dashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-600">Trang bị</p>
+                      <p className="text-sm font-medium text-slate-600">
+                        Trang bị
+                      </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
                         {stats?.totalEquipment || 0}
                       </p>
@@ -122,7 +152,9 @@ export default function Dashboard() {
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-600">Tài liệu</p>
+                      <p className="text-sm font-medium text-slate-600">
+                        Tài liệu
+                      </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
                         {stats?.totalDocuments || 0}
                       </p>
@@ -144,7 +176,9 @@ export default function Dashboard() {
             {/* Contract Types Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Số lượng hợp đồng theo loại hợp đồng - Biểu đồ tròn</CardTitle>
+                <CardTitle>
+                  Số lượng hợp đồng theo loại hợp đồng - Biểu đồ tròn
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {!isChartsLoading && chartData?.contractTypes ? (
@@ -155,14 +189,21 @@ export default function Dashboard() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {chartData.contractTypes.map((_: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                        {chartData.contractTypes.map(
+                          (_: any, index: number) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          )
+                        )}
                       </Pie>
                       <Tooltip />
                     </PieChart>
@@ -178,7 +219,9 @@ export default function Dashboard() {
             {/* Contract Types Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Số lượng hợp đồng theo loại hợp đồng - Biểu đồ cột</CardTitle>
+                <CardTitle>
+                  Số lượng hợp đồng theo loại hợp đồng - Biểu đồ cột
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 {!isChartsLoading && chartData?.contractTypes ? (
@@ -213,14 +256,21 @@ export default function Dashboard() {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
                         outerRadius={80}
                         fill="#82ca9d"
                         dataKey="value"
                       >
-                        {chartData.paymentStatus.map((_: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[(index + 2) % COLORS.length]} />
-                        ))}
+                        {chartData.paymentStatus.map(
+                          (_: any, index: number) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[(index + 2) % COLORS.length]}
+                            />
+                          )
+                        )}
                       </Pie>
                       <Tooltip />
                     </PieChart>
@@ -291,35 +341,54 @@ export default function Dashboard() {
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Tổng giá trị:</span>
                     <span className="text-lg font-bold text-green-600">
-                      {stats?.totalValue ? (stats.totalValue / 1000000000).toFixed(1) : '0'} tỷ VNĐ
+                      {stats?.totalValue
+                        ? (stats.totalValue / 1000000000).toFixed(1)
+                        : "0"}{" "}
+                      tỷ VNĐ
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Hợp đồng đang hoạt động:</span>
+                    <span className="text-sm font-medium">
+                      Hợp đồng đang hoạt động:
+                    </span>
                     <span className="text-lg font-bold text-blue-600">
                       {stats?.activeContracts || 0}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Tiến độ hoàn thành:</span>
+                    <span className="text-sm font-medium">
+                      Tiến độ hoàn thành:
+                    </span>
                     <span className="text-lg font-bold text-purple-600">
-                      {stats?.completedSteps || 0}/{stats?.totalProgressSteps || 0} bước
+                      {stats?.completedSteps || 0}/
+                      {stats?.totalProgressSteps || 0} bước
                     </span>
                   </div>
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-sm mb-2">Chi tiết loại hợp đồng:</h4>
-                    {chartData?.contractTypes?.map((item: any, index: number) => (
-                      <div key={index} className="flex justify-between items-center py-1">
-                        <div className="flex items-center">
-                          <div 
-                            className="w-3 h-3 rounded-full mr-2"
-                            style={{ backgroundColor: COLORS[index % COLORS.length] }}
-                          />
-                          <span className="text-xs">{item.name}</span>
+                    <h4 className="font-medium text-sm mb-2">
+                      Chi tiết loại hợp đồng:
+                    </h4>
+                    {chartData?.contractTypes?.map(
+                      (item: any, index: number) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center py-1"
+                        >
+                          <div className="flex items-center">
+                            <div
+                              className="w-3 h-3 rounded-full mr-2"
+                              style={{
+                                backgroundColor: COLORS[index % COLORS.length],
+                              }}
+                            />
+                            <span className="text-xs">{item.name}</span>
+                          </div>
+                          <span className="text-xs font-medium">
+                            {item.value} hợp đồng
+                          </span>
                         </div>
-                        <span className="text-xs font-medium">{item.value} hợp đồng</span>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </div>
               </CardContent>
