@@ -96,7 +96,9 @@ export function Sidebar() {
             <File className="text-white text-lg" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-slate-900">ContractPro</h1>
+            <h1 className="text-lg font-semibold text-slate-900">
+              ContractPro
+            </h1>
             <p className="text-xs text-slate-500">Quản lý hợp đồng</p>
           </div>
         </div>
@@ -110,12 +112,7 @@ export function Sidebar() {
 
           return (
             <Link key={item.name} href={item.href}>
-              <div
-                className={cn(
-                  "sidebar-nav-item",
-                  isActive && "active"
-                )}
-              >
+              <div className={cn("sidebar-nav-item", isActive && "active")}>
                 <Icon className="w-5 h-5" />
                 <span>{item.name}</span>
                 {item.badge && (
@@ -139,7 +136,7 @@ export function Sidebar() {
           />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-slate-900 truncate">
-              Nguyễn Văn A
+              Ngô Văn Khang
             </p>
             <p className="text-xs text-slate-500 truncate">Quản lý hợp đồng</p>
           </div>

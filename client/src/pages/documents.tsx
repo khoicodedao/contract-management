@@ -5,11 +5,40 @@ import Header from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, Edit, Trash2, Search, Plus, Download, File, FileText, FileSpreadsheet, ExternalLink } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Search,
+  Plus,
+  Download,
+  File,
+  FileText,
+  FileSpreadsheet,
+  ExternalLink,
+} from "lucide-react";
 import { FileHopDong } from "@shared/schema";
 import { FILE_TYPE_LABELS } from "@/lib/constants";
 import { apiRequest } from "@/lib/queryClient";
@@ -22,7 +51,9 @@ export default function Documents() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<FileHopDong | null>(null);
+  const [selectedDocument, setSelectedDocument] = useState<FileHopDong | null>(
+    null
+  );
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -43,7 +74,7 @@ export default function Documents() {
     },
     onError: () => {
       toast({
-        title: "Lỗi", 
+        title: "Lỗi",
         description: "Không thể xóa tài liệu",
         variant: "destructive",
       });
@@ -71,33 +102,35 @@ export default function Documents() {
         }
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: document.loaiFile });
-        
+
         const url = window.URL.createObjectURL(blob);
-        const link = globalThis.document.createElement('a');
+        const link = globalThis.document.createElement("a");
         link.href = url;
-        link.download = document.tenFile || 'document';
+        link.download = document.tenFile || "document";
         globalThis.document.body.appendChild(link);
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
       } else {
         // Fallback to server download endpoint
-        const response = await fetch(`/api/file-hop-dong/${document.id}/download`);
+        const response = await fetch(
+          `/api/file-hop-dong/${document.id}/download`
+        );
         if (!response.ok) {
           throw new Error("Không thể tải file");
         }
-        
+
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const link = globalThis.document.createElement('a');
+        const link = globalThis.document.createElement("a");
         link.href = url;
-        link.download = document.tenFile || 'document';
+        link.download = document.tenFile || "document";
         globalThis.document.body.appendChild(link);
         link.click();
         link.remove();
         window.URL.revokeObjectURL(url);
       }
-      
+
       toast({
         title: "Thành công",
         description: "Tài liệu đã được tải xuống",
@@ -119,52 +152,58 @@ export default function Documents() {
 
   const formatFileSize = (sizeInBytes: number | null) => {
     if (!sizeInBytes) return "-";
-    
-    const units = ['B', 'KB', 'MB', 'GB'];
+
+    const units = ["B", "KB", "MB", "GB"];
     let size = sizeInBytes;
     let unitIndex = 0;
-    
+
     while (size >= 1024 && unitIndex < units.length - 1) {
       size /= 1024;
       unitIndex++;
     }
-    
+
     return `${Math.round(size * 100) / 100} ${units[unitIndex]}`;
   };
 
   const formatDate = (dateString: Date | string | null) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   const getFileIcon = (fileType: string | null) => {
     if (!fileType) return File;
-    
+
     const type = fileType.toLowerCase();
-    if (type.includes('pdf')) return FileText;
-    if (type.includes('doc')) return FileText;
-    if (type.includes('xls')) return FileSpreadsheet;
+    if (type.includes("pdf")) return FileText;
+    if (type.includes("doc")) return FileText;
+    if (type.includes("xls")) return FileSpreadsheet;
     return File;
   };
 
   const getFileTypeLabel = (fileName: string | null) => {
     if (!fileName) return "Không xác định";
-    
-    const extension = '.' + fileName.split('.').pop()?.toLowerCase();
-    return FILE_TYPE_LABELS[extension as keyof typeof FILE_TYPE_LABELS] || "Khác";
+
+    const extension = "." + fileName.split(".").pop()?.toLowerCase();
+    return (
+      FILE_TYPE_LABELS[extension as keyof typeof FILE_TYPE_LABELS] || "Khác"
+    );
   };
 
-  const filteredDocuments = documents.filter(doc => {
-    const matchesSearch = doc.tenFile?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesSearch =
+      doc.tenFile?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       doc.ghiChu?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = typeFilter === "all" || doc.loaiFile === typeFilter;
-    
+
     return matchesSearch && matchesType;
   });
 
   const totalFiles = documents.length;
-  const totalSize = documents.reduce((sum, doc) => sum + (doc.kichThuoc || 0), 0);
-  const recentFiles = documents.filter(doc => {
+  const totalSize = documents.reduce(
+    (sum, doc) => sum + (doc.kichThuoc || 0),
+    0
+  );
+  const recentFiles = documents.filter((doc) => {
     if (!doc.ngayTaiLen) return false;
     const uploadDate = new Date(doc.ngayTaiLen);
     const weekAgo = new Date();
@@ -188,7 +227,9 @@ export default function Documents() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Tổng tài liệu</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Tổng tài liệu
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
                       {totalFiles}
                     </p>
@@ -204,7 +245,9 @@ export default function Documents() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Dung lượng</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Dung lượng
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
                       {formatFileSize(totalSize)}
                     </p>
@@ -220,7 +263,9 @@ export default function Documents() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Tải lên tuần này</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Tải lên tuần này
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
                       {recentFiles}
                     </p>
@@ -242,7 +287,7 @@ export default function Documents() {
                   Tải lên tài liệu
                 </Button>
               </div>
-              
+
               <div className="flex items-center space-x-4 mt-4">
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -266,12 +311,15 @@ export default function Documents() {
                 </Select>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-100 rounded animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-16 bg-slate-100 rounded animate-pulse"
+                    />
                   ))}
                 </div>
               ) : filteredDocuments.length === 0 ? (
@@ -280,8 +328,7 @@ export default function Documents() {
                   <p className="text-slate-500">
                     {searchTerm || typeFilter !== "all"
                       ? "Không tìm thấy tài liệu nào phù hợp"
-                      : "Chưa có tài liệu nào được tải lên"
-                    }
+                      : "Chưa có tài liệu nào được tải lên"}
                   </p>
                 </div>
               ) : (
@@ -300,7 +347,7 @@ export default function Documents() {
                     <TableBody>
                       {filteredDocuments.map((document) => {
                         const FileIcon = getFileIcon(document.loaiFile);
-                        
+
                         return (
                           <TableRow key={document.id} className="table-row">
                             <TableCell>
@@ -327,7 +374,9 @@ export default function Documents() {
                               {formatFileSize(document.kichThuoc)}
                             </TableCell>
                             <TableCell>
-                              {document.hopDongId ? `HD-${document.hopDongId}` : "Chưa gán"}
+                              {document.hopDongId
+                                ? `HD-${document.hopDongId}`
+                                : "Chưa gán"}
                             </TableCell>
                             <TableCell>
                               {formatDate(document.ngayTaiLen)}
@@ -347,7 +396,9 @@ export default function Documents() {
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 text-green-600 hover:text-green-800"
-                                  onClick={() => handleDownloadDocument(document)}
+                                  onClick={() =>
+                                    handleDownloadDocument(document)
+                                  }
                                   title="Tải xuống"
                                 >
                                   <Download className="h-4 w-4" />
@@ -365,7 +416,9 @@ export default function Documents() {
                                   variant="ghost"
                                   size="icon"
                                   className="h-8 w-8 text-red-600 hover:text-red-800"
-                                  onClick={() => handleDeleteDocument(document.id!)}
+                                  onClick={() =>
+                                    handleDeleteDocument(document.id!)
+                                  }
                                   title="Xóa"
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -382,14 +435,14 @@ export default function Documents() {
             </CardContent>
           </Card>
         </main>
-        <DocumentModal 
-          isOpen={isCreateModalOpen} 
-          onClose={() => setIsCreateModalOpen(false)} 
+        <DocumentModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
         />
-        
+
         {selectedDocument && (
-          <DocumentModal 
-            isOpen={isEditModalOpen} 
+          <DocumentModal
+            isOpen={isEditModalOpen}
             onClose={() => {
               setIsEditModalOpen(false);
               setSelectedDocument(null);
@@ -414,25 +467,45 @@ export default function Documents() {
                   <div className="bg-slate-50 p-4 rounded-lg">
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="font-medium text-slate-600">Tên file:</span>
-                        <p className="text-slate-900">{selectedDocument.tenFile}</p>
+                        <span className="font-medium text-slate-600">
+                          Tên file:
+                        </span>
+                        <p className="text-slate-900">
+                          {selectedDocument.tenFile}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-medium text-slate-600">Kích thước:</span>
-                        <p className="text-slate-900">{formatFileSize(selectedDocument.kichThuoc)}</p>
+                        <span className="font-medium text-slate-600">
+                          Kích thước:
+                        </span>
+                        <p className="text-slate-900">
+                          {formatFileSize(selectedDocument.kichThuoc)}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-medium text-slate-600">Loại file:</span>
-                        <p className="text-slate-900">{getFileTypeLabel(selectedDocument.tenFile)}</p>
+                        <span className="font-medium text-slate-600">
+                          Loại file:
+                        </span>
+                        <p className="text-slate-900">
+                          {getFileTypeLabel(selectedDocument.tenFile)}
+                        </p>
                       </div>
                       <div>
-                        <span className="font-medium text-slate-600">Ngày tải lên:</span>
-                        <p className="text-slate-900">{formatDate(selectedDocument.ngayTaiLen)}</p>
+                        <span className="font-medium text-slate-600">
+                          Ngày tải lên:
+                        </span>
+                        <p className="text-slate-900">
+                          {formatDate(selectedDocument.ngayTaiLen)}
+                        </p>
                       </div>
                       {selectedDocument.ghiChu && (
                         <div className="col-span-2">
-                          <span className="font-medium text-slate-600">Ghi chú:</span>
-                          <p className="text-slate-900">{selectedDocument.ghiChu}</p>
+                          <span className="font-medium text-slate-600">
+                            Ghi chú:
+                          </span>
+                          <p className="text-slate-900">
+                            {selectedDocument.ghiChu}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -450,9 +523,10 @@ export default function Documents() {
                       {selectedDocument.tenFile}
                     </h3>
                     <p className="text-slate-600 mb-4">
-                      {getFileTypeLabel(selectedDocument.tenFile)} • {formatFileSize(selectedDocument.kichThuoc)}
+                      {getFileTypeLabel(selectedDocument.tenFile)} •{" "}
+                      {formatFileSize(selectedDocument.kichThuoc)}
                     </p>
-                    
+
                     <div className="flex justify-center gap-3">
                       <Button
                         onClick={() => handleDownloadDocument(selectedDocument)}
@@ -461,13 +535,13 @@ export default function Documents() {
                         <Download className="w-4 h-4 mr-2" />
                         Tải xuống
                       </Button>
-                      
+
                       {selectedDocument.duongDan && (
                         <Button
                           variant="outline"
                           onClick={() => {
                             if (selectedDocument.duongDan) {
-                              window.open(selectedDocument.duongDan, '_blank');
+                              window.open(selectedDocument.duongDan, "_blank");
                             }
                           }}
                         >
@@ -478,26 +552,28 @@ export default function Documents() {
                     </div>
 
                     {/* Image Preview for image files */}
-                    {selectedDocument.loaiFile?.startsWith('image/') && selectedDocument.noiDung && (
-                      <div className="mt-6">
-                        <img
-                          src={`data:${selectedDocument.loaiFile};base64,${selectedDocument.noiDung}`}
-                          alt={selectedDocument.tenFile || 'Document preview'}
-                          className="max-w-full h-auto max-h-96 border rounded-lg mx-auto"
-                        />
-                      </div>
-                    )}
+                    {selectedDocument.loaiFile?.startsWith("image/") &&
+                      selectedDocument.noiDung && (
+                        <div className="mt-6">
+                          <img
+                            src={`data:${selectedDocument.loaiFile};base64,${selectedDocument.noiDung}`}
+                            alt={selectedDocument.tenFile || "Document preview"}
+                            className="max-w-full h-auto max-h-96 border rounded-lg mx-auto"
+                          />
+                        </div>
+                      )}
 
                     {/* PDF Preview for PDF files */}
-                    {selectedDocument.loaiFile?.includes('pdf') && selectedDocument.duongDan && (
-                      <div className="mt-6">
-                        <iframe
-                          src={`${selectedDocument.duongDan}#toolbar=0`}
-                          className="w-full h-96 border rounded-lg"
-                          title="PDF Preview"
-                        />
-                      </div>
-                    )}
+                    {selectedDocument.loaiFile?.includes("pdf") &&
+                      selectedDocument.duongDan && (
+                        <div className="mt-6">
+                          <iframe
+                            src={`${selectedDocument.duongDan}#toolbar=0`}
+                            className="w-full h-96 border rounded-lg"
+                            title="PDF Preview"
+                          />
+                        </div>
+                      )}
                   </div>
                 </div>
               )}

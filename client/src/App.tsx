@@ -15,7 +15,7 @@ import Payments from "@/pages/payments";
 import Progress from "@/pages/progress";
 import Documents from "@/pages/documents";
 import NotFound from "@/pages/not-found";
-
+import Footer from "./components/layout/footer";
 function Router() {
   return (
     <Switch>
@@ -41,6 +41,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <Footer />
       </TooltipProvider>
     </QueryClientProvider>
   );

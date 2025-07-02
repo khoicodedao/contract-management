@@ -78,7 +78,7 @@ export default function Dashboard() {
         <main className="flex-1 overflow-auto p-6">
           {/* Main Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Link href="/contracts">
+            <Link href="/hop-dong">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-blue-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
@@ -101,7 +101,7 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link href="/payments">
+            <Link href="/thanh-toan">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-green-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
@@ -124,7 +124,7 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link href="/equipment">
+            <Link href="/trang-bi">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-purple-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
@@ -147,7 +147,7 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link href="/documents">
+            <Link href="/tai-lieu">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-orange-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
