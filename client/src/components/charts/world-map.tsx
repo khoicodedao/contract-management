@@ -129,11 +129,6 @@ export default function WorldMap({ data }: WorldMapProps) {
           </div>
         </div>
       </div>
-
-      {/* Instructions - optional to remove */}
-      <div className="absolute bottom-4 right-4 bg-white rounded-lg shadow-lg p-3 border text-xs text-gray-600">
-        <div>Bản đồ tĩnh, không thể phóng to/thu nhỏ</div>
-      </div>
     </div>
   );
 }
