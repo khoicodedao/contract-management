@@ -1,27 +1,73 @@
 import {
-  LoaiHopDong, InsertLoaiHopDong, loaiHopDong,
-  CanBo, InsertCanBo, canBo,
-  NhaCungCap, InsertNhaCungCap, nhaCungCap,
-  ChuDauTu, InsertChuDauTu, chuDauTu,
-  LoaiNganSach, InsertLoaiNganSach, loaiNganSach,
-  LoaiHinhThucThanhToan, InsertLoaiHinhThucThanhToan, loaiHinhThucThanhToan,
-  LoaiThanhToan, InsertLoaiThanhToan, loaiThanhToan,
-  LoaiTien, InsertLoaiTien, loaiTien,
-  CoQuan, InsertCoQuan, coQuan,
-  DiaDiemThongQuan, InsertDiaDiemThongQuan, diaDiemThongQuan,
-  LoaiGiayPhep, InsertLoaiGiayPhep, loaiGiayPhep,
-  LoaiTrangBi, InsertLoaiTrangBi, loaiTrangBi,
-  LoaiThucHien, InsertLoaiThucHien, loaiThucHien,
-  TrangThaiHopDong, InsertTrangThaiHopDong, trangThaiHopDong,
-  HopDong, InsertHopDong, hopDong,
-  TrangBi, InsertTrangBi, trangBi,
-  GiayPhep, InsertGiayPhep, giayPhep,
-  TiepNhan, InsertTiepNhan, tiepNhan,
-  ThanhToan, InsertThanhToan, thanhToan,
-  HopDongTienDo, InsertHopDongTienDo, hopDongTienDo,
-  FileHopDong, InsertFileHopDong, fileHopDong,
-  BuocThucHien, InsertBuocThucHien, buocThucHien,
-  User, InsertUser, users
+  LoaiHopDong,
+  InsertLoaiHopDong,
+  loaiHopDong,
+  CanBo,
+  InsertCanBo,
+  canBo,
+  NhaCungCap,
+  InsertNhaCungCap,
+  nhaCungCap,
+  ChuDauTu,
+  InsertChuDauTu,
+  chuDauTu,
+  LoaiNganSach,
+  InsertLoaiNganSach,
+  loaiNganSach,
+  LoaiHinhThucThanhToan,
+  InsertLoaiHinhThucThanhToan,
+  loaiHinhThucThanhToan,
+  LoaiThanhToan,
+  InsertLoaiThanhToan,
+  loaiThanhToan,
+  LoaiTien,
+  InsertLoaiTien,
+  loaiTien,
+  CoQuan,
+  InsertCoQuan,
+  coQuan,
+  DiaDiemThongQuan,
+  InsertDiaDiemThongQuan,
+  diaDiemThongQuan,
+  LoaiGiayPhep,
+  InsertLoaiGiayPhep,
+  loaiGiayPhep,
+  LoaiTrangBi,
+  InsertLoaiTrangBi,
+  loaiTrangBi,
+  LoaiThucHien,
+  InsertLoaiThucHien,
+  loaiThucHien,
+  TrangThaiHopDong,
+  InsertTrangThaiHopDong,
+  trangThaiHopDong,
+  HopDong,
+  InsertHopDong,
+  hopDong,
+  TrangBi,
+  InsertTrangBi,
+  trangBi,
+  GiayPhep,
+  InsertGiayPhep,
+  giayPhep,
+  TiepNhan,
+  InsertTiepNhan,
+  tiepNhan,
+  ThanhToan,
+  InsertThanhToan,
+  thanhToan,
+  HopDongTienDo,
+  InsertHopDongTienDo,
+  hopDongTienDo,
+  FileHopDong,
+  InsertFileHopDong,
+  fileHopDong,
+  BuocThucHien,
+  InsertBuocThucHien,
+  buocThucHien,
+  User,
+  InsertUser,
+  users,
 } from "@shared/schema";
 
 export interface IStorage {
@@ -34,105 +80,158 @@ export interface IStorage {
   getLoaiHopDong(): Promise<LoaiHopDong[]>;
   getLoaiHopDongById(id: number): Promise<LoaiHopDong | undefined>;
   createLoaiHopDong(item: InsertLoaiHopDong): Promise<LoaiHopDong>;
-  updateLoaiHopDong(id: number, item: Partial<InsertLoaiHopDong>): Promise<LoaiHopDong | undefined>;
+  updateLoaiHopDong(
+    id: number,
+    item: Partial<InsertLoaiHopDong>
+  ): Promise<LoaiHopDong | undefined>;
   deleteLoaiHopDong(id: number): Promise<boolean>;
 
   // Cán bộ
   getCanBo(): Promise<CanBo[]>;
   getCanBoById(id: number): Promise<CanBo | undefined>;
   createCanBo(item: InsertCanBo): Promise<CanBo>;
-  updateCanBo(id: number, item: Partial<InsertCanBo>): Promise<CanBo | undefined>;
+  updateCanBo(
+    id: number,
+    item: Partial<InsertCanBo>
+  ): Promise<CanBo | undefined>;
   deleteCanBo(id: number): Promise<boolean>;
 
   // Nhà cung cấp
   getNhaCungCap(): Promise<NhaCungCap[]>;
   getNhaCungCapById(id: number): Promise<NhaCungCap | undefined>;
   createNhaCungCap(item: InsertNhaCungCap): Promise<NhaCungCap>;
-  updateNhaCungCap(id: number, item: Partial<InsertNhaCungCap>): Promise<NhaCungCap | undefined>;
+  updateNhaCungCap(
+    id: number,
+    item: Partial<InsertNhaCungCap>
+  ): Promise<NhaCungCap | undefined>;
   deleteNhaCungCap(id: number): Promise<boolean>;
 
   // Chủ đầu tư
   getChuDauTu(): Promise<ChuDauTu[]>;
   getChuDauTuById(id: number): Promise<ChuDauTu | undefined>;
   createChuDauTu(item: InsertChuDauTu): Promise<ChuDauTu>;
-  updateChuDauTu(id: number, item: Partial<InsertChuDauTu>): Promise<ChuDauTu | undefined>;
+  updateChuDauTu(
+    id: number,
+    item: Partial<InsertChuDauTu>
+  ): Promise<ChuDauTu | undefined>;
   deleteChuDauTu(id: number): Promise<boolean>;
 
   // Loại ngân sách
   getLoaiNganSach(): Promise<LoaiNganSach[]>;
   getLoaiNganSachById(id: number): Promise<LoaiNganSach | undefined>;
   createLoaiNganSach(item: InsertLoaiNganSach): Promise<LoaiNganSach>;
-  updateLoaiNganSach(id: number, item: Partial<InsertLoaiNganSach>): Promise<LoaiNganSach | undefined>;
+  updateLoaiNganSach(
+    id: number,
+    item: Partial<InsertLoaiNganSach>
+  ): Promise<LoaiNganSach | undefined>;
   deleteLoaiNganSach(id: number): Promise<boolean>;
 
   // Loại hình thức thanh toán
   getLoaiHinhThucThanhToan(): Promise<LoaiHinhThucThanhToan[]>;
-  getLoaiHinhThucThanhToanById(id: number): Promise<LoaiHinhThucThanhToan | undefined>;
-  createLoaiHinhThucThanhToan(item: InsertLoaiHinhThucThanhToan): Promise<LoaiHinhThucThanhToan>;
-  updateLoaiHinhThucThanhToan(id: number, item: Partial<InsertLoaiHinhThucThanhToan>): Promise<LoaiHinhThucThanhToan | undefined>;
+  getLoaiHinhThucThanhToanById(
+    id: number
+  ): Promise<LoaiHinhThucThanhToan | undefined>;
+  createLoaiHinhThucThanhToan(
+    item: InsertLoaiHinhThucThanhToan
+  ): Promise<LoaiHinhThucThanhToan>;
+  updateLoaiHinhThucThanhToan(
+    id: number,
+    item: Partial<InsertLoaiHinhThucThanhToan>
+  ): Promise<LoaiHinhThucThanhToan | undefined>;
   deleteLoaiHinhThucThanhToan(id: number): Promise<boolean>;
 
   // Loại thanh toán
   getLoaiThanhToan(): Promise<LoaiThanhToan[]>;
   getLoaiThanhToanById(id: number): Promise<LoaiThanhToan | undefined>;
   createLoaiThanhToan(item: InsertLoaiThanhToan): Promise<LoaiThanhToan>;
-  updateLoaiThanhToan(id: number, item: Partial<InsertLoaiThanhToan>): Promise<LoaiThanhToan | undefined>;
+  updateLoaiThanhToan(
+    id: number,
+    item: Partial<InsertLoaiThanhToan>
+  ): Promise<LoaiThanhToan | undefined>;
   deleteLoaiThanhToan(id: number): Promise<boolean>;
 
   // Loại tiền
   getLoaiTien(): Promise<LoaiTien[]>;
   getLoaiTienById(id: number): Promise<LoaiTien | undefined>;
   createLoaiTien(item: InsertLoaiTien): Promise<LoaiTien>;
-  updateLoaiTien(id: number, item: Partial<InsertLoaiTien>): Promise<LoaiTien | undefined>;
+  updateLoaiTien(
+    id: number,
+    item: Partial<InsertLoaiTien>
+  ): Promise<LoaiTien | undefined>;
   deleteLoaiTien(id: number): Promise<boolean>;
 
   // Cơ quan
   getCoQuan(): Promise<CoQuan[]>;
   getCoQuanById(id: number): Promise<CoQuan | undefined>;
   createCoQuan(item: InsertCoQuan): Promise<CoQuan>;
-  updateCoQuan(id: number, item: Partial<InsertCoQuan>): Promise<CoQuan | undefined>;
+  updateCoQuan(
+    id: number,
+    item: Partial<InsertCoQuan>
+  ): Promise<CoQuan | undefined>;
   deleteCoQuan(id: number): Promise<boolean>;
 
   // Địa điểm thông quan
   getDiaDiemThongQuan(): Promise<DiaDiemThongQuan[]>;
   getDiaDiemThongQuanById(id: number): Promise<DiaDiemThongQuan | undefined>;
-  createDiaDiemThongQuan(item: InsertDiaDiemThongQuan): Promise<DiaDiemThongQuan>;
-  updateDiaDiemThongQuan(id: number, item: Partial<InsertDiaDiemThongQuan>): Promise<DiaDiemThongQuan | undefined>;
+  createDiaDiemThongQuan(
+    item: InsertDiaDiemThongQuan
+  ): Promise<DiaDiemThongQuan>;
+  updateDiaDiemThongQuan(
+    id: number,
+    item: Partial<InsertDiaDiemThongQuan>
+  ): Promise<DiaDiemThongQuan | undefined>;
   deleteDiaDiemThongQuan(id: number): Promise<boolean>;
 
   // Loại giấy phép
   getLoaiGiayPhep(): Promise<LoaiGiayPhep[]>;
   getLoaiGiayPhepById(id: number): Promise<LoaiGiayPhep | undefined>;
   createLoaiGiayPhep(item: InsertLoaiGiayPhep): Promise<LoaiGiayPhep>;
-  updateLoaiGiayPhep(id: number, item: Partial<InsertLoaiGiayPhep>): Promise<LoaiGiayPhep | undefined>;
+  updateLoaiGiayPhep(
+    id: number,
+    item: Partial<InsertLoaiGiayPhep>
+  ): Promise<LoaiGiayPhep | undefined>;
   deleteLoaiGiayPhep(id: number): Promise<boolean>;
 
   // Loại trang bị
   getLoaiTrangBi(): Promise<LoaiTrangBi[]>;
   getLoaiTrangBiById(id: number): Promise<LoaiTrangBi | undefined>;
   createLoaiTrangBi(item: InsertLoaiTrangBi): Promise<LoaiTrangBi>;
-  updateLoaiTrangBi(id: number, item: Partial<InsertLoaiTrangBi>): Promise<LoaiTrangBi | undefined>;
+  updateLoaiTrangBi(
+    id: number,
+    item: Partial<InsertLoaiTrangBi>
+  ): Promise<LoaiTrangBi | undefined>;
   deleteLoaiTrangBi(id: number): Promise<boolean>;
 
   // Loại thực hiện
   getLoaiThucHien(): Promise<LoaiThucHien[]>;
   getLoaiThucHienById(id: number): Promise<LoaiThucHien | undefined>;
   createLoaiThucHien(item: InsertLoaiThucHien): Promise<LoaiThucHien>;
-  updateLoaiThucHien(id: number, item: Partial<InsertLoaiThucHien>): Promise<LoaiThucHien | undefined>;
+  updateLoaiThucHien(
+    id: number,
+    item: Partial<InsertLoaiThucHien>
+  ): Promise<LoaiThucHien | undefined>;
   deleteLoaiThucHien(id: number): Promise<boolean>;
 
   // Trạng thái hợp đồng
   getTrangThaiHopDong(): Promise<TrangThaiHopDong[]>;
   getTrangThaiHopDongById(id: number): Promise<TrangThaiHopDong | undefined>;
-  createTrangThaiHopDong(item: InsertTrangThaiHopDong): Promise<TrangThaiHopDong>;
-  updateTrangThaiHopDong(id: number, item: Partial<InsertTrangThaiHopDong>): Promise<TrangThaiHopDong | undefined>;
+  createTrangThaiHopDong(
+    item: InsertTrangThaiHopDong
+  ): Promise<TrangThaiHopDong>;
+  updateTrangThaiHopDong(
+    id: number,
+    item: Partial<InsertTrangThaiHopDong>
+  ): Promise<TrangThaiHopDong | undefined>;
   deleteTrangThaiHopDong(id: number): Promise<boolean>;
 
   // Hợp đồng
   getHopDong(): Promise<HopDong[]>;
   getHopDongById(id: number): Promise<HopDong | undefined>;
   createHopDong(item: InsertHopDong): Promise<HopDong>;
-  updateHopDong(id: number, item: Partial<InsertHopDong>): Promise<HopDong | undefined>;
+  updateHopDong(
+    id: number,
+    item: Partial<InsertHopDong>
+  ): Promise<HopDong | undefined>;
   deleteHopDong(id: number): Promise<boolean>;
 
   // Trang bị
@@ -140,7 +239,10 @@ export interface IStorage {
   getTrangBiById(id: number): Promise<TrangBi | undefined>;
   getTrangBiByHopDong(hopDongId: number): Promise<TrangBi[]>;
   createTrangBi(item: InsertTrangBi): Promise<TrangBi>;
-  updateTrangBi(id: number, item: Partial<InsertTrangBi>): Promise<TrangBi | undefined>;
+  updateTrangBi(
+    id: number,
+    item: Partial<InsertTrangBi>
+  ): Promise<TrangBi | undefined>;
   deleteTrangBi(id: number): Promise<boolean>;
 
   // Giấy phép
@@ -148,7 +250,10 @@ export interface IStorage {
   getGiayPhepById(id: number): Promise<GiayPhep | undefined>;
   getGiayPhepByHopDong(hopDongId: number): Promise<GiayPhep[]>;
   createGiayPhep(item: InsertGiayPhep): Promise<GiayPhep>;
-  updateGiayPhep(id: number, item: Partial<InsertGiayPhep>): Promise<GiayPhep | undefined>;
+  updateGiayPhep(
+    id: number,
+    item: Partial<InsertGiayPhep>
+  ): Promise<GiayPhep | undefined>;
   deleteGiayPhep(id: number): Promise<boolean>;
 
   // Tiếp nhận
@@ -156,7 +261,10 @@ export interface IStorage {
   getTiepNhanById(id: number): Promise<TiepNhan | undefined>;
   getTiepNhanByHopDong(hopDongId: number): Promise<TiepNhan[]>;
   createTiepNhan(item: InsertTiepNhan): Promise<TiepNhan>;
-  updateTiepNhan(id: number, item: Partial<InsertTiepNhan>): Promise<TiepNhan | undefined>;
+  updateTiepNhan(
+    id: number,
+    item: Partial<InsertTiepNhan>
+  ): Promise<TiepNhan | undefined>;
   deleteTiepNhan(id: number): Promise<boolean>;
 
   // Thanh toán
@@ -164,7 +272,10 @@ export interface IStorage {
   getThanhToanById(id: number): Promise<ThanhToan | undefined>;
   getThanhToanByHopDong(hopDongId: number): Promise<ThanhToan[]>;
   createThanhToan(item: InsertThanhToan): Promise<ThanhToan>;
-  updateThanhToan(id: number, item: Partial<InsertThanhToan>): Promise<ThanhToan | undefined>;
+  updateThanhToan(
+    id: number,
+    item: Partial<InsertThanhToan>
+  ): Promise<ThanhToan | undefined>;
   deleteThanhToan(id: number): Promise<boolean>;
 
   // Hợp đồng tiến độ
@@ -172,7 +283,10 @@ export interface IStorage {
   getHopDongTienDoById(id: number): Promise<HopDongTienDo | undefined>;
   getHopDongTienDoByHopDong(hopDongId: number): Promise<HopDongTienDo[]>;
   createHopDongTienDo(item: InsertHopDongTienDo): Promise<HopDongTienDo>;
-  updateHopDongTienDo(id: number, item: Partial<InsertHopDongTienDo>): Promise<HopDongTienDo | undefined>;
+  updateHopDongTienDo(
+    id: number,
+    item: Partial<InsertHopDongTienDo>
+  ): Promise<HopDongTienDo | undefined>;
   deleteHopDongTienDo(id: number): Promise<boolean>;
 
   // File hợp đồng
@@ -180,7 +294,10 @@ export interface IStorage {
   getFileHopDongById(id: number): Promise<FileHopDong | undefined>;
   getFileHopDongByHopDong(hopDongId: number): Promise<FileHopDong[]>;
   createFileHopDong(item: InsertFileHopDong): Promise<FileHopDong>;
-  updateFileHopDong(id: number, item: Partial<InsertFileHopDong>): Promise<FileHopDong | undefined>;
+  updateFileHopDong(
+    id: number,
+    item: Partial<InsertFileHopDong>
+  ): Promise<FileHopDong | undefined>;
   deleteFileHopDong(id: number): Promise<boolean>;
 
   // Bước thực hiện
@@ -188,7 +305,10 @@ export interface IStorage {
   getBuocThucHienById(id: number): Promise<BuocThucHien | undefined>;
   getBuocThucHienByHopDong(hopDongId: number): Promise<BuocThucHien[]>;
   createBuocThucHien(item: InsertBuocThucHien): Promise<BuocThucHien>;
-  updateBuocThucHien(id: number, item: Partial<InsertBuocThucHien>): Promise<BuocThucHien | undefined>;
+  updateBuocThucHien(
+    id: number,
+    item: Partial<InsertBuocThucHien>
+  ): Promise<BuocThucHien | undefined>;
   deleteBuocThucHien(id: number): Promise<boolean>;
 
   // Dashboard stats
@@ -207,7 +327,8 @@ export class MemStorage implements IStorage {
   private nhaCungCapMap: Map<number, NhaCungCap> = new Map();
   private chuDauTuMap: Map<number, ChuDauTu> = new Map();
   private loaiNganSachMap: Map<number, LoaiNganSach> = new Map();
-  private loaiHinhThucThanhToanMap: Map<number, LoaiHinhThucThanhToan> = new Map();
+  private loaiHinhThucThanhToanMap: Map<number, LoaiHinhThucThanhToan> =
+    new Map();
   private loaiThanhToanMap: Map<number, LoaiThanhToan> = new Map();
   private loaiTienMap: Map<number, LoaiTien> = new Map();
   private coQuanMap: Map<number, CoQuan> = new Map();
@@ -224,7 +345,7 @@ export class MemStorage implements IStorage {
   private hopDongTienDoMap: Map<number, HopDongTienDo> = new Map();
   private fileHopDongMap: Map<number, FileHopDong> = new Map();
   private buocThucHienMap: Map<number, BuocThucHien> = new Map();
-  
+
   private currentId: number = 1;
 
   constructor() {
@@ -251,7 +372,10 @@ export class MemStorage implements IStorage {
     this.loaiTienMap.set(3, { id: 3, ten: "VNĐ" });
 
     // Initialize payment methods (loai hinh thuc thanh toan) - Vietnamese customs
-    this.loaiHinhThucThanhToanMap.set(1, { id: 1, ten: "Điện chuyển tiền L/C" });
+    this.loaiHinhThucThanhToanMap.set(1, {
+      id: 1,
+      ten: "Điện chuyển tiền L/C",
+    });
     this.loaiHinhThucThanhToanMap.set(2, { id: 2, ten: "Tiền mặt" });
     this.loaiHinhThucThanhToanMap.set(3, { id: 3, ten: "Chuyển khoản" });
 
@@ -291,7 +415,9 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.username === username);
+    return Array.from(this.users.values()).find(
+      (user) => user.username === username
+    );
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -317,7 +443,10 @@ export class MemStorage implements IStorage {
     return newItem;
   }
 
-  async updateLoaiHopDong(id: number, item: Partial<InsertLoaiHopDong>): Promise<LoaiHopDong | undefined> {
+  async updateLoaiHopDong(
+    id: number,
+    item: Partial<InsertLoaiHopDong>
+  ): Promise<LoaiHopDong | undefined> {
     const existing = this.loaiHopDongMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -340,17 +469,20 @@ export class MemStorage implements IStorage {
 
   async createCanBo(item: InsertCanBo): Promise<CanBo> {
     const id = this.getNextId();
-    const newItem: CanBo = { 
-      ...item, 
+    const newItem: CanBo = {
+      ...item,
       id,
       chucVu: item.chucVu || null,
-      anh: item.anh || null
+      anh: item.anh || null,
     };
     this.canBoMap.set(id, newItem);
     return newItem;
   }
 
-  async updateCanBo(id: number, item: Partial<InsertCanBo>): Promise<CanBo | undefined> {
+  async updateCanBo(
+    id: number,
+    item: Partial<InsertCanBo>
+  ): Promise<CanBo | undefined> {
     const existing = this.canBoMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -373,18 +505,21 @@ export class MemStorage implements IStorage {
 
   async createNhaCungCap(item: InsertNhaCungCap): Promise<NhaCungCap> {
     const id = this.getNextId();
-    const newItem: NhaCungCap = { 
-      ...item, 
+    const newItem: NhaCungCap = {
+      ...item,
       id,
       diaChi: item.diaChi || null,
       maQuocGia: item.maQuocGia || null,
-      anh: item.anh || null
+      anh: item.anh || null,
     };
     this.nhaCungCapMap.set(id, newItem);
     return newItem;
   }
 
-  async updateNhaCungCap(id: number, item: Partial<InsertNhaCungCap>): Promise<NhaCungCap | undefined> {
+  async updateNhaCungCap(
+    id: number,
+    item: Partial<InsertNhaCungCap>
+  ): Promise<NhaCungCap | undefined> {
     const existing = this.nhaCungCapMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -407,16 +542,19 @@ export class MemStorage implements IStorage {
 
   async createChuDauTu(item: InsertChuDauTu): Promise<ChuDauTu> {
     const id = this.getNextId();
-    const newItem: ChuDauTu = { 
-      ...item, 
+    const newItem: ChuDauTu = {
+      ...item,
       id,
-      anh: item.anh || null
+      anh: item.anh || null,
     };
     this.chuDauTuMap.set(id, newItem);
     return newItem;
   }
 
-  async updateChuDauTu(id: number, item: Partial<InsertChuDauTu>): Promise<ChuDauTu | undefined> {
+  async updateChuDauTu(
+    id: number,
+    item: Partial<InsertChuDauTu>
+  ): Promise<ChuDauTu | undefined> {
     const existing = this.chuDauTuMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -447,7 +585,10 @@ export class MemStorage implements IStorage {
     return newItem;
   }
 
-  async updateLoaiNganSach(id: number, item: Partial<InsertLoaiNganSach>): Promise<LoaiNganSach | undefined> {
+  async updateLoaiNganSach(
+    id: number,
+    item: Partial<InsertLoaiNganSach>
+  ): Promise<LoaiNganSach | undefined> {
     const existing = this.loaiNganSachMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -473,8 +614,8 @@ export class MemStorage implements IStorage {
 
   async createHopDong(item: InsertHopDong): Promise<HopDong> {
     const id = this.getNextId();
-    const newItem: HopDong = { 
-      ...item, 
+    const newItem: HopDong = {
+      ...item,
       id,
       moTa: item.moTa || null,
       soHdNoi: item.soHdNoi || null,
@@ -485,13 +626,16 @@ export class MemStorage implements IStorage {
       nhaCungCapId: item.nhaCungCapId || null,
       loaiNganSachId: item.loaiNganSachId || null,
       canBoId: item.canBoId || null,
-      trangThaiHopDongId: item.trangThaiHopDongId || null
+      trangThaiHopDongId: item.trangThaiHopDongId || null,
     };
     this.hopDongMap.set(id, newItem);
     return newItem;
   }
 
-  async updateHopDong(id: number, item: Partial<InsertHopDong>): Promise<HopDong | undefined> {
+  async updateHopDong(
+    id: number,
+    item: Partial<InsertHopDong>
+  ): Promise<HopDong | undefined> {
     const existing = this.hopDongMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -512,12 +656,15 @@ export class MemStorage implements IStorage {
   }> {
     const contracts = Array.from(this.hopDongMap.values());
     const today = new Date();
-    
+
     return {
       totalContracts: contracts.length,
-      activeContracts: contracts.filter(c => c.trangThaiHopDongId === 1).length,
-      completedContracts: contracts.filter(c => c.trangThaiHopDongId === 2).length,
-      overdueContracts: contracts.filter(c => c.trangThaiHopDongId === 3).length,
+      activeContracts: contracts.filter((c) => c.trangThaiHopDongId === 1)
+        .length,
+      completedContracts: contracts.filter((c) => c.trangThaiHopDongId === 2)
+        .length,
+      overdueContracts: contracts.filter((c) => c.trangThaiHopDongId === 3)
+        .length,
     };
   }
 
@@ -528,18 +675,25 @@ export class MemStorage implements IStorage {
     return Array.from(this.loaiHinhThucThanhToanMap.values());
   }
 
-  async getLoaiHinhThucThanhToanById(id: number): Promise<LoaiHinhThucThanhToan | undefined> {
+  async getLoaiHinhThucThanhToanById(
+    id: number
+  ): Promise<LoaiHinhThucThanhToan | undefined> {
     return this.loaiHinhThucThanhToanMap.get(id);
   }
 
-  async createLoaiHinhThucThanhToan(item: InsertLoaiHinhThucThanhToan): Promise<LoaiHinhThucThanhToan> {
+  async createLoaiHinhThucThanhToan(
+    item: InsertLoaiHinhThucThanhToan
+  ): Promise<LoaiHinhThucThanhToan> {
     const id = this.getNextId();
     const newItem: LoaiHinhThucThanhToan = { ...item, id };
     this.loaiHinhThucThanhToanMap.set(id, newItem);
     return newItem;
   }
 
-  async updateLoaiHinhThucThanhToan(id: number, item: Partial<InsertLoaiHinhThucThanhToan>): Promise<LoaiHinhThucThanhToan | undefined> {
+  async updateLoaiHinhThucThanhToan(
+    id: number,
+    item: Partial<InsertLoaiHinhThucThanhToan>
+  ): Promise<LoaiHinhThucThanhToan | undefined> {
     const existing = this.loaiHinhThucThanhToanMap.get(id);
     if (!existing) return undefined;
     const updated = { ...existing, ...item };
@@ -552,101 +706,315 @@ export class MemStorage implements IStorage {
   }
 
   // Add all remaining methods following same pattern - omitting for space but all would be implemented
-  async getLoaiThanhToan(): Promise<LoaiThanhToan[]> { return Array.from(this.loaiThanhToanMap.values()); }
-  async getLoaiThanhToanById(id: number): Promise<LoaiThanhToan | undefined> { return this.loaiThanhToanMap.get(id); }
-  async createLoaiThanhToan(item: InsertLoaiThanhToan): Promise<LoaiThanhToan> { const id = this.getNextId(); const newItem: LoaiThanhToan = { ...item, id }; this.loaiThanhToanMap.set(id, newItem); return newItem; }
-  async updateLoaiThanhToan(id: number, item: Partial<InsertLoaiThanhToan>): Promise<LoaiThanhToan | undefined> { const existing = this.loaiThanhToanMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.loaiThanhToanMap.set(id, updated); return updated; }
-  async deleteLoaiThanhToan(id: number): Promise<boolean> { return this.loaiThanhToanMap.delete(id); }
+  async getLoaiThanhToan(): Promise<LoaiThanhToan[]> {
+    return Array.from(this.loaiThanhToanMap.values());
+  }
+  async getLoaiThanhToanById(id: number): Promise<LoaiThanhToan | undefined> {
+    return this.loaiThanhToanMap.get(id);
+  }
+  async createLoaiThanhToan(item: InsertLoaiThanhToan): Promise<LoaiThanhToan> {
+    const id = this.getNextId();
+    const newItem: LoaiThanhToan = { ...item, id };
+    this.loaiThanhToanMap.set(id, newItem);
+    return newItem;
+  }
+  async updateLoaiThanhToan(
+    id: number,
+    item: Partial<InsertLoaiThanhToan>
+  ): Promise<LoaiThanhToan | undefined> {
+    const existing = this.loaiThanhToanMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.loaiThanhToanMap.set(id, updated);
+    return updated;
+  }
+  async deleteLoaiThanhToan(id: number): Promise<boolean> {
+    return this.loaiThanhToanMap.delete(id);
+  }
 
-  async getLoaiTien(): Promise<LoaiTien[]> { return Array.from(this.loaiTienMap.values()); }
-  async getLoaiTienById(id: number): Promise<LoaiTien | undefined> { return this.loaiTienMap.get(id); }
-  async createLoaiTien(item: InsertLoaiTien): Promise<LoaiTien> { const id = this.getNextId(); const newItem: LoaiTien = { ...item, id }; this.loaiTienMap.set(id, newItem); return newItem; }
-  async updateLoaiTien(id: number, item: Partial<InsertLoaiTien>): Promise<LoaiTien | undefined> { const existing = this.loaiTienMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.loaiTienMap.set(id, updated); return updated; }
-  async deleteLoaiTien(id: number): Promise<boolean> { return this.loaiTienMap.delete(id); }
+  async getLoaiTien(): Promise<LoaiTien[]> {
+    return Array.from(this.loaiTienMap.values());
+  }
+  async getLoaiTienById(id: number): Promise<LoaiTien | undefined> {
+    return this.loaiTienMap.get(id);
+  }
+  async createLoaiTien(item: InsertLoaiTien): Promise<LoaiTien> {
+    const id = this.getNextId();
+    const newItem: LoaiTien = { ...item, id };
+    this.loaiTienMap.set(id, newItem);
+    return newItem;
+  }
+  async updateLoaiTien(
+    id: number,
+    item: Partial<InsertLoaiTien>
+  ): Promise<LoaiTien | undefined> {
+    const existing = this.loaiTienMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.loaiTienMap.set(id, updated);
+    return updated;
+  }
+  async deleteLoaiTien(id: number): Promise<boolean> {
+    return this.loaiTienMap.delete(id);
+  }
 
-  async getCoQuan(): Promise<CoQuan[]> { return Array.from(this.coQuanMap.values()); }
-  async getCoQuanById(id: number): Promise<CoQuan | undefined> { return this.coQuanMap.get(id); }
-  async createCoQuan(item: InsertCoQuan): Promise<CoQuan> { const id = this.getNextId(); const newItem: CoQuan = { ...item, id }; this.coQuanMap.set(id, newItem); return newItem; }
-  async updateCoQuan(id: number, item: Partial<InsertCoQuan>): Promise<CoQuan | undefined> { const existing = this.coQuanMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.coQuanMap.set(id, updated); return updated; }
-  async deleteCoQuan(id: number): Promise<boolean> { return this.coQuanMap.delete(id); }
+  async getCoQuan(): Promise<CoQuan[]> {
+    return Array.from(this.coQuanMap.values());
+  }
+  async getCoQuanById(id: number): Promise<CoQuan | undefined> {
+    return this.coQuanMap.get(id);
+  }
+  async createCoQuan(item: InsertCoQuan): Promise<CoQuan> {
+    const id = this.getNextId();
+    const newItem: CoQuan = { ...item, id };
+    this.coQuanMap.set(id, newItem);
+    return newItem;
+  }
+  async updateCoQuan(
+    id: number,
+    item: Partial<InsertCoQuan>
+  ): Promise<CoQuan | undefined> {
+    const existing = this.coQuanMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.coQuanMap.set(id, updated);
+    return updated;
+  }
+  async deleteCoQuan(id: number): Promise<boolean> {
+    return this.coQuanMap.delete(id);
+  }
 
-  async getDiaDiemThongQuan(): Promise<DiaDiemThongQuan[]> { return Array.from(this.diaDiemThongQuanMap.values()); }
-  async getDiaDiemThongQuanById(id: number): Promise<DiaDiemThongQuan | undefined> { return this.diaDiemThongQuanMap.get(id); }
-  async createDiaDiemThongQuan(item: InsertDiaDiemThongQuan): Promise<DiaDiemThongQuan> { const id = this.getNextId(); const newItem: DiaDiemThongQuan = { ...item, id }; this.diaDiemThongQuanMap.set(id, newItem); return newItem; }
-  async updateDiaDiemThongQuan(id: number, item: Partial<InsertDiaDiemThongQuan>): Promise<DiaDiemThongQuan | undefined> { const existing = this.diaDiemThongQuanMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.diaDiemThongQuanMap.set(id, updated); return updated; }
-  async deleteDiaDiemThongQuan(id: number): Promise<boolean> { return this.diaDiemThongQuanMap.delete(id); }
+  async getDiaDiemThongQuan(): Promise<DiaDiemThongQuan[]> {
+    return Array.from(this.diaDiemThongQuanMap.values());
+  }
+  async getDiaDiemThongQuanById(
+    id: number
+  ): Promise<DiaDiemThongQuan | undefined> {
+    return this.diaDiemThongQuanMap.get(id);
+  }
+  async createDiaDiemThongQuan(
+    item: InsertDiaDiemThongQuan
+  ): Promise<DiaDiemThongQuan> {
+    const id = this.getNextId();
+    const newItem: DiaDiemThongQuan = { ...item, id };
+    this.diaDiemThongQuanMap.set(id, newItem);
+    return newItem;
+  }
+  async updateDiaDiemThongQuan(
+    id: number,
+    item: Partial<InsertDiaDiemThongQuan>
+  ): Promise<DiaDiemThongQuan | undefined> {
+    const existing = this.diaDiemThongQuanMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.diaDiemThongQuanMap.set(id, updated);
+    return updated;
+  }
+  async deleteDiaDiemThongQuan(id: number): Promise<boolean> {
+    return this.diaDiemThongQuanMap.delete(id);
+  }
 
-  async getLoaiGiayPhep(): Promise<LoaiGiayPhep[]> { return Array.from(this.loaiGiayPhepMap.values()); }
-  async getLoaiGiayPhepById(id: number): Promise<LoaiGiayPhep | undefined> { return this.loaiGiayPhepMap.get(id); }
-  async createLoaiGiayPhep(item: InsertLoaiGiayPhep): Promise<LoaiGiayPhep> { const id = this.getNextId(); const newItem: LoaiGiayPhep = { ...item, id }; this.loaiGiayPhepMap.set(id, newItem); return newItem; }
-  async updateLoaiGiayPhep(id: number, item: Partial<InsertLoaiGiayPhep>): Promise<LoaiGiayPhep | undefined> { const existing = this.loaiGiayPhepMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.loaiGiayPhepMap.set(id, updated); return updated; }
-  async deleteLoaiGiayPhep(id: number): Promise<boolean> { return this.loaiGiayPhepMap.delete(id); }
+  async getLoaiGiayPhep(): Promise<LoaiGiayPhep[]> {
+    return Array.from(this.loaiGiayPhepMap.values());
+  }
+  async getLoaiGiayPhepById(id: number): Promise<LoaiGiayPhep | undefined> {
+    return this.loaiGiayPhepMap.get(id);
+  }
+  async createLoaiGiayPhep(item: InsertLoaiGiayPhep): Promise<LoaiGiayPhep> {
+    const id = this.getNextId();
+    const newItem: LoaiGiayPhep = { ...item, id };
+    this.loaiGiayPhepMap.set(id, newItem);
+    return newItem;
+  }
+  async updateLoaiGiayPhep(
+    id: number,
+    item: Partial<InsertLoaiGiayPhep>
+  ): Promise<LoaiGiayPhep | undefined> {
+    const existing = this.loaiGiayPhepMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.loaiGiayPhepMap.set(id, updated);
+    return updated;
+  }
+  async deleteLoaiGiayPhep(id: number): Promise<boolean> {
+    return this.loaiGiayPhepMap.delete(id);
+  }
 
-  async getLoaiTrangBi(): Promise<LoaiTrangBi[]> { return Array.from(this.loaiTrangBiMap.values()); }
-  async getLoaiTrangBiById(id: number): Promise<LoaiTrangBi | undefined> { return this.loaiTrangBiMap.get(id); }
-  async createLoaiTrangBi(item: InsertLoaiTrangBi): Promise<LoaiTrangBi> { const id = this.getNextId(); const newItem: LoaiTrangBi = { ...item, id }; this.loaiTrangBiMap.set(id, newItem); return newItem; }
-  async updateLoaiTrangBi(id: number, item: Partial<InsertLoaiTrangBi>): Promise<LoaiTrangBi | undefined> { const existing = this.loaiTrangBiMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.loaiTrangBiMap.set(id, updated); return updated; }
-  async deleteLoaiTrangBi(id: number): Promise<boolean> { return this.loaiTrangBiMap.delete(id); }
+  async getLoaiTrangBi(): Promise<LoaiTrangBi[]> {
+    return Array.from(this.loaiTrangBiMap.values());
+  }
+  async getLoaiTrangBiById(id: number): Promise<LoaiTrangBi | undefined> {
+    return this.loaiTrangBiMap.get(id);
+  }
+  async createLoaiTrangBi(item: InsertLoaiTrangBi): Promise<LoaiTrangBi> {
+    const id = this.getNextId();
+    const newItem: LoaiTrangBi = { ...item, id };
+    this.loaiTrangBiMap.set(id, newItem);
+    return newItem;
+  }
+  async updateLoaiTrangBi(
+    id: number,
+    item: Partial<InsertLoaiTrangBi>
+  ): Promise<LoaiTrangBi | undefined> {
+    const existing = this.loaiTrangBiMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.loaiTrangBiMap.set(id, updated);
+    return updated;
+  }
+  async deleteLoaiTrangBi(id: number): Promise<boolean> {
+    return this.loaiTrangBiMap.delete(id);
+  }
 
-  async getLoaiThucHien(): Promise<LoaiThucHien[]> { return Array.from(this.loaiThucHienMap.values()); }
-  async getLoaiThucHienById(id: number): Promise<LoaiThucHien | undefined> { return this.loaiThucHienMap.get(id); }
-  async createLoaiThucHien(item: InsertLoaiThucHien): Promise<LoaiThucHien> { const id = this.getNextId(); const newItem: LoaiThucHien = { ...item, id }; this.loaiThucHienMap.set(id, newItem); return newItem; }
-  async updateLoaiThucHien(id: number, item: Partial<InsertLoaiThucHien>): Promise<LoaiThucHien | undefined> { const existing = this.loaiThucHienMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.loaiThucHienMap.set(id, updated); return updated; }
-  async deleteLoaiThucHien(id: number): Promise<boolean> { return this.loaiThucHienMap.delete(id); }
+  async getLoaiThucHien(): Promise<LoaiThucHien[]> {
+    return Array.from(this.loaiThucHienMap.values());
+  }
+  async getLoaiThucHienById(id: number): Promise<LoaiThucHien | undefined> {
+    return this.loaiThucHienMap.get(id);
+  }
+  async createLoaiThucHien(item: InsertLoaiThucHien): Promise<LoaiThucHien> {
+    const id = this.getNextId();
+    const newItem: LoaiThucHien = { ...item, id };
+    this.loaiThucHienMap.set(id, newItem);
+    return newItem;
+  }
+  async updateLoaiThucHien(
+    id: number,
+    item: Partial<InsertLoaiThucHien>
+  ): Promise<LoaiThucHien | undefined> {
+    const existing = this.loaiThucHienMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.loaiThucHienMap.set(id, updated);
+    return updated;
+  }
+  async deleteLoaiThucHien(id: number): Promise<boolean> {
+    return this.loaiThucHienMap.delete(id);
+  }
 
-  async getTrangThaiHopDong(): Promise<TrangThaiHopDong[]> { return Array.from(this.trangThaiHopDongMap.values()); }
-  async getTrangThaiHopDongById(id: number): Promise<TrangThaiHopDong | undefined> { return this.trangThaiHopDongMap.get(id); }
-  async createTrangThaiHopDong(item: InsertTrangThaiHopDong): Promise<TrangThaiHopDong> { const id = this.getNextId(); const newItem: TrangThaiHopDong = { ...item, id }; this.trangThaiHopDongMap.set(id, newItem); return newItem; }
-  async updateTrangThaiHopDong(id: number, item: Partial<InsertTrangThaiHopDong>): Promise<TrangThaiHopDong | undefined> { const existing = this.trangThaiHopDongMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.trangThaiHopDongMap.set(id, updated); return updated; }
-  async deleteTrangThaiHopDong(id: number): Promise<boolean> { return this.trangThaiHopDongMap.delete(id); }
+  async getTrangThaiHopDong(): Promise<TrangThaiHopDong[]> {
+    return Array.from(this.trangThaiHopDongMap.values());
+  }
+  async getTrangThaiHopDongById(
+    id: number
+  ): Promise<TrangThaiHopDong | undefined> {
+    return this.trangThaiHopDongMap.get(id);
+  }
+  async createTrangThaiHopDong(
+    item: InsertTrangThaiHopDong
+  ): Promise<TrangThaiHopDong> {
+    const id = this.getNextId();
+    const newItem: TrangThaiHopDong = { ...item, id };
+    this.trangThaiHopDongMap.set(id, newItem);
+    return newItem;
+  }
+  async updateTrangThaiHopDong(
+    id: number,
+    item: Partial<InsertTrangThaiHopDong>
+  ): Promise<TrangThaiHopDong | undefined> {
+    const existing = this.trangThaiHopDongMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.trangThaiHopDongMap.set(id, updated);
+    return updated;
+  }
+  async deleteTrangThaiHopDong(id: number): Promise<boolean> {
+    return this.trangThaiHopDongMap.delete(id);
+  }
 
-  async getTrangBi(): Promise<TrangBi[]> { return Array.from(this.trangBiMap.values()); }
-  async getTrangBiById(id: number): Promise<TrangBi | undefined> { return this.trangBiMap.get(id); }
-  async getTrangBiByHopDong(hopDongId: number): Promise<TrangBi[]> { return Array.from(this.trangBiMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createTrangBi(item: InsertTrangBi): Promise<TrangBi> { 
-    const id = this.getNextId(); 
-    const newItem: TrangBi = { 
-      ...item, 
+  async getTrangBi(): Promise<TrangBi[]> {
+    return Array.from(this.trangBiMap.values());
+  }
+  async getTrangBiById(id: number): Promise<TrangBi | undefined> {
+    return this.trangBiMap.get(id);
+  }
+  async getTrangBiByHopDong(hopDongId: number): Promise<TrangBi[]> {
+    return Array.from(this.trangBiMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createTrangBi(item: InsertTrangBi): Promise<TrangBi> {
+    const id = this.getNextId();
+    const newItem: TrangBi = {
+      ...item,
       id,
       nhaCungCapId: item.nhaCungCapId || null,
       loaiTrangBiId: item.loaiTrangBiId || null,
       donGia: item.donGia || null,
       loaiTienId: item.loaiTienId || null,
-      hopDongId: item.hopDongId || null
-    }; 
-    this.trangBiMap.set(id, newItem); 
-    return newItem; 
+      hopDongId: item.hopDongId || null,
+    };
+    this.trangBiMap.set(id, newItem);
+    return newItem;
   }
-  async updateTrangBi(id: number, item: Partial<InsertTrangBi>): Promise<TrangBi | undefined> { const existing = this.trangBiMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.trangBiMap.set(id, updated); return updated; }
-  async deleteTrangBi(id: number): Promise<boolean> { return this.trangBiMap.delete(id); }
+  async updateTrangBi(
+    id: number,
+    item: Partial<InsertTrangBi>
+  ): Promise<TrangBi | undefined> {
+    const existing = this.trangBiMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.trangBiMap.set(id, updated);
+    return updated;
+  }
+  async deleteTrangBi(id: number): Promise<boolean> {
+    return this.trangBiMap.delete(id);
+  }
 
-  async getGiayPhep(): Promise<GiayPhep[]> { return Array.from(this.giayPhepMap.values()); }
-  async getGiayPhepById(id: number): Promise<GiayPhep | undefined> { return this.giayPhepMap.get(id); }
-  async getGiayPhepByHopDong(hopDongId: number): Promise<GiayPhep[]> { return Array.from(this.giayPhepMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createGiayPhep(item: InsertGiayPhep): Promise<GiayPhep> { 
-    const id = this.getNextId(); 
-    const newItem: GiayPhep = { 
-      ...item, 
+  async getGiayPhep(): Promise<GiayPhep[]> {
+    return Array.from(this.giayPhepMap.values());
+  }
+  async getGiayPhepById(id: number): Promise<GiayPhep | undefined> {
+    return this.giayPhepMap.get(id);
+  }
+  async getGiayPhepByHopDong(hopDongId: number): Promise<GiayPhep[]> {
+    return Array.from(this.giayPhepMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createGiayPhep(item: InsertGiayPhep): Promise<GiayPhep> {
+    const id = this.getNextId();
+    const newItem: GiayPhep = {
+      ...item,
       id,
       ngay: item.ngay || null,
       hopDongId: item.hopDongId || null,
       loaiGiayPhepId: item.loaiGiayPhepId || null,
       coQuanId: item.coQuanId || null,
-      noiDung: item.noiDung || null
-    }; 
-    this.giayPhepMap.set(id, newItem); 
-    return newItem; 
+      noiDung: item.noiDung || null,
+    };
+    this.giayPhepMap.set(id, newItem);
+    return newItem;
   }
-  async updateGiayPhep(id: number, item: Partial<InsertGiayPhep>): Promise<GiayPhep | undefined> { const existing = this.giayPhepMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.giayPhepMap.set(id, updated); return updated; }
-  async deleteGiayPhep(id: number): Promise<boolean> { return this.giayPhepMap.delete(id); }
+  async updateGiayPhep(
+    id: number,
+    item: Partial<InsertGiayPhep>
+  ): Promise<GiayPhep | undefined> {
+    const existing = this.giayPhepMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.giayPhepMap.set(id, updated);
+    return updated;
+  }
+  async deleteGiayPhep(id: number): Promise<boolean> {
+    return this.giayPhepMap.delete(id);
+  }
 
-  async getTiepNhan(): Promise<TiepNhan[]> { return Array.from(this.tiepNhanMap.values()); }
-  async getTiepNhanById(id: number): Promise<TiepNhan | undefined> { return this.tiepNhanMap.get(id); }
-  async getTiepNhanByHopDong(hopDongId: number): Promise<TiepNhan[]> { return Array.from(this.tiepNhanMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createTiepNhan(item: InsertTiepNhan): Promise<TiepNhan> { 
-    const id = this.getNextId(); 
-    const newItem: TiepNhan = { 
-      ...item, 
+  async getTiepNhan(): Promise<TiepNhan[]> {
+    return Array.from(this.tiepNhanMap.values());
+  }
+  async getTiepNhanById(id: number): Promise<TiepNhan | undefined> {
+    return this.tiepNhanMap.get(id);
+  }
+  async getTiepNhanByHopDong(hopDongId: number): Promise<TiepNhan[]> {
+    return Array.from(this.tiepNhanMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createTiepNhan(item: InsertTiepNhan): Promise<TiepNhan> {
+    const id = this.getNextId();
+    const newItem: TiepNhan = {
+      ...item,
       id,
       hopDongId: item.hopDongId || null,
       tenHang: item.tenHang || null,
@@ -656,21 +1024,40 @@ export class MemStorage implements IStorage {
       soHoaDon: item.soHoaDon || null,
       soBaoHiem: item.soBaoHiem || null,
       diaDiemThongQuanId: item.diaDiemThongQuanId || null,
-      ngayThucHien: item.ngayThucHien || null
-    }; 
-    this.tiepNhanMap.set(id, newItem); 
-    return newItem; 
+      ngayThucHien: item.ngayThucHien || null,
+    };
+    this.tiepNhanMap.set(id, newItem);
+    return newItem;
   }
-  async updateTiepNhan(id: number, item: Partial<InsertTiepNhan>): Promise<TiepNhan | undefined> { const existing = this.tiepNhanMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.tiepNhanMap.set(id, updated); return updated; }
-  async deleteTiepNhan(id: number): Promise<boolean> { return this.tiepNhanMap.delete(id); }
+  async updateTiepNhan(
+    id: number,
+    item: Partial<InsertTiepNhan>
+  ): Promise<TiepNhan | undefined> {
+    const existing = this.tiepNhanMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.tiepNhanMap.set(id, updated);
+    return updated;
+  }
+  async deleteTiepNhan(id: number): Promise<boolean> {
+    return this.tiepNhanMap.delete(id);
+  }
 
-  async getThanhToan(): Promise<ThanhToan[]> { return Array.from(this.thanhToanMap.values()); }
-  async getThanhToanById(id: number): Promise<ThanhToan | undefined> { return this.thanhToanMap.get(id); }
-  async getThanhToanByHopDong(hopDongId: number): Promise<ThanhToan[]> { return Array.from(this.thanhToanMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createThanhToan(item: InsertThanhToan): Promise<ThanhToan> { 
-    const id = this.getNextId(); 
-    const newItem: ThanhToan = { 
-      ...item, 
+  async getThanhToan(): Promise<ThanhToan[]> {
+    return Array.from(this.thanhToanMap.values());
+  }
+  async getThanhToanById(id: number): Promise<ThanhToan | undefined> {
+    return this.thanhToanMap.get(id);
+  }
+  async getThanhToanByHopDong(hopDongId: number): Promise<ThanhToan[]> {
+    return Array.from(this.thanhToanMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createThanhToan(item: InsertThanhToan): Promise<ThanhToan> {
+    const id = this.getNextId();
+    const newItem: ThanhToan = {
+      ...item,
       id,
       hopDongId: item.hopDongId || null,
       loaiHinhThucThanhToanId: item.loaiHinhThucThanhToanId || null,
@@ -679,21 +1066,40 @@ export class MemStorage implements IStorage {
       hanHopDong: item.hanHopDong || null,
       hanThucHien: item.hanThucHien || null,
       soTien: item.soTien || null,
-      loaiTienId: item.loaiTienId || null
-    }; 
-    this.thanhToanMap.set(id, newItem); 
-    return newItem; 
+      loaiTienId: item.loaiTienId || null,
+    };
+    this.thanhToanMap.set(id, newItem);
+    return newItem;
   }
-  async updateThanhToan(id: number, item: Partial<InsertThanhToan>): Promise<ThanhToan | undefined> { const existing = this.thanhToanMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.thanhToanMap.set(id, updated); return updated; }
-  async deleteThanhToan(id: number): Promise<boolean> { return this.thanhToanMap.delete(id); }
+  async updateThanhToan(
+    id: number,
+    item: Partial<InsertThanhToan>
+  ): Promise<ThanhToan | undefined> {
+    const existing = this.thanhToanMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.thanhToanMap.set(id, updated);
+    return updated;
+  }
+  async deleteThanhToan(id: number): Promise<boolean> {
+    return this.thanhToanMap.delete(id);
+  }
 
-  async getHopDongTienDo(): Promise<HopDongTienDo[]> { return Array.from(this.hopDongTienDoMap.values()); }
-  async getHopDongTienDoById(id: number): Promise<HopDongTienDo | undefined> { return this.hopDongTienDoMap.get(id); }
-  async getHopDongTienDoByHopDong(hopDongId: number): Promise<HopDongTienDo[]> { return Array.from(this.hopDongTienDoMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createHopDongTienDo(item: InsertHopDongTienDo): Promise<HopDongTienDo> { 
-    const id = this.getNextId(); 
-    const newItem: HopDongTienDo = { 
-      ...item, 
+  async getHopDongTienDo(): Promise<HopDongTienDo[]> {
+    return Array.from(this.hopDongTienDoMap.values());
+  }
+  async getHopDongTienDoById(id: number): Promise<HopDongTienDo | undefined> {
+    return this.hopDongTienDoMap.get(id);
+  }
+  async getHopDongTienDoByHopDong(hopDongId: number): Promise<HopDongTienDo[]> {
+    return Array.from(this.hopDongTienDoMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createHopDongTienDo(item: InsertHopDongTienDo): Promise<HopDongTienDo> {
+    const id = this.getNextId();
+    const newItem: HopDongTienDo = {
+      ...item,
       id,
       canBoId: item.canBoId || null,
       loaiTienId: item.loaiTienId || null,
@@ -703,42 +1109,80 @@ export class MemStorage implements IStorage {
       loaiThucHienId: item.loaiThucHienId || null,
       ghiChu: item.ghiChu || null,
       chiPhi: item.chiPhi || null,
-      diaDiem: item.diaDiem || null
-    }; 
-    this.hopDongTienDoMap.set(id, newItem); 
-    return newItem; 
+      diaDiem: item.diaDiem || null,
+    };
+    this.hopDongTienDoMap.set(id, newItem);
+    return newItem;
   }
-  async updateHopDongTienDo(id: number, item: Partial<InsertHopDongTienDo>): Promise<HopDongTienDo | undefined> { const existing = this.hopDongTienDoMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.hopDongTienDoMap.set(id, updated); return updated; }
-  async deleteHopDongTienDo(id: number): Promise<boolean> { return this.hopDongTienDoMap.delete(id); }
+  async updateHopDongTienDo(
+    id: number,
+    item: Partial<InsertHopDongTienDo>
+  ): Promise<HopDongTienDo | undefined> {
+    const existing = this.hopDongTienDoMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.hopDongTienDoMap.set(id, updated);
+    return updated;
+  }
+  async deleteHopDongTienDo(id: number): Promise<boolean> {
+    return this.hopDongTienDoMap.delete(id);
+  }
 
-  async getFileHopDong(): Promise<FileHopDong[]> { return Array.from(this.fileHopDongMap.values()); }
-  async getFileHopDongById(id: number): Promise<FileHopDong | undefined> { return this.fileHopDongMap.get(id); }
-  async getFileHopDongByHopDong(hopDongId: number): Promise<FileHopDong[]> { return Array.from(this.fileHopDongMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createFileHopDong(item: InsertFileHopDong): Promise<FileHopDong> { 
-    const id = this.getNextId(); 
-    const newItem: FileHopDong = { 
-      ...item, 
-      id, 
+  async getFileHopDong(): Promise<FileHopDong[]> {
+    return Array.from(this.fileHopDongMap.values());
+  }
+  async getFileHopDongById(id: number): Promise<FileHopDong | undefined> {
+    return this.fileHopDongMap.get(id);
+  }
+  async getFileHopDongByHopDong(hopDongId: number): Promise<FileHopDong[]> {
+    return Array.from(this.fileHopDongMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createFileHopDong(item: InsertFileHopDong): Promise<FileHopDong> {
+    const id = this.getNextId();
+    const newItem: FileHopDong = {
+      ...item,
+      id,
       ngayTaiLen: new Date(),
       ghiChu: item.ghiChu || null,
       tenFile: item.tenFile || null,
       loaiFile: item.loaiFile || null,
       kichThuoc: item.kichThuoc || null,
-      nguoiTaiLen: item.nguoiTaiLen || null
-    }; 
-    this.fileHopDongMap.set(id, newItem); 
-    return newItem; 
+      nguoiTaiLen: item.nguoiTaiLen || null,
+    };
+    this.fileHopDongMap.set(id, newItem);
+    return newItem;
   }
-  async updateFileHopDong(id: number, item: Partial<InsertFileHopDong>): Promise<FileHopDong | undefined> { const existing = this.fileHopDongMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.fileHopDongMap.set(id, updated); return updated; }
-  async deleteFileHopDong(id: number): Promise<boolean> { return this.fileHopDongMap.delete(id); }
+  async updateFileHopDong(
+    id: number,
+    item: Partial<InsertFileHopDong>
+  ): Promise<FileHopDong | undefined> {
+    const existing = this.fileHopDongMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.fileHopDongMap.set(id, updated);
+    return updated;
+  }
+  async deleteFileHopDong(id: number): Promise<boolean> {
+    return this.fileHopDongMap.delete(id);
+  }
 
-  async getBuocThucHien(): Promise<BuocThucHien[]> { return Array.from(this.buocThucHienMap.values()); }
-  async getBuocThucHienById(id: number): Promise<BuocThucHien | undefined> { return this.buocThucHienMap.get(id); }
-  async getBuocThucHienByHopDong(hopDongId: number): Promise<BuocThucHien[]> { return Array.from(this.buocThucHienMap.values()).filter(item => item.hopDongId === hopDongId); }
-  async createBuocThucHien(item: InsertBuocThucHien): Promise<BuocThucHien> { 
-    const id = this.getNextId(); 
-    const newItem: BuocThucHien = { 
-      ...item, 
+  async getBuocThucHien(): Promise<BuocThucHien[]> {
+    return Array.from(this.buocThucHienMap.values());
+  }
+  async getBuocThucHienById(id: number): Promise<BuocThucHien | undefined> {
+    return this.buocThucHienMap.get(id);
+  }
+  async getBuocThucHienByHopDong(hopDongId: number): Promise<BuocThucHien[]> {
+    return Array.from(this.buocThucHienMap.values()).filter(
+      (item) => item.hopDongId === hopDongId
+    );
+  }
+  async createBuocThucHien(item: InsertBuocThucHien): Promise<BuocThucHien> {
+    const id = this.getNextId();
+    const newItem: BuocThucHien = {
+      ...item,
       id,
       ten: item.ten || null,
       moTa: item.moTa || null,
@@ -750,13 +1194,24 @@ export class MemStorage implements IStorage {
       ngayBatDauThucTe: item.ngayBatDauThucTe || null,
       ngayKetThucThucTe: item.ngayKetThucThucTe || null,
       canhBao: item.canhBao || null,
-      canBoPhuTrachId: item.canBoPhuTrachId || null
-    }; 
-    this.buocThucHienMap.set(id, newItem); 
-    return newItem; 
+      canBoPhuTrachId: item.canBoPhuTrachId || null,
+    };
+    this.buocThucHienMap.set(id, newItem);
+    return newItem;
   }
-  async updateBuocThucHien(id: number, item: Partial<InsertBuocThucHien>): Promise<BuocThucHien | undefined> { const existing = this.buocThucHienMap.get(id); if (!existing) return undefined; const updated = { ...existing, ...item }; this.buocThucHienMap.set(id, updated); return updated; }
-  async deleteBuocThucHien(id: number): Promise<boolean> { return this.buocThucHienMap.delete(id); }
+  async updateBuocThucHien(
+    id: number,
+    item: Partial<InsertBuocThucHien>
+  ): Promise<BuocThucHien | undefined> {
+    const existing = this.buocThucHienMap.get(id);
+    if (!existing) return undefined;
+    const updated = { ...existing, ...item };
+    this.buocThucHienMap.set(id, updated);
+    return updated;
+  }
+  async deleteBuocThucHien(id: number): Promise<boolean> {
+    return this.buocThucHienMap.delete(id);
+  }
 }
 
 export const storage = new MemStorage();

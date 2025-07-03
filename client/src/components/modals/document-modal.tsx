@@ -2,12 +2,30 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertFileHopDongSchema, InsertFileHopDong } from "@shared/schema";
@@ -19,29 +37,35 @@ interface DocumentModalProps {
   document?: any;
 }
 
-export default function DocumentModal({ isOpen, onClose, document }: DocumentModalProps) {
+export default function DocumentModal({
+  isOpen,
+  onClose,
+  document,
+}: DocumentModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<InsertFileHopDong>({
     resolver: zodResolver(insertFileHopDongSchema),
-    defaultValues: document ? {
-      hopDongId: document.hopDongId || 0,
-      tenFile: document.tenFile || "",
-      loaiFile: document.loaiFile || "",
-      duongDan: document.duongDan || "",
-      kichThuoc: document.kichThuoc || 0,
-      ghiChu: document.ghiChu || "",
-      nguoiTaiLen: document.nguoiTaiLen,
-    } : {
-      hopDongId: 0,
-      tenFile: "",
-      loaiFile: "",
-      duongDan: "",
-      kichThuoc: 0,
-      ghiChu: "",
-    },
+    defaultValues: document
+      ? {
+          hopDongId: document.hopDongId || 0,
+          tenFile: document.tenFile || "",
+          loaiFile: document.loaiFile || "",
+          duongDan: document.duongDan || "",
+          kichThuoc: document.kichThuoc || 0,
+          ghiChu: document.ghiChu || "",
+          nguoiTaiLen: document.nguoiTaiLen,
+        }
+      : {
+          hopDongId: 0,
+          tenFile: "",
+          loaiFile: "",
+          duongDan: "",
+          kichThuoc: 0,
+          ghiChu: "",
+        },
   });
 
   const { data: contracts } = useQuery({
@@ -55,10 +79,10 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
       reader.onload = () => {
         const result = reader.result as string;
         // Remove the data:image/jpeg;base64, prefix to store only the base64 content
-        const base64Content = result.split(',')[1];
+        const base64Content = result.split(",")[1];
         resolve(base64Content);
       };
-      reader.onerror = error => reject(error);
+      reader.onerror = (error) => reject(error);
     });
   };
 
@@ -69,7 +93,7 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
       form.setValue("tenFile", file.name);
       form.setValue("loaiFile", file.type);
       form.setValue("kichThuoc", file.size);
-      form.setValue("duongDan", `/file/${file.name}`);
+      // Remove duongDan as we store base64 content directly
     }
   };
 
@@ -91,13 +115,13 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
 
   const validateAndSetFile = (file: File) => {
     // Check file size (5MB limit for images, 10MB for documents)
-    const isImage = file.type.startsWith('image/');
+    const isImage = file.type.startsWith("image/");
     const maxSize = isImage ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
-    
+
     if (file.size > maxSize) {
       toast({
         title: "Lỗi",
-        description: `File không được vượt quá ${isImage ? '5MB' : '10MB'}`,
+        description: `File không được vượt quá ${isImage ? "5MB" : "10MB"}`,
         variant: "destructive",
       });
       return;
@@ -105,17 +129,17 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
 
     // Check file type
     const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/plain',
-      'image/png',
-      'image/jpeg',
-      'image/jpg',
-      'image/gif',
-      'image/webp'
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "text/plain",
+      "image/png",
+      "image/jpeg",
+      "image/jpg",
+      "image/gif",
+      "image/webp",
     ];
 
     if (!allowedTypes.includes(file.type)) {
@@ -137,7 +161,7 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
   const createDocumentMutation = useMutation({
     mutationFn: async (data: InsertFileHopDong) => {
       let finalData = { ...data };
-      
+
       // Convert file to base64 if selected
       if (selectedFile) {
         try {
@@ -147,25 +171,54 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
             tenFile: selectedFile.name,
             loaiFile: selectedFile.type,
             kichThuoc: selectedFile.size,
-            noiDung: base64Content,
-            duongDan: `/file/${selectedFile.name}`, // Virtual path for display
+            noiDungFile: `data:${selectedFile.type};base64,${base64Content}`,
+            // Store only base64 content, no file path needed
           };
         } catch (error) {
           throw new Error("Không thể xử lý file");
         }
       }
-      
+
       if (document) {
-        return await apiRequest("PUT", `/api/file-hop-dong/${document.id}`, finalData);
+        return await apiRequest(`/api/file-hop-dong/${document.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(finalData),
+        });
       } else {
-        return await apiRequest("POST", "/api/file-hop-dong", finalData);
+        const formData = new FormData();
+        formData.append("tenFile", finalData.tenFile);
+        formData.append("loaiFile", finalData.loaiFile || "");
+        formData.append("ghiChu", finalData.ghiChu || "");
+        formData.append("hopDongId", finalData.hopDongId.toString());
+        formData.append(
+          "nguoiTaiLen",
+          finalData.nguoiTaiLen?.toString() || "1"
+        );
+
+        if (selectedFile) {
+          formData.append("file", selectedFile);
+        }
+
+        const response = await fetch("/api/file-hop-dong", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("Upload failed");
+        }
+
+        return response.json();
       }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/file-hop-dong"] });
       toast({
         title: "Thành công",
-        description: document ? "Tài liệu đã được cập nhật" : "Tài liệu đã được tạo",
+        description: document
+          ? "Tài liệu đã được cập nhật"
+          : "Tài liệu đã được tạo",
       });
       onClose();
       form.reset();
@@ -188,7 +241,9 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{document ? "Chỉnh sửa tài liệu" : "Tạo tài liệu mới"}</DialogTitle>
+          <DialogTitle>
+            {document ? "Chỉnh sửa tài liệu" : "Tạo tài liệu mới"}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -199,7 +254,10 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Hợp đồng</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn hợp đồng" />
@@ -207,7 +265,10 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                     </FormControl>
                     <SelectContent>
                       {contracts?.map((contract: any) => (
-                        <SelectItem key={contract.id} value={contract.id.toString()}>
+                        <SelectItem
+                          key={contract.id}
+                          value={contract.id.toString()}
+                        >
                           {contract.ten}
                         </SelectItem>
                       ))}
@@ -221,7 +282,7 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
             {!document && (
               <div className="space-y-2">
                 <label className="text-sm font-medium">Tải lên file</label>
-                <div 
+                <div
                   className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors"
                   onDrop={handleFileDrop}
                   onDragOver={handleDragOver}
@@ -240,7 +301,8 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                       Nhấp để chọn file hoặc kéo thả file vào đây
                     </p>
                     <p className="text-xs text-gray-500">
-                      PDF, DOC, DOCX, XLS, XLSX, TXT (10MB) • PNG, JPG, GIF, WEBP (5MB)
+                      PDF, DOC, DOCX, XLS, XLSX, TXT (10MB) • PNG, JPG, GIF,
+                      WEBP (5MB)
                     </p>
                   </label>
                 </div>
@@ -248,16 +310,18 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                   <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                        {selectedFile.type.includes('pdf') ? (
+                        {selectedFile.type.includes("pdf") ? (
                           <FileText className="w-4 h-4 text-blue-600" />
-                        ) : selectedFile.type.includes('image') ? (
+                        ) : selectedFile.type.includes("image") ? (
                           <File className="w-4 h-4 text-blue-600" />
                         ) : (
                           <File className="w-4 h-4 text-blue-600" />
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {selectedFile.name}
+                        </p>
                         <p className="text-xs text-gray-500">
                           {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                         </p>
@@ -272,7 +336,7 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                         form.setValue("tenFile", "");
                         form.setValue("loaiFile", "");
                         form.setValue("kichThuoc", 0);
-                        form.setValue("duongDan", "");
+                        // No duongDan needed
                       }}
                     >
                       <X className="h-4 w-4" />
@@ -312,19 +376,7 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="duongDan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Đường dẫn</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Đường dẫn file" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Removed duongDan field - files stored as base64 in database */}
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
@@ -334,11 +386,13 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                   <FormItem>
                     <FormLabel>Kích thước (bytes)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Kích thước" 
+                      <Input
+                        type="number"
+                        placeholder="Kích thước"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -352,7 +406,10 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Người tải lên</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn người tải lên" />
@@ -360,7 +417,10 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                       </FormControl>
                       <SelectContent>
                         {staff?.map((person: any) => (
-                          <SelectItem key={person.id} value={person.id.toString()}>
+                          <SelectItem
+                            key={person.id}
+                            value={person.id.toString()}
+                          >
                             {person.ten} - {person.chucVu}
                           </SelectItem>
                         ))}
@@ -391,7 +451,11 @@ export default function DocumentModal({ isOpen, onClose, document }: DocumentMod
                 Hủy
               </Button>
               <Button type="submit" disabled={createDocumentMutation.isPending}>
-                {createDocumentMutation.isPending ? "Đang lưu..." : (document ? "Cập nhật" : "Tạo mới")}
+                {createDocumentMutation.isPending
+                  ? "Đang lưu..."
+                  : document
+                  ? "Cập nhật"
+                  : "Tạo mới"}
               </Button>
             </div>
           </form>

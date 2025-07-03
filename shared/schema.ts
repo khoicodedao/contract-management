@@ -173,7 +173,7 @@ export const thanhToan = sqliteTable("thanh_toan", {
   loaiTienId: integer("loai_tien_id"),
   loaiHinhThucThanhToanId: integer("loai_hinh_thuc_thanh_toan_id"),
   loaiThanhToanId: integer("loai_thanh_toan_id"),
-  soTien: integer("so_tien"),
+  soTien: real("so_tien"),
   ngayDenHan: text("ngay_den_han"),
   ngayThanhToan: text("ngay_thanh_toan"),
   ghiChu: text("ghi_chu"),
@@ -203,7 +203,7 @@ export const fileHopDong = sqliteTable("file_hop_dong", {
   hopDongId: integer("hop_dong_id").notNull(),
   tenFile: text("ten_file").notNull(),
   loaiFile: text("loai_file"),
-  duongDan: text("duong_dan"),
+  duongDan: text("duong_dan"), // Deprecated - keeping for backward compatibility
   noiDungFile: text("noi_dung_file"), // Base64 content
   kichThuoc: integer("kich_thuoc"),
   ngayTaiLen: text("ngay_tai_len"),

@@ -63,7 +63,9 @@ export default function Documents() {
 
   const deleteDocumentMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest("DELETE", `/api/file-hop-dong/${id}`);
+      return await apiRequest(`/api/file-hop-dong/${id}`, {
+        method: "DELETE",
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/file-hop-dong"] });
@@ -93,24 +95,14 @@ export default function Documents() {
 
   const handleDownloadDocument = async (document: FileHopDong) => {
     try {
-      if (document.noiDung && document.loaiFile) {
+      if (document.noiDungFile && document.noiDungFile.startsWith("data:")) {
         // Download from base64 content stored in database
-        const byteCharacters = atob(document.noiDung);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: document.loaiFile });
-
-        const url = window.URL.createObjectURL(blob);
         const link = globalThis.document.createElement("a");
-        link.href = url;
+        link.href = document.noiDungFile;
         link.download = document.tenFile || "document";
         globalThis.document.body.appendChild(link);
         link.click();
         link.remove();
-        window.URL.revokeObjectURL(url);
       } else {
         // Fallback to server download endpoint
         const response = await fetch(

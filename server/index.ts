@@ -1,8 +1,4 @@
-import express, {
-  type Request,
-  type Response,
-  type NextFunction,
-} from "express";
+import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
@@ -43,40 +39,36 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Export Promise để Electron có thể chờ server sẵn sàng
-export const serverReady = (async () => {
-  // 1. Register API routes
+(async () => {
+  // Register routes
   await registerRoutes(app);
 
-  // 2. Error handler
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
+
     res.status(status).json({ message });
     throw err;
   });
 
-  // 3. Serve client
-  if (process.env.NODE_ENV === "development") {
+  // Setup vite in development
+  if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // 4. Khởi động server và DB
-  return new Promise<void>((resolve) => {
-    const port = 5001;
-    server.listen(port, "0.0.0.0", async () => {
-      log(`serving on port ${port}`);
+  // Start server
+  const port = 5000;
+  server.listen(port, "0.0.0.0", async () => {
+    log(`serving on port ${port}`);
 
-      try {
-        const { initializeDatabase } = await import("./database");
-        await initializeDatabase();
-      } catch (error) {
-        console.log("Note: Could not initialize database:", error);
-      }
-
-      resolve(); // ✅ Đánh dấu server đã sẵn sàng
-    });
+    // Initialize SQLite database
+    try {
+      const { initializeDatabase } = await import("./database");
+      await initializeDatabase();
+    } catch (error) {
+      console.log("Note: Could not initialize database:", error);
+    }
   });
 })();

@@ -9,7 +9,7 @@ export const db = drizzle(sqlite, { schema });
 // Create tables manually since we don't have migrations
 function createTables() {
   console.log("Creating database tables...");
-  
+
   // Create all tables
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS loai_hop_dong (
@@ -190,10 +190,10 @@ function createTables() {
 // Initialize database with sample data
 export async function initializeDatabase() {
   console.log("Initializing SQLite database...");
-  
+
   // Create tables first
   createTables();
-  
+
   // Check if data already exists
   try {
     const existingContracts = await db.select().from(schema.hopDong).limit(1);
@@ -204,89 +204,183 @@ export async function initializeDatabase() {
   } catch (error) {
     console.log("Database is empty, proceeding with seeding...");
   }
-  
+
   console.log("Seeding database with initial data...");
-  
+
   // Insert contract types
-  await db.insert(schema.loaiHopDong).values([
-    { ten: "Nhập khẩu" },
-    { ten: "Xuất khẩu" },
-    { ten: "Tạm xuất – Tái nhập" },
-    { ten: "Tạm nhập – Tái xuất" },
-  ]);
-  
+  await db
+    .insert(schema.loaiHopDong)
+    .values([
+      { ten: "Nhập khẩu" },
+      { ten: "Xuất khẩu" },
+      { ten: "Tạm xuất – Tái nhập" },
+      { ten: "Tạm nhập – Tái xuất" },
+    ]);
+
   // Insert budget types
-  await db.insert(schema.loaiNganSach).values([
-    { ten: "Ngân sách thường xuyên" },
-    { ten: "Ngân sách dôi dư" },
-    { ten: "Ngân sách 432" },
-    { ten: "Ngân sách đặc biệt" },
-    { ten: "Ngân sách đặc thù" },
-  ]);
-  
+  await db
+    .insert(schema.loaiNganSach)
+    .values([
+      { ten: "Ngân sách thường xuyên" },
+      { ten: "Ngân sách dôi dư" },
+      { ten: "Ngân sách 432" },
+      { ten: "Ngân sách đặc biệt" },
+      { ten: "Ngân sách đặc thù" },
+    ]);
+
   // Insert currency types
-  await db.insert(schema.loaiTien).values([
-    { ten: "USD" },
-    { ten: "EUR" },
-    { ten: "VNĐ" },
-  ]);
-  
+  await db
+    .insert(schema.loaiTien)
+    .values([{ ten: "USD" }, { ten: "EUR" }, { ten: "VNĐ" }]);
+
   // Insert payment methods
-  await db.insert(schema.loaiHinhThucThanhToan).values([
-    { ten: "Điện chuyển tiền L/C" },
-    { ten: "Tiền mặt" },
-    { ten: "Chuyển khoản" },
-  ]);
-  
+  await db
+    .insert(schema.loaiHinhThucThanhToan)
+    .values([
+      { ten: "Điện chuyển tiền L/C" },
+      { ten: "Tiền mặt" },
+      { ten: "Chuyển khoản" },
+    ]);
+
   // Insert payment types
-  await db.insert(schema.loaiThanhToan).values([
-    { ten: "Giá trị hàng hoá" },
-    { ten: "Thuế nhà thầu" },
-    { ten: "Thuế VAT" },
-    { ten: "Phí nhận hàng" },
-    { ten: "Phí giao hàng" },
-  ]);
-  
+  await db
+    .insert(schema.loaiThanhToan)
+    .values([
+      { ten: "Giá trị hàng hoá" },
+      { ten: "Thuế nhà thầu" },
+      { ten: "Thuế VAT" },
+      { ten: "Phí nhận hàng" },
+      { ten: "Phí giao hàng" },
+    ]);
+
   // Insert equipment types
-  await db.insert(schema.loaiTrangBi).values([
-    { ten: "Trang bị Công nghệ thông tin" },
-    { ten: "Trang bị điện tử" },
-    { ten: "Trang bị Hoá học" },
-  ]);
-  
+  await db
+    .insert(schema.loaiTrangBi)
+    .values([
+      { ten: "Trang bị Công nghệ thông tin" },
+      { ten: "Trang bị điện tử" },
+      { ten: "Trang bị Hoá học" },
+    ]);
+
   // Insert contract statuses
   await db.insert(schema.trangThaiHopDong).values([
     { trangThai: 1 }, // Đang thực hiện
     { trangThai: 2 }, // Chưa thực hiện
     { trangThai: 3 }, // Đã thanh lý
   ]);
-  
+
   // Insert sample staff
   await db.insert(schema.canBo).values([
-    { ten: "Ngô Văn Khang", chucVu: "Trưởng phòng", soDienThoai: "0123456789", email: "ngovankang@customs.gov.vn", diaChi: "Hà Nội", moTa: "Trưởng phòng với 15 năm kinh nghiệm" },
-    { ten: "Nguyễn Văn Sáu", chucVu: "Phó trưởng phòng", soDienThoai: "0987654321", email: "nguyenvansau@customs.gov.vn", diaChi: "Hà Nội", moTa: "Phó trưởng phòng phụ trách nghiệp vụ" },
-    { ten: "Hoàng Văn Công", chucVu: "Trợ lý", soDienThoai: "0112233445", email: "hoangvancong@customs.gov.vn", diaChi: "Hà Nội", moTa: "Trợ lý trưởng phòng" },
-    { ten: "Phan Quân", chucVu: "Trợ lý", soDienThoai: "0556677889", email: "phanquan@customs.gov.vn", diaChi: "Hà Nội", moTa: "Trợ lý chuyên viên" },
-    { ten: "Tô Quyên", chucVu: "Trợ lý", soDienThoai: "0334455667", email: "toquyen@customs.gov.vn", diaChi: "Hà Nội", moTa: "Trợ lý kỹ thuật" },
+    {
+      ten: "Ngô Văn Khang",
+      chucVu: "Trưởng phòng",
+      soDienThoai: "0123456789",
+      email: "ngovankang@customs.gov.vn",
+      diaChi: "Hà Nội",
+      moTa: "Trưởng phòng với 15 năm kinh nghiệm",
+    },
+    {
+      ten: "Nguyễn Văn Sáu",
+      chucVu: "Phó trưởng phòng",
+      soDienThoai: "0987654321",
+      email: "nguyenvansau@customs.gov.vn",
+      diaChi: "Hà Nội",
+      moTa: "Phó trưởng phòng phụ trách nghiệp vụ",
+    },
+    {
+      ten: "Hoàng Văn Công",
+      chucVu: "Trợ lý",
+      soDienThoai: "0112233445",
+      email: "hoangvancong@customs.gov.vn",
+      diaChi: "Hà Nội",
+      moTa: "Trợ lý trưởng phòng",
+    },
+    {
+      ten: "Phan Quân",
+      chucVu: "Trợ lý",
+      soDienThoai: "0556677889",
+      email: "phanquan@customs.gov.vn",
+      diaChi: "Hà Nội",
+      moTa: "Trợ lý chuyên viên",
+    },
+    {
+      ten: "Tô Quyên",
+      chucVu: "Trợ lý",
+      soDienThoai: "0334455667",
+      email: "toquyen@customs.gov.vn",
+      diaChi: "Hà Nội",
+      moTa: "Trợ lý kỹ thuật",
+    },
   ]);
-  
+
   // Insert sample suppliers
   await db.insert(schema.nhaCungCap).values([
-    { ten: "YXG", diaChi: "Singapore, Singapore", soDienThoai: "+65 6555 1234", email: "contact@yxg.com.sg", nguoiLienHe: "Lim Wei Ming", chucVuNguoiLienHe: "Sales Director", moTa: "Nhà cung cấp thiết bị công nghệ cao", maQuocGia: "SG" },
-    { ten: "Yamaha", diaChi: "Madrid, Tây Ban Nha", soDienThoai: "+34 91 555 6789", email: "spain@yamaha.com", nguoiLienHe: "Carlos Rodriguez", chucVuNguoiLienHe: "Regional Manager", moTa: "Công ty sản xuất thiết bị âm thanh và điện tử", maQuocGia: "ES" },
-    { ten: "Corpus", diaChi: "Praha, CH Séc", soDienThoai: "+420 222 555 888", email: "info@corpus.cz", nguoiLienHe: "Pavel Novák", chucVuNguoiLienHe: "Export Manager", moTa: "Nhà sản xuất thiết bị y tế và khoa học", maQuocGia: "CZ" },
+    {
+      ten: "YXG",
+      diaChi: "Singapore, Singapore",
+      soDienThoai: "+65 6555 1234",
+      email: "contact@yxg.com.sg",
+      nguoiLienHe: "Lim Wei Ming",
+      chucVuNguoiLienHe: "Sales Director",
+      moTa: "Nhà cung cấp thiết bị công nghệ cao",
+      maQuocGia: "SG",
+    },
+    {
+      ten: "Yamaha",
+      diaChi: "Madrid, Tây Ban Nha",
+      soDienThoai: "+34 91 555 6789",
+      email: "spain@yamaha.com",
+      nguoiLienHe: "Carlos Rodriguez",
+      chucVuNguoiLienHe: "Regional Manager",
+      moTa: "Công ty sản xuất thiết bị âm thanh và điện tử",
+      maQuocGia: "ES",
+    },
+    {
+      ten: "Corpus",
+      diaChi: "Praha, CH Séc",
+      soDienThoai: "+420 222 555 888",
+      email: "info@corpus.cz",
+      nguoiLienHe: "Pavel Novák",
+      chucVuNguoiLienHe: "Export Manager",
+      moTa: "Nhà sản xuất thiết bị y tế và khoa học",
+      maQuocGia: "CZ",
+    },
   ]);
-  
+
   // Insert sample investors
   await db.insert(schema.chuDauTu).values([
-    { ten: "Cục Y tế", diaChi: "138A Giảng Võ, Đống Đa, Hà Nội", soDienThoai: "024-3962-5555", email: "cuc.yte@moh.gov.vn", nguoiLienHe: "Phạm Duy Tuấn", chucVuNguoiLienHe: "Cục trưởng", moTa: "Cơ quan quản lý y tế dự phòng và y tế công cộng" },
-    { ten: "Cục Trắc địa", diaChi: "1 Hoàng Diệu, Ba Đình, Hà Nội", soDienThoai: "024-3734-6666", email: "cuc.tracdia@monre.gov.vn", nguoiLienHe: "Lê Văn Nam", chucVuNguoiLienHe: "Cục trưởng", moTa: "Cơ quan quản lý đo đạc bản đồ và thông tin địa lý" },
-    { ten: "Cục Vận tải", diaChi: "80 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội", soDienThoai: "024-3942-7777", email: "cuc.vantai@mt.gov.vn", nguoiLienHe: "Nguyễn Văn Hùng", chucVuNguoiLienHe: "Cục trưởng", moTa: "Cơ quan quản lý vận tải đường bộ, đường sắt, đường thủy" },
+    {
+      ten: "Cục Y tế",
+      diaChi: "138A Giảng Võ, Đống Đa, Hà Nội",
+      soDienThoai: "024-3962-5555",
+      email: "cuc.yte@moh.gov.vn",
+      nguoiLienHe: "Phạm Duy Tuấn",
+      chucVuNguoiLienHe: "Cục trưởng",
+      moTa: "Cơ quan quản lý y tế dự phòng và y tế công cộng",
+    },
+    {
+      ten: "Cục Trắc địa",
+      diaChi: "1 Hoàng Diệu, Ba Đình, Hà Nội",
+      soDienThoai: "024-3734-6666",
+      email: "cuc.tracdia@monre.gov.vn",
+      nguoiLienHe: "Lê Văn Nam",
+      chucVuNguoiLienHe: "Cục trưởng",
+      moTa: "Cơ quan quản lý đo đạc bản đồ và thông tin địa lý",
+    },
+    {
+      ten: "Cục Vận tải",
+      diaChi: "80 Trần Hưng Đạo, Hoàn Kiếm, Hà Nội",
+      soDienThoai: "024-3942-7777",
+      email: "cuc.vantai@mt.gov.vn",
+      nguoiLienHe: "Nguyễn Văn Hùng",
+      chucVuNguoiLienHe: "Cục trưởng",
+      moTa: "Cơ quan quản lý vận tải đường bộ, đường sắt, đường thủy",
+    },
   ]);
-  
+
   // Seed sample contracts and related data
   const { seedSQLiteDatabase } = await import("./seed-data-sqlite");
   await seedSQLiteDatabase();
-  
+
   console.log("Database initialization completed!");
 }
