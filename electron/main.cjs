@@ -1,3 +1,4 @@
+process.env.NODE_ENV = "production"; // ✅ Thêm dòng này ở đầu
 const path = require("path");
 const { app, BrowserWindow } = require("electron");
 
