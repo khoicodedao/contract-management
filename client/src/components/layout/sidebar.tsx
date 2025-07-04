@@ -97,9 +97,9 @@ export function Sidebar() {
           </div>
           <div>
             <h1 className="text-lg font-semibold text-slate-900">
-              ContractPro
+              Quản lý dự án
             </h1>
-            <p className="text-xs text-slate-500">Quản lý hợp đồng</p>
+            {/* <p className="text-xs text-slate-500">Quản lý hợp đồng</p> */}
           </div>
         </div>
       </div>

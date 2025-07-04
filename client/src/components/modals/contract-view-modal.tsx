@@ -110,7 +110,11 @@ export default function ContractViewModal({
     queryKey: ["/api/thanh-toan"],
     enabled: isOpen && !!contract,
   });
-
+  // Fetch repception data for this contract
+  const { data: repceptions = [] } = useQuery({
+    queryKey: ["/api/tiep-nhan"],
+    enabled: isOpen && !!contract,
+  });
   const { data: loaiTien = [] } = useQuery({
     queryKey: ["/api/loai-tien"],
     enabled: isOpen && !!contract,
@@ -134,6 +138,10 @@ export default function ContractViewModal({
   );
   const contractFileList = contractFiles.filter(
     (file) => file.hopDongId === contract.id
+  );
+
+  const reception = repceptions.filter(
+    (reception) => reception.hopDongId === contract.id
   );
 
   const form = useForm<InsertBuocThucHien>({
@@ -300,11 +308,12 @@ export default function ContractViewModal({
         </DialogHeader>
 
         <Tabs defaultValue="info" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="info">Thông tin</TabsTrigger>
             <TabsTrigger value="progress">Tiến độ</TabsTrigger>
             <TabsTrigger value="payments">Thanh toán</TabsTrigger>
             <TabsTrigger value="files">Tài liệu</TabsTrigger>
+            <TabsTrigger value="reception">Tiếp nhận</TabsTrigger>
           </TabsList>
 
           {/* Contract Info Tab */}
@@ -739,14 +748,14 @@ export default function ContractViewModal({
                 <Folder className="w-5 h-5 mr-2 text-blue-600" />
                 Tiến độ thực hiện ({contractProgressSteps.length} bước)
               </h3>
-              <Button
+              {/* <Button
                 onClick={() => setIsAddingProgress(true)}
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Thêm bước
-              </Button>
+              </Button> */}
             </div>
 
             {/* Progress Step Form */}
@@ -1099,14 +1108,14 @@ export default function ContractViewModal({
           <TabsContent value="files" className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-semibold">Tài liệu hợp đồng</h3>
-              <Button
+              {/* <Button
                 onClick={() => setIsAddingFile(true)}
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Thêm tài liệu
-              </Button>
+              </Button> */}
             </div>
 
             {/* File Upload Form */}
@@ -1333,6 +1342,72 @@ export default function ContractViewModal({
                 </Table>
               )}
             </div>
+          </TabsContent>
+
+          {/* Reception Tab */}
+          <TabsContent value="reception" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Tiếp nhận</h3>
+            </div>
+
+            {reception.length === 0 ? (
+              <div className="text-center py-8 text-slate-500">
+                <Package className="w-12 h-12 mx-auto mb-2 text-slate-300" />
+                <p>Chưa có thông tin tiếp nhận</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {reception.map((item) => (
+                  <div
+                    key={item.id}
+                    className="border rounded-lg p-4 bg-white shadow-sm"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                        <h4 className="font-medium text-slate-800">
+                          {item.tenHang}
+                        </h4>
+                      </div>
+                      <span className="text-xs text-slate-500">
+                        Ngày thực hiện: {formatDate(item.ngayThucHien)}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
+                      <div>
+                        <span className="font-medium">Số tờ khai:</span>{" "}
+                        {item.soToKhai || "—"}
+                      </div>
+                      <div>
+                        <span className="font-medium">Số vận đơn:</span>{" "}
+                        {item.soVanDon || "—"}
+                      </div>
+                      <div>
+                        <span className="font-medium">Số phiếu đóng gói:</span>{" "}
+                        {item.soPhieuDongGoi || "—"}
+                      </div>
+                      <div>
+                        <span className="font-medium">Số hóa đơn:</span>{" "}
+                        {item.soHoaDon || "—"}
+                      </div>
+                      <div>
+                        <span className="font-medium">Số bảo hiểm:</span>{" "}
+                        {item.soBaoHiem || "—"}
+                      </div>
+                      <div>
+                        <span className="font-medium">
+                          Địa điểm thông quan:
+                        </span>{" "}
+                        {item.diaDiemThongQuanId
+                          ? `Mã ${item.diaDiemThongQuanId}`
+                          : "—"}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>

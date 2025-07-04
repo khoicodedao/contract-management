@@ -176,9 +176,7 @@ export default function Dashboard() {
             {/* Contract Types Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>
-                  Số lượng hợp đồng theo loại hợp đồng - Biểu đồ tròn
-                </CardTitle>
+                <CardTitle>Số lượng hợp đồng theo loại hợp đồng</CardTitle>
               </CardHeader>
               <CardContent>
                 {!isChartsLoading && chartData?.contractTypes ? (
@@ -219,9 +217,7 @@ export default function Dashboard() {
             {/* Contract Types Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>
-                  Số lượng hợp đồng theo loại hợp đồng - Biểu đồ cột
-                </CardTitle>
+                <CardTitle>Số lượng hợp đồng theo loại hợp đồng</CardTitle>
               </CardHeader>
               <CardContent>
                 {!isChartsLoading && chartData?.contractTypes ? (

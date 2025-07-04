@@ -2,12 +2,30 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertHopDongSchema, InsertHopDong } from "@shared/schema";
@@ -19,32 +37,39 @@ interface ContractModalProps {
   contract?: any;
 }
 
-export default function ContractModal({ isOpen, onClose, contract }: ContractModalProps) {
+export default function ContractModal({
+  isOpen,
+  onClose,
+  contract,
+}: ContractModalProps) {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<InsertHopDong>({
     resolver: zodResolver(insertHopDongSchema),
-    defaultValues: contract ? {
-      ten: contract.ten || "",
-      moTa: contract.moTa || "",
-      soHdNoi: contract.soHdNoi || "",
-      soHdNgoai: contract.soHdNgoai || "",
-      ngay: contract.ngay || new Date().toISOString().split('T')[0],
-      loaiHopDongId: contract.loaiHopDongId,
-      chuDauTuId: contract.chuDauTuId,
-      nhaCungCapId: contract.nhaCungCapId,
-      loaiNganSachId: contract.loaiNganSachId,
-      canBoId: contract.canBoId,
-      trangThaiHopDongId: contract.trangThaiHopDongId,
-    } : {
-      ten: "",
-      moTa: "",
-      soHdNoi: "",
-      soHdNgoai: "",
-      ngay: new Date().toISOString().split('T')[0],
-    },
+    defaultValues: contract
+      ? {
+          ten: contract.ten || "",
+          moTa: contract.moTa || "",
+          soHdNoi: contract.soHdNoi || "",
+          soHdNgoai: contract.soHdNgoai || "",
+          ngay: contract.ngay || new Date().toISOString().split("T")[0],
+          loaiHopDongId: contract.loaiHopDongId,
+          chuDauTuId: contract.chuDauTuId,
+          nhaCungCapId: contract.nhaCungCapId,
+          loaiNganSachId: contract.loaiNganSachId,
+          canBoId: contract.canBoId,
+          trangThaiHopDongId: contract.trangThaiHopDongId,
+          giaTriHopDong: contract.giaTriHopDong ?? 0,
+        }
+      : {
+          ten: "",
+          moTa: "",
+          soHdNoi: "",
+          soHdNgoai: "",
+          ngay: new Date().toISOString().split("T")[0],
+        },
   });
 
   // Fetch reference data
@@ -85,7 +110,9 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({
         title: "Thành công",
-        description: contract ? "Hợp đồng đã được cập nhật thành công" : "Hợp đồng đã được tạo thành công",
+        description: contract
+          ? "Hợp đồng đã được cập nhật thành công"
+          : "Hợp đồng đã được tạo thành công",
       });
       form.reset();
       setSelectedFiles([]);
@@ -103,17 +130,19 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      const newFiles = Array.from(files).filter(file => {
-        const validTypes = ['.pdf', '.doc', '.docx', '.xls', '.xlsx'];
-        const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
-        return validTypes.includes(fileExtension) && file.size <= 10 * 1024 * 1024; // 10MB
+      const newFiles = Array.from(files).filter((file) => {
+        const validTypes = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
+        const fileExtension = "." + file.name.split(".").pop()?.toLowerCase();
+        return (
+          validTypes.includes(fileExtension) && file.size <= 10 * 1024 * 1024
+        ); // 10MB
       });
-      setSelectedFiles(prev => [...prev, ...newFiles]);
+      setSelectedFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
   const removeFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const onSubmit = (data: InsertHopDong) => {
@@ -125,7 +154,7 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
       <DialogContent className="max-w-4xl max-h-screen overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold text-slate-900">
-{contract ? "Chỉnh sửa hợp đồng" : "Tạo hợp đồng mới"}
+            {contract ? "Chỉnh sửa hợp đồng" : "Tạo hợp đồng mới"}
           </DialogTitle>
         </DialogHeader>
 
@@ -194,7 +223,10 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Loại hợp đồng *</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn loại hợp đồng" />
@@ -219,7 +251,10 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Nhà cung cấp *</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn nhà cung cấp" />
@@ -230,7 +265,9 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                           <SelectItem key={item.id} value={item.id.toString()}>
                             <div className="flex flex-col">
                               <span className="font-medium">{item.ten}</span>
-                              <span className="text-xs text-gray-500">{item.diaChi}</span>
+                              <span className="text-xs text-gray-500">
+                                {item.diaChi}
+                              </span>
                             </div>
                           </SelectItem>
                         ))}
@@ -247,7 +284,10 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Chủ đầu tư *</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn chủ đầu tư" />
@@ -258,12 +298,37 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                           <SelectItem key={item.id} value={item.id.toString()}>
                             <div className="flex flex-col">
                               <span className="font-medium">{item.ten}</span>
-                              <span className="text-xs text-gray-500">{item.diaChi}</span>
+                              <span className="text-xs text-gray-500">
+                                {item.diaChi}
+                              </span>
                             </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="giaTriHopDong"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Giá trị hợp đồng (VND) *</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={100000}
+                        placeholder="VD: 100000000"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          field.onChange(isNaN(value) ? 0 : value);
+                        }}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -275,7 +340,10 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Cán bộ phụ trách *</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn cán bộ" />
@@ -286,8 +354,14 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                           <SelectItem key={item.id} value={item.id.toString()}>
                             <div className="flex flex-col">
                               <span className="font-medium">{item.ten}</span>
-                              <span className="text-xs text-gray-500">{item.chucVu}</span>
-                              {item.email && <span className="text-xs text-gray-400">{item.email}</span>}
+                              <span className="text-xs text-gray-500">
+                                {item.chucVu}
+                              </span>
+                              {item.email && (
+                                <span className="text-xs text-gray-400">
+                                  {item.email}
+                                </span>
+                              )}
                             </div>
                           </SelectItem>
                         ))}
@@ -304,7 +378,12 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Loại ngân sách</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(value ? parseInt(value) : undefined)} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) =>
+                        field.onChange(value ? parseInt(value) : undefined)
+                      }
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn loại ngân sách" />
@@ -375,7 +454,9 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
                       key={index}
                       className="flex items-center justify-between p-2 bg-slate-50 rounded border"
                     >
-                      <span className="text-sm text-slate-700">{file.name}</span>
+                      <span className="text-sm text-slate-700">
+                        {file.name}
+                      </span>
                       <Button
                         type="button"
                         variant="ghost"
@@ -394,11 +475,10 @@ export default function ContractModal({ isOpen, onClose, contract }: ContractMod
               <Button type="button" variant="outline" onClick={onClose}>
                 Hủy
               </Button>
-              <Button
-                type="submit"
-                disabled={createContractMutation.isPending}
-              >
-                {createContractMutation.isPending ? "Đang tạo..." : "Tạo hợp đồng"}
+              <Button type="submit" disabled={createContractMutation.isPending}>
+                {createContractMutation.isPending
+                  ? "Đang tạo..."
+                  : "Tạo hợp đồng"}
               </Button>
             </div>
           </form>
