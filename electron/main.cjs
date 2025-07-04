@@ -13,5 +13,5 @@ app.whenReady().then(async () => {
     },
   });
 
-  win.loadURL("http://localhost:5001"); // ✅ Sau khi server chạy thì mới load UI
+  win.loadURL("http://localhost:5000"); // ✅ Sau khi server chạy thì mới load UI
 });
