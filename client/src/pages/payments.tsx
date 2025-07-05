@@ -153,38 +153,43 @@ export default function Payments() {
     return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
-  const getStatusBadge = (dateString: string | null) => {
-    return dateString ? (
+  const getStatusBadge = (daThanhToan: boolean) => {
+    return daThanhToan ? (
       <Badge className="bg-green-100 text-green-800">Đã thanh toán</Badge>
     ) : (
       <Badge className="bg-orange-100 text-orange-800">Chưa thanh toán</Badge>
     );
   };
-
   const getPaymentStatus = (
     hanHopDong: string | null,
-    hanThucHien: string | null
+    hanThucHien: string | null,
+    daThanhToan: boolean
   ) => {
-    if (!hanHopDong && !hanThucHien)
-      return { label: "Chưa xác định", color: "bg-gray-100 text-gray-800" };
-
     const now = new Date();
-    const contractDeadline = hanHopDong ? new Date(hanHopDong) : null;
-    const executionDeadline = hanThucHien ? new Date(hanThucHien) : null;
-
-    const deadline = executionDeadline || contractDeadline;
+    const deadline = hanThucHien
+      ? new Date(hanThucHien)
+      : hanHopDong
+      ? new Date(hanHopDong)
+      : null;
 
     if (!deadline)
       return { label: "Chưa xác định", color: "bg-gray-100 text-gray-800" };
 
-    if (deadline < now) {
+    if (!daThanhToan && deadline < now)
       return { label: "Quá hạn", color: "bg-red-100 text-red-800" };
-    } else if (deadline.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000) {
+
+    if (
+      !daThanhToan &&
+      deadline.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000
+    )
       return { label: "Sắp đến hạn", color: "bg-yellow-100 text-yellow-800" };
-    } else {
-      return { label: "Bình thường", color: "bg-green-100 text-green-800" };
-    }
+
+    return { label: "Bình thường", color: "bg-green-100 text-green-800" };
   };
+  const overdueCount = payments.filter((p) => {
+    const status = getPaymentStatus(p.hanHopDong, p.hanThucHien, p.daThanhToan);
+    return status.label === "Quá hạn";
+  }).length;
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -250,15 +255,7 @@ export default function Payments() {
                       Quá hạn
                     </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
-                      {
-                        payments.filter((p) => {
-                          const status = getPaymentStatus(
-                            p.hanHopDong,
-                            p.hanThucHien
-                          );
-                          return status.label === "Quá hạn";
-                        }).length
-                      }
+                      {overdueCount}
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
@@ -366,14 +363,13 @@ export default function Payments() {
                                   </div>
                                   <div className="flex items-center space-x-2 mt-1">
                                     <span className="text-sm font-medium">
-                                      {contractPaymentSummary.paid}/
                                       {contractPaymentSummary.total} lần
                                     </span>
                                     <div className="w-20">
                                       <Progress
                                         value={
-                                          (contractPaymentSummary.paid /
-                                            contractPaymentSummary.total) *
+                                          (contractPaymentSummary.paidAmount /
+                                            contractPaymentSummary.totalAmount) *
                                           100
                                         }
                                         className="h-2"
@@ -426,17 +422,30 @@ export default function Payments() {
                                       <h4 className="text-md font-medium text-slate-900">
                                         Lần thanh toán #{index + 1}
                                       </h4>
-                                      <Badge
-                                        className={
-                                          payment.hanThucHien
-                                            ? "bg-green-100 text-green-800"
-                                            : "bg-orange-100 text-orange-800"
-                                        }
-                                      >
-                                        {payment.hanThucHien
-                                          ? "Đã thanh toán"
-                                          : "Chưa thanh toán"}
-                                      </Badge>
+                                      {getStatusBadge(
+                                        payment.daThanhToan ?? false
+                                      )}
+                                      {/* Badge trạng thái thời hạn */}
+                                      {!payment.daThanhToan &&
+                                        (() => {
+                                          const { label, color } =
+                                            getPaymentStatus(
+                                              payment.hanHopDong,
+                                              payment.hanThucHien,
+                                              payment.daThanhToan ?? false
+                                            );
+                                          if (
+                                            label === "Sắp đến hạn" ||
+                                            label === "Quá hạn"
+                                          ) {
+                                            return (
+                                              <Badge className={color}>
+                                                {label}
+                                              </Badge>
+                                            );
+                                          }
+                                          return null;
+                                        })()}
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 text-sm mb-3">

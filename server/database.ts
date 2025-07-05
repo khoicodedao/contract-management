@@ -174,9 +174,11 @@ function createTables() {
       so_bao_hiem TEXT,
       dia_diem_thong_quan_id INTEGER,
       dia_diem_thong_quan_tu_do TEXT,
+      dieu_kien_giao_hang_id INTEGER,
       ngay_thuc_hien TEXT NOT NULL,
       FOREIGN KEY (hop_dong_id) REFERENCES hop_dong(id),
       FOREIGN KEY (dia_diem_thong_quan_id) REFERENCES dia_diem_thong_quan(id)
+      FOREIGN KEY (dieu_kien_giao_hang_id) REFERENCES dieu_kien_giao_hang(id)
     );
     
     CREATE TABLE IF NOT EXISTS users (
@@ -184,6 +186,11 @@ function createTables() {
       username TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS dieu_kien_giao_hang (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ten TEXT NOT NULL
+    );
+
   `);
 }
 
@@ -346,7 +353,22 @@ export async function initializeDatabase() {
       maQuocGia: "CZ",
     },
   ]);
-
+  // Insert sample incoterm
+  await db
+    .insert(schema.dieuKienGiaoHang)
+    .values([
+      { ten: "Ex Works(EXW)" },
+      { ten: "Free Carrier (FCA)" },
+      { ten: "Carriage Paid To(CPT)" },
+      { ten: "Carriage and Insurance Paid To(CIP)" },
+      { ten: "Delivered at Terminal(DAT)" },
+      { ten: "Delivered at Place(DAP)" },
+      { ten: "Delivered Duty Paid (DDP)" },
+      { ten: "Free Alongside Ship(FAS)" },
+      { ten: "Cost and Freight(CFR)" },
+      { ten: "Free On Board(FOB)" },
+      { ten: "Cost, Insurance and Freight(CIF)" },
+    ]);
   // Insert sample investors
   await db.insert(schema.chuDauTu).values([
     {

@@ -6,9 +6,8 @@ import { setupVite, serveStatic, log } from "./vite";
 const app = express();
 const server = createServer(app);
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -59,7 +58,7 @@ app.use((req, res, next) => {
   }
 
   // Start server
-  const port = 5000;
+  const port = 5001;
   server.listen(port, "0.0.0.0", async () => {
     log(`serving on port ${port}`);
 

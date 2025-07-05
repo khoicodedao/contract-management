@@ -28,6 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertThanhToanSchema, InsertThanhToan } from "@shared/schema";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -55,6 +56,7 @@ export default function PaymentModal({
           hanHopDong: payment.hanHopDong || "",
           hanThucHien: payment.hanThucHien || "",
           soTien: payment.soTien || "",
+          daThanhToan: payment.daThanhToan ?? false, // ✅ Thêm dòng này
         }
       : {
           hopDongId: 0,
@@ -62,6 +64,7 @@ export default function PaymentModal({
           hanHopDong: "",
           hanThucHien: "",
           soTien: "",
+          daThanhToan: false, // ✅ Thêm dòng này
         },
   });
 
@@ -314,7 +317,21 @@ export default function PaymentModal({
                 )}
               />
             </div>
-
+            <FormField
+              control={form.control}
+              name="daThanhToan"
+              render={({ field }) => (
+                <FormItem className="flex items-center space-x-2">
+                  <FormControl className="mt-2">
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormLabel className="mb-0">Đã thanh toán</FormLabel>
+                </FormItem>
+              )}
+            />
             <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={onClose}>
                 Hủy

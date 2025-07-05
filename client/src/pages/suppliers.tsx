@@ -7,18 +7,65 @@ import Header from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Trash2, Search, Plus, Building2, MapPin } from "lucide-react";
-import { NhaCungCap, insertNhaCungCapSchema, InsertNhaCungCap } from "@shared/schema";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Search,
+  Plus,
+  Building2,
+  MapPin,
+} from "lucide-react";
+import {
+  NhaCungCap,
+  insertNhaCungCapSchema,
+  InsertNhaCungCap,
+} from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
+const imageToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const base64 = reader.result?.toString().split(",")[1];
+      resolve(base64 || "");
+    };
+    reader.onerror = (error) => reject(error);
+  });
+
 export default function Suppliers() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingSupplier, setEditingSupplier] = useState<NhaCungCap | null>(
+    null
+  );
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -38,7 +85,12 @@ export default function Suppliers() {
 
   const createSupplierMutation = useMutation({
     mutationFn: async (data: InsertNhaCungCap) => {
-      return await apiRequest("POST", "/api/nha-cung-cap", data);
+      let finalData = { ...data };
+      if (selectedImage) {
+        const base64Content = await imageToBase64(selectedImage);
+        finalData.anh = base64Content;
+      }
+      return await apiRequest("POST", "/api/nha-cung-cap", finalData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nha-cung-cap"] });
@@ -47,6 +99,7 @@ export default function Suppliers() {
         description: "Nhà cung cấp đã được thêm thành công",
       });
       form.reset();
+      setSelectedImage(null);
       setIsCreateModalOpen(false);
     },
     onError: () => {
@@ -58,16 +111,42 @@ export default function Suppliers() {
     },
   });
 
+  const updateSupplierMutation = useMutation({
+    mutationFn: async (data: NhaCungCap) => {
+      let finalData = { ...data };
+      if (selectedImage) {
+        const base64Content = await imageToBase64(selectedImage);
+        finalData.anh = base64Content;
+      }
+      return await apiRequest("PUT", `/api/nha-cung-cap/${data.id}`, finalData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/nha-cung-cap"] });
+      toast({
+        title: "Cập nhật thành công",
+        description: "Thông tin nhà cung cấp đã được cập nhật",
+      });
+      form.reset();
+      setSelectedImage(null);
+      setEditingSupplier(null);
+      setIsEditModalOpen(false);
+    },
+    onError: () => {
+      toast({
+        title: "Lỗi",
+        description: "Không thể cập nhật nhà cung cấp",
+        variant: "destructive",
+      });
+    },
+  });
+
   const deleteSupplierMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest("DELETE", `/api/nha-cung-cap/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nha-cung-cap"] });
-      toast({
-        title: "Thành công",
-        description: "Nhà cung cấp đã được xóa",
-      });
+      toast({ title: "Thành công", description: "Nhà cung cấp đã được xóa" });
     },
     onError: () => {
       toast({
@@ -78,10 +157,23 @@ export default function Suppliers() {
     },
   });
 
-  const filteredSuppliers = suppliers.filter(supplier =>
-    supplier.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.diaChi?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    supplier.maQuocGia?.toLowerCase().includes(searchTerm.toLowerCase())
+  const handleEdit = (supplier: NhaCungCap) => {
+    form.reset({
+      ten: supplier.ten,
+      diaChi: supplier.diaChi || "",
+      maQuocGia: supplier.maQuocGia || "",
+      anh: supplier.anh || "",
+    });
+    setEditingSupplier(supplier);
+    setIsEditModalOpen(true);
+    setSelectedImage(null);
+  };
+
+  const filteredSuppliers = suppliers.filter(
+    (supplier) =>
+      supplier.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.diaChi?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      supplier.maQuocGia?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDeleteSupplier = (id: number) => {
@@ -91,24 +183,30 @@ export default function Suppliers() {
   };
 
   const onSubmit = (data: InsertNhaCungCap) => {
-    createSupplierMutation.mutate(data);
+    if (editingSupplier) {
+      updateSupplierMutation.mutate({ ...editingSupplier, ...data });
+    } else {
+      createSupplierMutation.mutate(data);
+    }
   };
 
   const getCountryFlag = (countryCode: string | null) => {
     if (!countryCode) return "🌐";
-    
     const flags: { [key: string]: string } = {
-      "VN": "🇻🇳",
-      "US": "🇺🇸", 
-      "CN": "🇨🇳",
-      "JP": "🇯🇵",
-      "KR": "🇰🇷",
-      "DE": "🇩🇪",
-      "FR": "🇫🇷",
-      "GB": "🇬🇧",
+      VN: "🇻🇳",
+      US: "🇺🇸",
+      CN: "🇨🇳",
+      JP: "🇯🇵",
+      KR: "🇰🇷",
+      DE: "🇩🇪",
+      FR: "🇫🇷",
+      GB: "🇬🇧",
     };
-    
     return flags[countryCode.toUpperCase()] || "🌐";
+  };
+
+  const getSupplierAvatar = (anh?: string | null) => {
+    return anh ? `data:image/jpeg;base64,${anh}` : "/default-avatar.png";
   };
 
   return (
@@ -120,7 +218,6 @@ export default function Suppliers() {
           subtitle="Quản lý thông tin đối tác và nhà cung cấp"
           onCreateContract={() => setIsCreateModalOpen(true)}
         />
-
         <main className="flex-1 overflow-auto p-6">
           <Card>
             <CardHeader>
@@ -131,7 +228,6 @@ export default function Suppliers() {
                   Thêm nhà cung cấp
                 </Button>
               </div>
-              
               <div className="flex items-center space-x-4 mt-4">
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -144,111 +240,85 @@ export default function Suppliers() {
                 </div>
               </div>
             </CardHeader>
-            
             <CardContent>
               {isLoading ? (
-                <div className="space-y-4">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-100 rounded animate-pulse" />
-                  ))}
-                </div>
-              ) : filteredSuppliers.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-slate-500">
-                    {searchTerm 
-                      ? "Không tìm thấy nhà cung cấp nào phù hợp"
-                      : "Chưa có nhà cung cấp nào được thêm"
-                    }
-                  </p>
-                </div>
+                <p>Đang tải...</p>
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nhà cung cấp</TableHead>
-                        <TableHead>Địa chỉ</TableHead>
-                        <TableHead>Quốc gia</TableHead>
-                        <TableHead>Hành động</TableHead>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Ảnh</TableHead>
+                      <TableHead>Tên</TableHead>
+                      <TableHead>Địa chỉ</TableHead>
+                      <TableHead>Quốc gia</TableHead>
+                      <TableHead>Hành động</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredSuppliers.map((supplier) => (
+                      <TableRow key={supplier.id}>
+                        <TableCell>
+                          <img
+                            src={getSupplierAvatar(supplier.anh)}
+                            alt="avatar"
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        </TableCell>
+                        <TableCell>{supplier.ten}</TableCell>
+                        <TableCell>{supplier.diaChi}</TableCell>
+                        <TableCell>
+                          {getCountryFlag(supplier.maQuocGia)}{" "}
+                          {supplier.maQuocGia}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(supplier)}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDeleteSupplier(supplier.id)}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredSuppliers.map((supplier) => (
-                        <TableRow key={supplier.id} className="table-row">
-                          <TableCell>
-                            <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <Building2 className="w-5 h-5 text-blue-600" />
-                              </div>
-                              <div>
-                                <div className="font-medium text-slate-900">
-                                  {supplier.ten || "Chưa có tên"}
-                                </div>
-                                <div className="text-sm text-slate-500">
-                                  ID: {supplier.id}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <MapPin className="w-4 h-4 text-slate-400" />
-                              <span className="text-slate-700">
-                                {supplier.diaChi || "Chưa có địa chỉ"}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="flex items-center space-x-1 w-fit">
-                              <span>{getCountryFlag(supplier.maQuocGia)}</span>
-                              <span>{supplier.maQuocGia || "Chưa xác định"}</span>
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-primary hover:text-primary/80"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-slate-600 hover:text-slate-800"
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 text-red-600 hover:text-red-800"
-                                onClick={() => handleDeleteSupplier(supplier.id)}
-                                disabled={deleteSupplierMutation.isPending}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                    ))}
+                  </TableBody>
+                </Table>
               )}
             </CardContent>
           </Card>
         </main>
       </div>
 
-      {/* Create Supplier Modal */}
-      <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+      {/* Modal for Create/Edit */}
+      <Dialog
+        open={isCreateModalOpen || isEditModalOpen}
+        onOpenChange={(open) => {
+          setIsCreateModalOpen(false);
+          setIsEditModalOpen(false);
+          if (!open) {
+            setEditingSupplier(null);
+            form.reset();
+            setSelectedImage(null);
+          }
+        }}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Thêm nhà cung cấp mới</DialogTitle>
+            <DialogTitle>
+              {editingSupplier
+                ? "Cập nhật nhà cung cấp"
+                : "Thêm nhà cung cấp mới"}
+            </DialogTitle>
           </DialogHeader>
-
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -264,7 +334,6 @@ export default function Suppliers() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="diaChi"
@@ -278,7 +347,6 @@ export default function Suppliers() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="maQuocGia"
@@ -292,27 +360,52 @@ export default function Suppliers() {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="anh"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>URL ảnh logo</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://example.com/logo.jpg" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <FormItem>
+                <FormLabel>Ảnh logo (tùy chọn)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setSelectedImage(e.target.files[0]);
+                      }
+                    }}
+                  />
+                </FormControl>
+                {editingSupplier?.anh && !selectedImage && (
+                  <img
+                    src={`data:image/jpeg;base64,${editingSupplier.anh}`}
+                    alt="Ảnh hiện tại"
+                    className="mt-2 w-20 h-20 object-cover rounded"
+                  />
                 )}
-              />
-
+              </FormItem>
               <div className="flex justify-end space-x-4">
-                <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setIsCreateModalOpen(false);
+                    setIsEditModalOpen(false);
+                  }}
+                >
                   Hủy
                 </Button>
-                <Button type="submit" disabled={createSupplierMutation.isPending}>
-                  {createSupplierMutation.isPending ? "Đang thêm..." : "Thêm nhà cung cấp"}
+                <Button
+                  type="submit"
+                  disabled={
+                    createSupplierMutation.isPending ||
+                    updateSupplierMutation.isPending
+                  }
+                >
+                  {editingSupplier
+                    ? updateSupplierMutation.isPending
+                      ? "Đang cập nhật..."
+                      : "Cập nhật nhà cung cấp"
+                    : createSupplierMutation.isPending
+                    ? "Đang thêm..."
+                    : "Thêm nhà cung cấp"}
                 </Button>
               </div>
             </form>

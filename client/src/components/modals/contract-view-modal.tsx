@@ -134,9 +134,25 @@ export default function ContractViewModal({
   const contractProgressSteps = progressSteps.filter(
     (step) => step.hopDongId === contract.id
   );
-  const contractPayments = payments.filter(
-    (payment) => payment.hopDongId === contract.id
-  );
+  const contractPayments = payments
+    .filter((payment) => payment.hopDongId === contract.id)
+    .map((payment) => {
+      const now = new Date();
+      const hanThucHien = payment.hanThucHien
+        ? new Date(payment.hanThucHien)
+        : null;
+      const hanHopDong = payment.hanHopDong
+        ? new Date(payment.hanHopDong)
+        : null;
+      const deadline = hanThucHien || hanHopDong;
+      const isOverdue = deadline && !payment.daThanhToan && deadline < now;
+
+      return {
+        ...payment,
+        isOverdue,
+      };
+    });
+
   const contractFileList = contractFiles.filter(
     (file) => file.hopDongId === contract.id
   );
@@ -417,7 +433,22 @@ export default function ContractViewModal({
                                 className={`w-4 h-4 ${statusColor}`}
                               />
                             </div>
-
+                            {step.canBoPhuTrachId &&
+                              (() => {
+                                const staff = canBo.find(
+                                  (item: any) =>
+                                    item.id === step.canBoPhuTrachId
+                                );
+                                if (!staff || !staff.anh) return null;
+                                return (
+                                  <img
+                                    src={staff.anh}
+                                    alt={staff.ten || "Cán bộ"}
+                                    className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                                    title={staff.ten}
+                                  />
+                                );
+                              })()}
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
                                 <h4 className="text-sm font-medium text-gray-900 flex items-center">
@@ -446,7 +477,18 @@ export default function ContractViewModal({
                                 </p>
                               )}
 
-                              <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-2">
+                              <div className="grid grid-cols-2 gap-1 text-xs text-gray-500">
+                                <div>
+                                  <span className="font-medium">Cán bộ:</span>{" "}
+                                  {(() => {
+                                    const staff = canBo.find(
+                                      (item: any) =>
+                                        item.id === step.canBoPhuTrachId
+                                    );
+                                    if (!staff || !staff.anh) return null;
+                                    return staff.ten || "Chưa xác định";
+                                  })()}
+                                </div>
                                 <div>
                                   <span className="font-medium">Bắt đầu:</span>{" "}
                                   {formatDate(step.ngayBatDau)}
@@ -529,7 +571,7 @@ export default function ContractViewModal({
                     <div className="text-center">
                       <p className="text-sm text-slate-600">Đã thanh toán</p>
                       <p className="text-xl font-bold text-slate-700">
-                        {contractPayments.filter((p) => p.hanThucHien).length}/
+                        {contractPayments.filter((p) => p.daThanhToan).length}/
                         {contractPayments.length}
                       </p>
                     </div>
@@ -547,13 +589,17 @@ export default function ContractViewModal({
                           </h4>
                           <span
                             className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              payment.hanThucHien
+                              payment.daThanhToan
                                 ? "bg-green-100 text-green-800"
+                                : payment.isOverdue
+                                ? "bg-red-100 text-red-800"
                                 : "bg-orange-100 text-orange-800"
                             }`}
                           >
-                            {payment.hanThucHien
+                            {payment.daThanhToan
                               ? "Đã thanh toán"
+                              : payment.isOverdue
+                              ? "Quá hạn"
                               : "Chưa thanh toán"}
                           </span>
                         </div>
@@ -705,37 +751,41 @@ export default function ContractViewModal({
                     Cán bộ phụ trách
                   </label>
                   <div className="mt-1 bg-indigo-50 p-3 rounded border">
-                    <p className="text-sm font-medium text-gray-900">
-                      {canBo.find((item: any) => item.id === contract.canBoId)
-                        ?.ten || "Chưa xác định"}
-                    </p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Chức vụ:{" "}
-                      {canBo.find((item: any) => item.id === contract.canBoId)
-                        ?.chucVu || ""}
-                    </p>
-                    {canBo.find((item: any) => item.id === contract.canBoId)
-                      ?.email && (
-                      <p className="text-xs text-gray-600">
-                        Email:{" "}
-                        {
-                          canBo.find(
-                            (item: any) => item.id === contract.canBoId
-                          )?.email
-                        }
-                      </p>
-                    )}
-                    {canBo.find((item: any) => item.id === contract.canBoId)
-                      ?.soDienThoai && (
-                      <p className="text-xs text-gray-600">
-                        SĐT:{" "}
-                        {
-                          canBo.find(
-                            (item: any) => item.id === contract.canBoId
-                          )?.soDienThoai
-                        }
-                      </p>
-                    )}
+                    {(() => {
+                      const staff = canBo.find(
+                        (item: any) => item.id === contract.canBoId
+                      );
+                      if (!staff) return null;
+                      return (
+                        <>
+                          {staff.anh && (
+                            <div className="mb-2">
+                              <img
+                                src={`${staff.anh}`}
+                                alt="Ảnh cán bộ"
+                                className="w-16 h-16 rounded-full object-cover"
+                              />
+                            </div>
+                          )}
+                          <p className="text-sm font-medium text-gray-900">
+                            {staff.ten || "Chưa xác định"}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Chức vụ: {staff.chucVu || ""}
+                          </p>
+                          {staff.email && (
+                            <p className="text-xs text-gray-600">
+                              Email: {staff.email}
+                            </p>
+                          )}
+                          {staff.soDienThoai && (
+                            <p className="text-xs text-gray-600">
+                              SĐT: {staff.soDienThoai}
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </div>
@@ -1009,11 +1059,7 @@ export default function ContractViewModal({
                   <div>
                     <p className="text-sm text-green-600">Đã thanh toán</p>
                     <p className="text-xl font-bold text-green-900">
-                      {
-                        contractPayments.filter(
-                          (p) => p.trangThai === "Đã thanh toán"
-                        ).length
-                      }
+                      {contractPayments.filter((p) => p.daThanhToan).length}
                     </p>
                   </div>
                 </div>
@@ -1024,11 +1070,7 @@ export default function ContractViewModal({
                   <div>
                     <p className="text-sm text-red-600">Chưa thanh toán</p>
                     <p className="text-xl font-bold text-red-900">
-                      {
-                        contractPayments.filter(
-                          (p) => p.trangThai === "Chưa thanh toán"
-                        ).length
-                      }
+                      {contractPayments.filter((p) => !p.daThanhToan).length}
                     </p>
                   </div>
                 </div>
@@ -1052,9 +1094,7 @@ export default function ContractViewModal({
                       <div className="flex items-center space-x-3">
                         <div
                           className={`w-3 h-3 rounded-full ${
-                            payment.trangThai === "Đã thanh toán"
-                              ? "bg-green-500"
-                              : "bg-red-500"
+                            payment.daThanhToan ? "bg-green-500" : "bg-red-500"
                           }`}
                         ></div>
                         <h4 className="font-medium">
@@ -1064,13 +1104,13 @@ export default function ContractViewModal({
                       </div>
                       <Badge
                         variant={
-                          payment.trangThai === "Đã thanh toán"
-                            ? "default"
-                            : "destructive"
+                          payment.daThanhToan ? "default" : "destructive"
                         }
                         className="text-xs"
                       >
-                        {payment.trangThai || "Chưa xác định"}
+                        {payment.daThanhToan
+                          ? "Đã Thanh Toán"
+                          : "Chưa Thanh Toán"}
                       </Badge>
                     </div>
 
@@ -1084,12 +1124,8 @@ export default function ContractViewModal({
                         {getPaymentMethodName(payment.loaiHinhThucThanhToanId)}
                       </div>
                       <div>
-                        <span className="font-medium">Ngày đến hạn:</span>{" "}
-                        {formatDate(payment.ngayDenHan)}
-                      </div>
-                      <div>
-                        <span className="font-medium">Ngày thanh toán:</span>{" "}
-                        {formatDate(payment.ngayThanhToan)}
+                        <span className="font-medium">Hạn thực hiện:</span>{" "}
+                        {formatDate(payment.hanThucHien)}
                       </div>
                     </div>
 

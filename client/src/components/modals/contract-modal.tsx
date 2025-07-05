@@ -244,6 +244,39 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="trangThaiHopDongId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Trạng thái hợp đồng *</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn trạng thái" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {trangThaiHopDong?.map((item: any) => (
+                          <SelectItem key={item.id} value={item.id.toString()}>
+                            {item.id === 1
+                              ? "Đang thực hiện"
+                              : item.id === 2
+                              ? "Hoàn thành"
+                              : item.id === 3
+                              ? "Tạm dừng"
+                              : `Trạng thái ${item.id}`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <FormField
                 control={form.control}
@@ -420,57 +453,6 @@ export default function ContractModal({
                 </FormItem>
               )}
             />
-
-            {/* File Upload Section */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Tài liệu đính kèm
-              </label>
-              <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
-                <CloudUpload className="mx-auto h-12 w-12 text-slate-400 mb-4" />
-                <p className="text-sm text-slate-600 mb-2">
-                  Kéo thả file vào đây hoặc{" "}
-                  <label className="text-primary cursor-pointer">
-                    chọn file
-                    <input
-                      type="file"
-                      multiple
-                      accept=".pdf,.doc,.docx,.xls,.xlsx"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </label>
-                </p>
-                <p className="text-xs text-slate-500">
-                  Hỗ trợ: PDF, DOC, DOCX, XLS, XLSX (Tối đa 10MB)
-                </p>
-              </div>
-
-              {/* Selected Files */}
-              {selectedFiles.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  {selectedFiles.map((file, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-2 bg-slate-50 rounded border"
-                    >
-                      <span className="text-sm text-slate-700">
-                        {file.name}
-                      </span>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeFile(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
               <Button type="button" variant="outline" onClick={onClose}>
                 Hủy

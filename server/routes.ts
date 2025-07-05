@@ -25,7 +25,7 @@ import path from "path";
 const upload = multer({
   storage: multer.memoryStorage(), // Lưu file trong RAM (có thể đổi thành diskStorage)
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB
+    fileSize: 1000 * 1024 * 1024, // 10MB
   },
 });
 export async function registerRoutes(app: Express): Promise<void> {
@@ -291,6 +291,46 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Lỗi khi tạo cán bộ" });
     }
   });
+  app.put("/api/can-bo/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertCanBoSchema.parse(req.body);
+
+      const updated = await db
+        .update(schema.canBo)
+        .set(validatedData)
+        .where(eq(schema.canBo.id, id))
+        .returning();
+
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy cán bộ" });
+      }
+
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating can bo:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật cán bộ" });
+    }
+  });
+  app.delete("/api/can-bo/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      console.log(id);
+      const deleted = await db
+        .delete(schema.canBo)
+        .where(eq(schema.canBo.id, id))
+        .returning();
+
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy cán bộ để xóa" });
+      }
+
+      res.json({ message: "Đã xóa cán bộ thành công", item: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting can bo:", error);
+      res.status(500).json({ error: "Lỗi khi xóa cán bộ" });
+    }
+  });
 
   // Nhà cung cấp routes
   app.get("/api/nha-cung-cap", async (req, res) => {
@@ -316,6 +356,46 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Lỗi khi tạo nhà cung cấp" });
     }
   });
+  app.put("/api/nha-cung-cap/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertNhaCungCapSchema.parse(req.body);
+
+      const updated = await db
+        .update(schema.nhaCungCap)
+        .set(validatedData)
+        .where(eq(schema.nhaCungCap.id, id))
+        .returning();
+
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy nhà cung cấp" });
+      }
+
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating nha cung cap:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật nhà cung cấp" });
+    }
+  });
+  app.delete("/api/nha-cung-cap/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+
+      const deleted = await db
+        .delete(schema.nhaCungCap)
+        .where(eq(schema.nhaCungCap.id, id))
+        .returning();
+
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy nhà cung cấp" });
+      }
+
+      res.json({ message: "Đã xoá nhà cung cấp thành công" });
+    } catch (error) {
+      console.error("Error deleting nha cung cap:", error);
+      res.status(500).json({ error: "Lỗi khi xoá nhà cung cấp" });
+    }
+  });
 
   // Chủ đầu tư routes
   app.get("/api/chu-dau-tu", async (req, res) => {
@@ -339,6 +419,43 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error creating chu dau tu:", error);
       res.status(500).json({ error: "Lỗi khi tạo chủ đầu tư" });
+    }
+  });
+  // Cập nhật chủ đầu tư
+  app.put("/api/chu-dau-tu/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertChuDauTuSchema.parse(req.body); // Sử dụng schema giống POST
+      const updated = await db
+        .update(schema.chuDauTu)
+        .set(validatedData)
+        .where(eq(schema.chuDauTu.id, Number(id)))
+        .returning();
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy chủ đầu tư" });
+      }
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating chu dau tu:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật chủ đầu tư" });
+    }
+  });
+
+  // Xóa chủ đầu tư
+  app.delete("/api/chu-dau-tu/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await db
+        .delete(schema.chuDauTu)
+        .where(eq(schema.chuDauTu.id, Number(id)))
+        .returning();
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy chủ đầu tư" });
+      }
+      res.json({ message: "Đã xóa thành công", data: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting chu dau tu:", error);
+      res.status(500).json({ error: "Lỗi khi xóa chủ đầu tư" });
     }
   });
 
@@ -400,6 +517,50 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  app.put("/api/hop-dong/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
+      // Validate dữ liệu đầu vào (nếu cần chỉnh sửa thì dùng schema riêng)
+      const validatedData = insertHopDongSchema.parse(req.body);
+
+      const updated = await db
+        .update(schema.hopDong)
+        .set(validatedData)
+        .where(eq(schema.hopDong.id, Number(id))) // Convert string id to number
+        .returning();
+      if (updated.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "Không tìm thấy hợp đồng để cập nhật" });
+      }
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating hop dong:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật hợp đồng" });
+    }
+  });
+
+  app.delete("/api/hop-dong/:id", async (req, res) => {
+    const id = req.params.id;
+    try {
+      const deleted = await db
+        .delete(schema.hopDong)
+        .where(eq(schema.hopDong.id, Number(id))) // hoặc Number(id) nếu id là số
+        .returning();
+
+      if (deleted.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "Không tìm thấy hợp đồng để xóa" });
+      }
+
+      res.json({ message: "Đã xóa hợp đồng thành công", item: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting hop dong:", error);
+      res.status(500).json({ error: "Lỗi khi xóa hợp đồng" });
+    }
+  });
+
   // Thanh toán routes
   app.get("/api/thanh-toan", async (req, res) => {
     try {
@@ -422,6 +583,49 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error creating thanh toan:", error);
       res.status(500).json({ error: "Lỗi khi tạo thanh toán" });
+    }
+  });
+  // PUT: Cập nhật thanh toán
+  app.put("/api/thanh-toan/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertThanhToanSchema.parse(req.body);
+
+      const updated = await db
+        .update(schema.thanhToan)
+        .set(validatedData)
+        .where(eq(schema.thanhToan.id, Number(id)))
+        .returning();
+
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy thanh toán" });
+      }
+
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating thanh toan:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật thanh toán" });
+    }
+  });
+
+  // DELETE: Xóa thanh toán
+  app.delete("/api/thanh-toan/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const deleted = await db
+        .delete(schema.thanhToan)
+        .where(eq(schema.thanhToan.id, Number(id)))
+        .returning();
+
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy thanh toán" });
+      }
+
+      res.json({ message: "Đã xóa thành công", data: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting thanh toan:", error);
+      res.status(500).json({ error: "Lỗi khi xóa thanh toán" });
     }
   });
 
@@ -449,7 +653,43 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Lỗi khi tạo bước thực hiện" });
     }
   });
+  // Cập nhật bước thực hiện theo id
+  app.put("/api/buoc-thuc-hien/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = schema.updateBuocThucHienSchema.parse(req.body); // cần có schema cho update
+      const updated = await db
+        .update(schema.buocThucHien)
+        .set(validatedData)
+        .where(eq(schema.buocThucHien.id, id))
+        .returning();
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy bước thực hiện" });
+      }
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating buoc thuc hien:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật bước thực hiện" });
+    }
+  });
 
+  // Xóa bước thực hiện theo id
+  app.delete("/api/buoc-thuc-hien/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await db
+        .delete(schema.buocThucHien)
+        .where(eq(schema.buocThucHien.id, id))
+        .returning();
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy bước thực hiện" });
+      }
+      res.json({ message: "Xóa thành công", item: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting buoc thuc hien:", error);
+      res.status(500).json({ error: "Lỗi khi xóa bước thực hiện" });
+    }
+  });
   // Trang bị routes
   app.get("/api/trang-bi", async (req, res) => {
     try {
@@ -474,7 +714,47 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Lỗi khi tạo trang bị" });
     }
   });
+  // Cập nhật trang bị
+  app.put("/api/trang-bi/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertTrangBiSchema.parse(req.body); // có thể dùng updateSchema nếu có
+      const updated = await db
+        .update(schema.trangBi)
+        .set(validatedData)
+        .where(eq(schema.trangBi.id, Number(id)))
+        .returning();
 
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy trang bị" });
+      }
+
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating trang bi:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật trang bị" });
+    }
+  });
+
+  // Xóa trang bị
+  app.delete("/api/trang-bi/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await db
+        .delete(schema.trangBi)
+        .where(eq(schema.trangBi.id, Number(id)))
+        .returning();
+
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy trang bị" });
+      }
+
+      res.json({ message: "Đã xóa thành công", data: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting trang bi:", error);
+      res.status(500).json({ error: "Lỗi khi xóa trang bị" });
+    }
+  });
   // File hợp đồng routes
   app.get("/api/file-hop-dong", async (req, res) => {
     try {
@@ -673,8 +953,10 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   app.post("/api/dia-diem-thong-quan", async (req, res) => {
+    console.log("Received request body:", req.body);
     try {
       const validatedData = insertDiaDiemThongQuanSchema.parse(req.body);
+      console.log("Validated Data:", validatedData);
       const items = await db
         .insert(schema.diaDiemThongQuan)
         .values(validatedData)
@@ -683,6 +965,52 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error creating dia diem thong quan:", error);
       res.status(500).json({ error: "Lỗi khi tạo địa điểm thông quan" });
+    }
+  });
+  app.put("/api/dia-diem-thong-quan/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+      // Validate dữ liệu gửi lên
+      const validatedData = insertDiaDiemThongQuanSchema.parse(req.body);
+
+      const updated = await db
+        .update(schema.diaDiemThongQuan)
+        .set(validatedData)
+        .where(eq(schema.diaDiemThongQuan.id, Number(id)))
+        .returning();
+
+      if (updated.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "Không tìm thấy địa điểm để cập nhật" });
+      }
+
+      res.json({ message: "Cập nhật thành công", item: updated[0] });
+    } catch (error) {
+      console.error("Error updating dia diem thong quan:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật địa điểm thông quan" });
+    }
+  });
+  app.delete("/api/dia-diem-thong-quan/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+      const deleted = await db
+        .delete(schema.diaDiemThongQuan)
+        .where(eq(schema.diaDiemThongQuan.id, Number(id)))
+        .returning();
+
+      if (deleted.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "Không tìm thấy địa điểm để xóa" });
+      }
+
+      res.json({ message: "Xóa thành công", item: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting dia diem thong quan:", error);
+      res.status(500).json({ error: "Lỗi khi xóa địa điểm thông quan" });
     }
   });
 
@@ -775,6 +1103,16 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error deleting tiep nhan:", error);
       res.status(500).json({ error: "Lỗi khi xóa tiếp nhận" });
+    }
+  });
+  // Điều kiện giao hàng
+  app.get("/api/dieu-kien-giao-hang", async (req, res) => {
+    try {
+      const items = await db.select().from(schema.dieuKienGiaoHang);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching incoterm:", error);
+      res.status(500).json({ error: "Lỗi server" });
     }
   });
 }

@@ -39,7 +39,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
-
+import BorderGate from "@/components/modals/border_gate-modal";
 interface TiepNhan {
   id: number;
   hopDongId: number;
@@ -52,6 +52,7 @@ interface TiepNhan {
   diaDiemThongQuanId?: number;
   diaDiemThongQuanTuDo?: string;
   ngayThucHien: string;
+  dieuKienGiaoHangId: number;
 }
 
 interface DiaDiemThongQuan {
@@ -64,8 +65,16 @@ interface HopDong {
   id: number;
   ten: string;
 }
+interface DieuKienGiaoHang {
+  id: number;
+  ten: string;
+}
 
 export default function Reception() {
+  const [isCreateBorderGateModalOpen, setIsCreateBorderGateModalOpen] =
+    useState(false);
+  const openCreateBorderGate = () => setIsCreateBorderGateModalOpen(true);
+  const closeCreateBorderGate = () => setIsCreateBorderGateModalOpen(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingReception, setEditingReception] = useState<TiepNhan | null>(
@@ -85,6 +94,9 @@ export default function Reception() {
 
   const { data: contracts = [] } = useQuery<HopDong[]>({
     queryKey: ["/api/hop-dong"],
+  });
+  const { data: incoterms = [] } = useQuery<DieuKienGiaoHang[]>({
+    queryKey: ["/api/dieu-kien-giao-hang"],
   });
 
   const createMutation = useMutation({
@@ -150,6 +162,9 @@ export default function Reception() {
       soPhieuDongGoi: (formData.get("soPhieuDongGoi") as string) || undefined,
       soHoaDon: (formData.get("soHoaDon") as string) || undefined,
       soBaoHiem: (formData.get("soBaoHiem") as string) || undefined,
+      dieuKienGiaoHangId: parseInt(
+        formData.get("dieuKienGiaoHangId") as string
+      ),
       diaDiemThongQuanId: useCustomLocation
         ? undefined
         : parseInt(formData.get("diaDiemThongQuanId") as string) || undefined,
@@ -261,7 +276,26 @@ export default function Reception() {
                           <Input id="soVanDon" name="soVanDon" />
                         </div>
                       </div>
-
+                      <div className="space-y-2">
+                        <Label htmlFor="dieuKienGiaoHangId">
+                          Điều kiện giao hang
+                        </Label>
+                        <Select name="dieuKienGiaoHangId" required>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn điều kiện giao hàng" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {incoterms.map((inconterm) => (
+                              <SelectItem
+                                key={inconterm.id}
+                                value={inconterm.id.toString()}
+                              >
+                                {inconterm.ten}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="soPhieuDongGoi">
@@ -292,20 +326,6 @@ export default function Reception() {
                       </div>
 
                       <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="useCustomLocation"
-                            checked={useCustomLocation}
-                            onChange={(e) =>
-                              setUseCustomLocation(e.target.checked)
-                            }
-                          />
-                          <Label htmlFor="useCustomLocation">
-                            Nhập tay địa điểm thông quan
-                          </Label>
-                        </div>
-
                         {useCustomLocation ? (
                           <div className="space-y-2">
                             <Label htmlFor="diaDiemThongQuanTuDo">
@@ -506,7 +526,30 @@ export default function Reception() {
                           />
                         </div>
                       </div>
-
+                      <div className="space-y-2">
+                        <Label htmlFor="dieuKienGiaoHangId">
+                          Điều kiện giao hàng
+                        </Label>
+                        <Select
+                          name="dieuKienGiaoHangId"
+                          defaultValue={editingReception.dieuKienGiaoHangId.toString()}
+                          required
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Chọn điều kiện giao hàng" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {incoterms.map((incoterm) => (
+                              <SelectItem
+                                key={incoterm.id}
+                                value={incoterm.id.toString()}
+                              >
+                                {incoterm.ten}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="soPhieuDongGoi">
@@ -550,20 +593,6 @@ export default function Reception() {
                       </div>
 
                       <div className="space-y-4">
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="useCustomLocation"
-                            checked={useCustomLocation}
-                            onChange={(e) =>
-                              setUseCustomLocation(e.target.checked)
-                            }
-                          />
-                          <Label htmlFor="useCustomLocation">
-                            Nhập tay địa điểm thông quan
-                          </Label>
-                        </div>
-
                         {useCustomLocation ? (
                           <div className="space-y-2">
                             <Label htmlFor="diaDiemThongQuanTuDo">
@@ -619,6 +648,14 @@ export default function Reception() {
                   )}
                 </DialogContent>
               </Dialog>
+              <Button onClick={openCreateBorderGate}>
+                <Plus className="h-4 w-4 mr-2" />
+                Thêm địa điểm thông quan
+              </Button>
+              <BorderGate
+                isOpen={isCreateBorderGateModalOpen}
+                onClose={closeCreateBorderGate}
+              />
             </div>
           </div>
         </main>

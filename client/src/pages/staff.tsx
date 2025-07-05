@@ -7,16 +7,42 @@ import Header from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import StaffModal from "@/components/modals/staff-modal";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Eye, Edit, Trash2, Search, Plus, User, Upload, X } from "lucide-react";
 import { CanBo, insertCanBoSchema, InsertCanBo } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-
+function imageToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 export default function Staff() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -42,7 +68,7 @@ export default function Staff() {
   const createStaffMutation = useMutation({
     mutationFn: async (data: InsertCanBo) => {
       let finalData = { ...data };
-      
+
       if (selectedImage) {
         try {
           const base64Content = await imageToBase64(selectedImage);
@@ -54,9 +80,13 @@ export default function Staff() {
           throw new Error("Không thể xử lý ảnh");
         }
       }
-      
+
       if (selectedStaff) {
-        return await apiRequest("PUT", `/api/can-bo/${selectedStaff.id}`, finalData);
+        return await apiRequest(
+          "PUT",
+          `/api/can-bo/${selectedStaff.id}`,
+          finalData
+        );
       } else {
         return await apiRequest("POST", "/api/can-bo", finalData);
       }
@@ -99,9 +129,10 @@ export default function Staff() {
     },
   });
 
-  const filteredStaff = staff.filter(member =>
-    member.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.chucVu?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredStaff = staff.filter(
+    (member) =>
+      member.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.chucVu?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDeleteStaff = (id: number) => {
@@ -116,9 +147,9 @@ export default function Staff() {
 
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -143,7 +174,7 @@ export default function Staff() {
                   Thêm cán bộ
                 </Button>
               </div>
-              
+
               <div className="flex items-center space-x-4 mt-4">
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -156,21 +187,23 @@ export default function Staff() {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-100 rounded animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-16 bg-slate-100 rounded animate-pulse"
+                    />
                   ))}
                 </div>
               ) : filteredStaff.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-slate-500">
-                    {searchTerm 
+                    {searchTerm
                       ? "Không tìm thấy cán bộ nào phù hợp"
-                      : "Chưa có cán bộ nào được thêm"
-                    }
+                      : "Chưa có cán bộ nào được thêm"}
                   </p>
                 </div>
               ) : (
@@ -191,7 +224,11 @@ export default function Staff() {
                               <Avatar>
                                 <AvatarImage src={member.anh || undefined} />
                                 <AvatarFallback>
-                                  {member.ten ? getInitials(member.ten) : <User className="w-4 h-4" />}
+                                  {member.ten ? (
+                                    getInitials(member.ten)
+                                  ) : (
+                                    <User className="w-4 h-4" />
+                                  )}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
@@ -215,13 +252,22 @@ export default function Staff() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 text-primary hover:text-primary/80"
+                                onClick={() => {
+                                  setSelectedStaff(member);
+                                  setIsEditModalOpen(true); // Mở cùng modal
+                                }}
                               >
                                 <Eye className="h-4 w-4" />
                               </Button>
+
                               <Button
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 text-slate-600 hover:text-slate-800"
+                                onClick={() => {
+                                  setSelectedStaff(member);
+                                  setIsEditModalOpen(true);
+                                }}
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
@@ -291,7 +337,10 @@ export default function Staff() {
                   <FormItem>
                     <FormLabel>URL ảnh</FormLabel>
                     <FormControl>
-                      <Input placeholder="https://example.com/avatar.jpg" {...field} />
+                      <Input
+                        placeholder="https://example.com/avatar.jpg"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -299,17 +348,33 @@ export default function Staff() {
               />
 
               <div className="flex justify-end space-x-4">
-                <Button type="button" variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateModalOpen(false)}
+                >
                   Hủy
                 </Button>
                 <Button type="submit" disabled={createStaffMutation.isPending}>
-                  {createStaffMutation.isPending ? "Đang thêm..." : "Thêm cán bộ"}
+                  {createStaffMutation.isPending
+                    ? "Đang thêm..."
+                    : "Thêm cán bộ"}
                 </Button>
               </div>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
+      {/* Edit Staff Modal */}
+      <StaffModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        staff={selectedStaff}
+        onSubmit={(data) => {
+          createStaffMutation.mutate(data);
+        }}
+        isSubmitting={createStaffMutation.isPending}
+      />
     </div>
   );
 }

@@ -116,7 +116,7 @@ export default function DocumentModal({
   const validateAndSetFile = (file: File) => {
     // Check file size (5MB limit for images, 10MB for documents)
     const isImage = file.type.startsWith("image/");
-    const maxSize = isImage ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
+    const maxSize = isImage ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
 
     if (file.size > maxSize) {
       toast({

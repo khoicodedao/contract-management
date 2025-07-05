@@ -81,6 +81,7 @@ export const coQuan = sqliteTable("co_quan", {
 export const diaDiemThongQuan = sqliteTable("dia_diem_thong_quan", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   ten: text("ten").notNull(),
+  chiCuc: text("chi_cuc").notNull(),
 });
 
 // Loại giấy phép
@@ -164,6 +165,7 @@ export const tiepNhan = sqliteTable("tiep_nhan", {
   soBaoHiem: text("so_bao_hiem"),
   diaDiemThongQuanId: integer("dia_diem_thong_quan_id"),
   ngayThucHien: text("ngay_thuc_hien"),
+  dieuKienGiaoHangId: integer("dieu_kien_giao_hang_id"),
 });
 
 // Thanh toán
@@ -233,6 +235,10 @@ export const users = sqliteTable("users", {
   password: text("password").notNull(),
 });
 
+export const dieuKienGiaoHang = sqliteTable("dieu_kien_giao_hang", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ten: text("ten").notNull(),
+});
 // Insert schemas
 export const insertLoaiHopDongSchema = createInsertSchema(loaiHopDong).omit({
   id: true,
@@ -295,6 +301,9 @@ export const insertFileHopDongSchema = createInsertSchema(fileHopDong).omit({
   ngayTaiLen: true,
 });
 export const insertBuocThucHienSchema = createInsertSchema(buocThucHien).omit({
+  id: true,
+});
+export const updateBuocThucHienSchema = createInsertSchema(buocThucHien).omit({
   id: true,
 });
 

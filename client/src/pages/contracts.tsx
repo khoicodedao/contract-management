@@ -6,13 +6,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import ContractModal from "@/components/modals/contract-modal";
 import ContractViewModal from "@/components/modals/contract-view-modal";
 import { Eye, Edit, Trash2, Search, Filter, Plus } from "lucide-react";
 import { HopDong } from "@shared/schema";
-import { CONTRACT_STATUS_LABELS, CONTRACT_STATUS_COLORS } from "@/lib/constants";
+import {
+  CONTRACT_STATUS_LABELS,
+  CONTRACT_STATUS_COLORS,
+} from "@/lib/constants";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,7 +36,9 @@ export default function Contracts() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedContract, setSelectedContract] = useState<HopDong | null>(null);
+  const [selectedContract, setSelectedContract] = useState<HopDong | null>(
+    null
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
@@ -84,34 +102,32 @@ export default function Contracts() {
     }
   };
 
-  const filteredContracts = contracts.filter(contract => {
-    const matchesSearch = contract.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const filteredContracts = contracts.filter((contract) => {
+    const matchesSearch =
+      contract.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contract.soHdNoi?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || 
+    const matchesStatus =
+      statusFilter === "all" ||
       contract.trangThaiHopDongId?.toString() === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   const getStatusBadge = (statusId: number | null) => {
     if (!statusId) return null;
-    
-    const label = CONTRACT_STATUS_LABELS[statusId as keyof typeof CONTRACT_STATUS_LABELS];
-    const colors = CONTRACT_STATUS_COLORS[statusId as keyof typeof CONTRACT_STATUS_COLORS];
-    
-    return (
-      <Badge className={`status-badge ${colors}`}>
-        {label}
-      </Badge>
-    );
+
+    const label =
+      CONTRACT_STATUS_LABELS[statusId as keyof typeof CONTRACT_STATUS_LABELS];
+    const colors =
+      CONTRACT_STATUS_COLORS[statusId as keyof typeof CONTRACT_STATUS_COLORS];
+
+    return <Badge className={`status-badge ${colors}`}>{label}</Badge>;
   };
-
-
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -133,7 +149,7 @@ export default function Contracts() {
                   Thêm hợp đồng
                 </Button>
               </div>
-              
+
               {/* Filters */}
               <div className="flex items-center space-x-4 mt-4">
                 <div className="relative flex-1 max-w-sm">
@@ -158,21 +174,23 @@ export default function Contracts() {
                 </Select>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-100 rounded animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-16 bg-slate-100 rounded animate-pulse"
+                    />
                   ))}
                 </div>
               ) : filteredContracts.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-slate-500">
-                    {searchTerm || statusFilter !== "all" 
+                    {searchTerm || statusFilter !== "all"
                       ? "Không tìm thấy hợp đồng nào phù hợp"
-                      : "Chưa có hợp đồng nào được tạo"
-                    }
+                      : "Chưa có hợp đồng nào được tạo"}
                   </p>
                 </div>
               ) : (
@@ -215,7 +233,9 @@ export default function Contracts() {
                           </TableCell>
                           <TableCell>{formatDate(contract.ngay)}</TableCell>
                           <TableCell>
-                            {contract.nhaCungCapId ? `NCC-${contract.nhaCungCapId}` : "Chưa xác định"}
+                            {contract.nhaCungCapId
+                              ? `NCC-${contract.nhaCungCapId}`
+                              : "Chưa xác định"}
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(contract.trangThaiHopDongId)}
@@ -242,7 +262,9 @@ export default function Contracts() {
                                 variant="ghost"
                                 size="icon"
                                 className="h-8 w-8 text-red-600 hover:text-red-800"
-                                onClick={() => handleDeleteContract(contract.id)}
+                                onClick={() =>
+                                  handleDeleteContract(contract.id)
+                                }
                                 disabled={deleteContractMutation.isPending}
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -264,10 +286,10 @@ export default function Contracts() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
       />
-      
+
       {selectedContract && (
-        <ContractModal 
-          isOpen={isEditModalOpen} 
+        <ContractModal
+          isOpen={isEditModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
             setSelectedContract(null);
@@ -275,10 +297,10 @@ export default function Contracts() {
           contract={selectedContract}
         />
       )}
-      
+
       {selectedContract && (
-        <ContractViewModal 
-          isOpen={isViewModalOpen} 
+        <ContractViewModal
+          isOpen={isViewModalOpen}
           onClose={() => {
             setIsViewModalOpen(false);
             setSelectedContract(null);

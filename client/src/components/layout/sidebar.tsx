@@ -13,78 +13,82 @@ import {
   Inbox,
   DollarSign,
 } from "lucide-react";
-
-const navigation = [
-  {
-    name: "Tổng quan",
-    href: "/",
-    icon: BarChart3,
-    current: false,
-  },
-  {
-    name: "Hợp đồng",
-    href: "/hop-dong",
-    icon: File,
-    current: false,
-    badge: "15",
-  },
-  {
-    name: "Cán bộ",
-    href: "/can-bo",
-    icon: Users,
-    current: false,
-  },
-  {
-    name: "Nhà cung cấp",
-    href: "/nha-cung-cap",
-    icon: Building2,
-    current: false,
-  },
-  {
-    name: "Chủ đầu tư",
-    href: "/chu-dau-tu",
-    icon: Users,
-    current: false,
-  },
-  {
-    name: "Trang bị",
-    href: "/trang-bi",
-    icon: Settings,
-    current: false,
-  },
-  {
-    name: "Thanh toán",
-    href: "/thanh-toan",
-    icon: CreditCard,
-    current: false,
-  },
-  {
-    name: "Tiến độ",
-    href: "/tien-do",
-    icon: CheckSquare,
-    current: false,
-  },
-  {
-    name: "Tài liệu",
-    href: "/tai-lieu",
-    icon: FolderOpen,
-    current: false,
-  },
-  {
-    name: "Tiếp nhận",
-    href: "/tiep-nhan",
-    icon: Inbox,
-    current: false,
-  },
-  {
-    name: "Loại ngân sách",
-    href: "/loai-ngan-sach",
-    icon: DollarSign,
-    current: false,
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { HopDong } from "@shared/schema";
 
 export function Sidebar() {
+  const { data: contracts = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/hop-dong"],
+  });
+  const navigation = [
+    {
+      name: "Tổng quan",
+      href: "/",
+      icon: BarChart3,
+      current: false,
+    },
+    {
+      name: "Hợp đồng",
+      href: "/hop-dong",
+      icon: File,
+      current: false,
+      badge: contracts.length > 0 ? contracts.length : 0,
+    },
+    {
+      name: "Cán bộ",
+      href: "/can-bo",
+      icon: Users,
+      current: false,
+    },
+    {
+      name: "Nhà cung cấp",
+      href: "/nha-cung-cap",
+      icon: Building2,
+      current: false,
+    },
+    {
+      name: "Chủ đầu tư",
+      href: "/chu-dau-tu",
+      icon: Users,
+      current: false,
+    },
+    {
+      name: "Trang bị",
+      href: "/trang-bi",
+      icon: Settings,
+      current: false,
+    },
+    {
+      name: "Thanh toán",
+      href: "/thanh-toan",
+      icon: CreditCard,
+      current: false,
+    },
+    {
+      name: "Tiến độ",
+      href: "/tien-do",
+      icon: CheckSquare,
+      current: false,
+    },
+    {
+      name: "Tài liệu",
+      href: "/tai-lieu",
+      icon: FolderOpen,
+      current: false,
+    },
+    {
+      name: "Tiếp nhận",
+      href: "/tiep-nhan",
+      icon: Inbox,
+      current: false,
+    },
+    {
+      name: "Loại ngân sách",
+      href: "/loai-ngan-sach",
+      icon: DollarSign,
+      current: false,
+    },
+  ];
   const [location] = useLocation();
 
   return (
