@@ -1,10 +1,10 @@
-process.env.NODE_ENV = "production"; // ✅ Thêm dòng này ở đầu
-const path = require("path");
+process.env.NODE_ENV = "production"; // 🟢 Đặt ngay đầu tiên
+
 const { app, BrowserWindow } = require("electron");
+const { startServer } = require("../dist/index.js");
 
 app.whenReady().then(async () => {
-  const { serverReady } = require("../dist/index.js");
-  await serverReady; // ✅ Đợi server chạy xong
+  await startServer(); // ⏳ server sẽ dùng serveStatic nếu NODE_ENV === "production"
 
   const win = new BrowserWindow({
     width: 1200,
@@ -14,5 +14,5 @@ app.whenReady().then(async () => {
     },
   });
 
-  win.loadURL("http://localhost:5000"); // ✅ Sau khi server chạy thì mới load UI
+  win.loadURL("http://localhost:5000");
 });
