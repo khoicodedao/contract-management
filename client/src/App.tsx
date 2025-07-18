@@ -22,6 +22,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Dashboard} />
       <Route path="/hop-dong" component={Contracts} />
+      <Route path="/hop-dong/:id" component={Contracts} />
       <Route path="/can-bo" component={Staff} />
       <Route path="/nha-cung-cap" component={Suppliers} />
       <Route path="/chu-dau-tu" component={Investors} />

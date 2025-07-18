@@ -31,15 +31,18 @@ import {
 } from "@/lib/constants";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useRoute } from "wouter";
 
 export default function Contracts() {
+  const searchParams = new URLSearchParams(window.location.search);
+  const initialSearch = searchParams.get("search") || "";
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedContract, setSelectedContract] = useState<HopDong | null>(
     null
   );
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [statusFilter, setStatusFilter] = useState("all");
   const { toast } = useToast();
   const queryClient = useQueryClient();

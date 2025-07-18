@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { Server } from "http";
-import { eq } from "drizzle-orm";
+import { eq, ilike, sql } from "drizzle-orm";
 import { db } from "./database.js";
 import * as schema from "../shared/schema.js";
 import {
@@ -494,8 +494,23 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   // Hợp đồng routes
   app.get("/api/hop-dong", async (req, res) => {
+    console.log("🔍 API /api/hop-dong được gọi");
+    const search = req.query.search;
+    console.log("Search:", search);
     try {
-      const items = await db.select().from(schema.hopDong);
+      let items;
+
+      if (search) {
+        items = await db
+          .select()
+          .from(schema.hopDong)
+          .where(
+            sql`LOWER(${schema.hopDong.ten}) LIKE LOWER(${`%${search}%`})`
+          );
+      } else {
+        items = await db.select().from(schema.hopDong);
+      }
+
       res.json(items);
     } catch (error) {
       console.error("Error fetching hop dong:", error);
