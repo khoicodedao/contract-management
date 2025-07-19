@@ -59,7 +59,7 @@ app.use((req, res, next) => {
   }
 
   // Start server
-  const port = 5000;
+  const port = 5001;
   server.listen(port, "0.0.0.0", async () => {
     log(`serving on port ${port}`);
 

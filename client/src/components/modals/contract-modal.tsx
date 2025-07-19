@@ -194,7 +194,7 @@ export default function ContractModal({
                 name="soHdNgoai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Số hợp đồng đối tác</FormLabel>
+                    <FormLabel>Số hợp đồng ngoại</FormLabel>
                     <FormControl>
                       <Input placeholder="Số HĐ từ đối tác" {...field} />
                     </FormControl>
@@ -265,9 +265,9 @@ export default function ContractModal({
                             {item.id === 1
                               ? "Đang thực hiện"
                               : item.id === 2
-                              ? "Hoàn thành"
+                              ? "Đã Thanh lý  "
                               : item.id === 3
-                              ? "Tạm dừng"
+                              ? "Chưa thực hiện"
                               : `Trạng thái ${item.id}`}
                           </SelectItem>
                         ))}
@@ -348,7 +348,7 @@ export default function ContractModal({
                 name="giaTriHopDong"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Giá trị hợp đồng (VND) *</FormLabel>
+                    <FormLabel>Giá trị hợp đồng*</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
