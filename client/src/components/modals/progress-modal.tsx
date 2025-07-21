@@ -168,7 +168,7 @@ export default function ProgressModal({
                 name="hopDongId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Hợp đồng</FormLabel>
+                    <FormLabel>Số Hợp đồng ngoại</FormLabel>
                     <Select
                       onValueChange={(value) => field.onChange(parseInt(value))}
                       value={field.value?.toString()}
@@ -184,7 +184,7 @@ export default function ProgressModal({
                             key={contract.id}
                             value={contract.id.toString()}
                           >
-                            {contract.ten}
+                            {contract.soHdNgoai}
                           </SelectItem>
                         ))}
                       </SelectContent>

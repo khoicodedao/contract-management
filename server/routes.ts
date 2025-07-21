@@ -504,11 +504,12 @@ export async function registerRoutes(app: Express): Promise<void> {
       let items;
 
       if (search) {
+        const keyword = `%${search}%`;
         items = await db
           .select()
           .from(schema.hopDong)
           .where(
-            sql`LOWER(${schema.hopDong.ten}) LIKE LOWER(${`%${search}%`})`
+            sql`LOWER(${schema.hopDong.ten}) LIKE LOWER(${keyword}) OR LOWER(${schema.hopDong.soHdNgoai}) LIKE LOWER(${keyword})`
           );
       } else {
         items = await db.select().from(schema.hopDong);

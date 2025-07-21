@@ -5,9 +5,26 @@ import { Header } from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Trash2, Search, Plus, Building2, Users, FileText, TrendingUp } from "lucide-react";
+import {
+  Eye,
+  Edit,
+  Trash2,
+  Search,
+  Plus,
+  Building2,
+  Users,
+  FileText,
+  TrendingUp,
+} from "lucide-react";
 import { ChuDauTu, HopDong } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -16,7 +33,8 @@ import { InvestorModal } from "@/components/modals/investor-modal";
 export default function InvestorsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [selectedInvestor, setSelectedInvestor] = React.useState<ChuDauTu | null>(null);
+  const [selectedInvestor, setSelectedInvestor] =
+    React.useState<ChuDauTu | null>(null);
   const { toast } = useToast();
 
   const { data: investors = [], isLoading } = useQuery({
@@ -31,9 +49,10 @@ export default function InvestorsPage() {
 
   const filteredInvestors = React.useMemo(() => {
     if (!searchTerm) return investors;
-    return investors.filter((investor: ChuDauTu) =>
-      investor.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      investor.diaChi?.toLowerCase().includes(searchTerm.toLowerCase())
+    return investors.filter(
+      (investor: ChuDauTu) =>
+        investor.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        investor.diaChi?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [investors, searchTerm]);
 
@@ -70,29 +89,39 @@ export default function InvestorsPage() {
   });
 
   const getContractCount = (investor: ChuDauTu) => {
-    return contracts.filter((contract: HopDong) => 
-      contract.chuDauTuId === investor.id ||
-      contract.chuDauTu === investor.ten
+    return contracts.filter(
+      (contract: HopDong) =>
+        contract.chuDauTuId === investor.id ||
+        contract.chuDauTu === investor.ten
     ).length;
   };
 
   const getContractValue = (investor: ChuDauTu) => {
     return contracts
-      .filter((contract: HopDong) => 
-        contract.chuDauTuId === investor.id ||
-        contract.chuDauTu === investor.ten
+      .filter(
+        (contract: HopDong) =>
+          contract.chuDauTuId === investor.id ||
+          contract.chuDauTu === investor.ten
       )
-      .reduce((sum: number, contract: HopDong) => sum + (contract.giaTriHopDong || 0), 0);
+      .reduce(
+        (sum: number, contract: HopDong) => sum + (contract.giaTriHopDong || 0),
+        0
+      );
   };
 
   const totalContracts = contracts.length;
-  const totalValue = contracts.reduce((sum: number, contract: HopDong) => sum + (contract.giaTriHopDong || 0), 0);
-  const activeInvestors = investors.filter((investor: ChuDauTu) => getContractCount(investor) > 0).length;
+  const totalValue = contracts.reduce(
+    (sum: number, contract: HopDong) => sum + (contract.giaTriHopDong || 0),
+    0
+  );
+  const activeInvestors = investors.filter(
+    (investor: ChuDauTu) => getContractCount(investor) > 0
+  ).length;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(amount);
   };
 
@@ -113,7 +142,9 @@ export default function InvestorsPage() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Tổng chủ đầu tư</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Tổng chủ đầu tư
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
                       {investors.length}
                     </p>
@@ -129,7 +160,9 @@ export default function InvestorsPage() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Đang hợp tác</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Đang hợp tác
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
                       {activeInvestors}
                     </p>
@@ -145,7 +178,9 @@ export default function InvestorsPage() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Tổng hợp đồng</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Tổng hợp đồng
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
                       {totalContracts}
                     </p>
@@ -161,9 +196,11 @@ export default function InvestorsPage() {
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-600">Tổng giá trị</p>
+                    <p className="text-sm font-medium text-slate-600">
+                      Tổng giá trị
+                    </p>
                     <p className="text-2xl font-bold text-slate-900 mt-2">
-                      {formatCurrency(totalValue).replace('₫', 'VNĐ')}
+                      {formatCurrency(totalValue).replace("₫", "VNĐ")}
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -179,15 +216,17 @@ export default function InvestorsPage() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Danh sách chủ đầu tư</CardTitle>
-                <Button onClick={() => {
-                  setSelectedInvestor(null);
-                  setIsModalOpen(true);
-                }}>
+                <Button
+                  onClick={() => {
+                    setSelectedInvestor(null);
+                    setIsModalOpen(true);
+                  }}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Thêm chủ đầu tư
                 </Button>
               </div>
-              
+
               <div className="flex gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
@@ -200,19 +239,24 @@ export default function InvestorsPage() {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent>
               {isLoading ? (
                 <div className="space-y-4">
                   {[...Array(5)].map((_, i) => (
-                    <div key={i} className="h-16 bg-slate-100 rounded animate-pulse" />
+                    <div
+                      key={i}
+                      className="h-16 bg-slate-100 rounded animate-pulse"
+                    />
                   ))}
                 </div>
               ) : filteredInvestors.length === 0 ? (
                 <div className="text-center py-8">
                   <Building2 className="mx-auto h-12 w-12 text-slate-400 mb-4" />
                   <p className="text-slate-500">
-                    {searchTerm ? "Không tìm thấy chủ đầu tư nào" : "Chưa có chủ đầu tư nào"}
+                    {searchTerm
+                      ? "Không tìm thấy chủ đầu tư nào"
+                      : "Chưa có chủ đầu tư nào"}
                   </p>
                 </div>
               ) : (
@@ -220,20 +264,17 @@ export default function InvestorsPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Tên chủ đầu tư</TableHead>
-                      <TableHead>Địa chỉ</TableHead>
                       <TableHead>Số điện thoại</TableHead>
                       <TableHead>Email</TableHead>
                       <TableHead>Số hợp đồng</TableHead>
-                      <TableHead>Tổng giá trị</TableHead>
-                      <TableHead>Trạng thái</TableHead>
-                      <TableHead className="text-right">Thao tác</TableHead>
+                      <TableHead className="text-right"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredInvestors.map((investor: ChuDauTu) => {
                       const contractCount = getContractCount(investor);
                       const contractValue = getContractValue(investor);
-                      
+
                       return (
                         <TableRow key={investor.id}>
                           <TableCell>
@@ -242,27 +283,18 @@ export default function InvestorsPage() {
                                 <Building2 className="w-5 h-5 text-blue-600" />
                               </div>
                               <div>
-                                <div className="font-medium">{investor.ten}</div>
+                                <div className="font-medium">
+                                  {investor.ten}
+                                </div>
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{investor.diaChi || "-"}</TableCell>
                           <TableCell>{investor.soDienThoai || "-"}</TableCell>
                           <TableCell>{investor.email || "-"}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="bg-blue-50">
                               {contractCount} hợp đồng
                             </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {formatCurrency(contractValue).replace('₫', 'VNĐ')}
-                          </TableCell>
-                          <TableCell>
-                            {contractCount > 0 ? (
-                              <Badge className="bg-green-100 text-green-800">Đang hợp tác</Badge>
-                            ) : (
-                              <Badge className="bg-gray-100 text-gray-800">Chưa có hợp đồng</Badge>
-                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end space-x-2">

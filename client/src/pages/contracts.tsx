@@ -201,17 +201,30 @@ export default function Contracts() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Tên hợp đồng</TableHead>
                         <TableHead>Số hợp đồng</TableHead>
+                        <TableHead>Tên hợp đồng</TableHead>
+                        <TableHead>Chủ đầu tư</TableHead>
                         <TableHead>Ngày ký</TableHead>
                         <TableHead>Nhà cung cấp</TableHead>
                         <TableHead>Trạng thái</TableHead>
-                        <TableHead>Hành động</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredContracts.map((contract) => (
                         <TableRow key={contract.id} className="table-row">
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">
+                                {contract.soHdNoi || "Chưa có"}
+                              </div>
+                              {contract.soHdNgoai && (
+                                <div className="text-sm text-slate-500">
+                                  Ngoài: {contract.soHdNgoai}
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
                           <TableCell>
                             <div>
                               <div className="font-medium text-slate-900">
@@ -224,14 +237,11 @@ export default function Contracts() {
                           </TableCell>
                           <TableCell>
                             <div>
-                              <div className="font-medium">
-                                {contract.soHdNoi || "Chưa có"}
+                              <div className="font-medium text-slate-900">
+                                {chuDauTu.find(
+                                  (cdt) => cdt.id == contract.chuDauTuId
+                                )?.ten || "Chưa có tên"}
                               </div>
-                              {contract.soHdNgoai && (
-                                <div className="text-sm text-slate-500">
-                                  Ngoài: {contract.soHdNgoai}
-                                </div>
-                              )}
                             </div>
                           </TableCell>
                           <TableCell>{formatDate(contract.ngay)}</TableCell>
