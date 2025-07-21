@@ -171,8 +171,8 @@ export default function Contracts() {
                   <SelectContent>
                     <SelectItem value="all">Tất cả trạng thái</SelectItem>
                     <SelectItem value="1">Đang thực hiện</SelectItem>
-                    <SelectItem value="2">Hoàn thành</SelectItem>
-                    <SelectItem value="3">Tạm dừng</SelectItem>
+                    <SelectItem value="2">Đã thanh lý</SelectItem>
+                    <SelectItem value="3">Chưa thực hiện</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -265,7 +265,7 @@ export default function ContractModal({
                             {item.id === 1
                               ? "Đang thực hiện"
                               : item.id === 2
-                              ? "Đã Thanh lý  "
+                              ? "Đã Thanh lý"
                               : item.id === 3
                               ? "Chưa thực hiện"
                               : `Trạng thái ${item.id}`}

@@ -89,9 +89,6 @@ export default function Dashboard() {
                       <p className="text-2xl font-bold text-slate-900 mt-2">
                         {stats?.totalContracts || 0}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {stats?.activeContracts || 0} đang thực hiện
-                      </p>
                     </div>
                     <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                       <FileText className="w-6 h-6 text-blue-600" />
@@ -101,19 +98,16 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link href="/thanh-toan">
+            <Link href="/hop-dong">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-green-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-slate-600">
-                        Tổng thanh toán
+                        Đã thanh lý
                       </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
-                        {stats?.totalPayments || 0}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        {stats?.pendingPayments || 0} chưa thanh toán
+                        {stats?.completedContracts || 0}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -124,19 +118,16 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link href="/trang-bi">
+            <Link href="/hop-dong">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-purple-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-slate-600">
-                        Trang bị
+                        Chưa thực hiện
                       </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
-                        {stats?.totalEquipment || 0}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Thiết bị đang quản lý
+                        {stats?.pausedContracts || 0}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -147,19 +138,16 @@ export default function Dashboard() {
               </Card>
             </Link>
 
-            <Link href="/tai-lieu">
+            <Link href="/hop-dong">
               <Card className="hover:shadow-lg transition-shadow duration-200 cursor-pointer hover:bg-orange-50">
                 <CardContent className="p-6">
                   <div className="flex items-center">
                     <div className="flex-1">
                       <p className="text-sm font-medium text-slate-600">
-                        Tài liệu
+                        Đang thực hiện
                       </p>
                       <p className="text-2xl font-bold text-slate-900 mt-2">
-                        {stats?.totalDocuments || 0}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        File đã tải lên
+                        {stats?.activeContracts || 0}
                       </p>
                     </div>
                     <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">

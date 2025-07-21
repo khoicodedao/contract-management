@@ -15,10 +15,23 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { HopDong } from "@shared/schema";
+import { CanBo } from "@shared/schema";
 
 export function Sidebar() {
   const { data: contracts = [] } = useQuery<HopDong[]>({
     queryKey: ["/api/hop-dong"],
+  });
+  const { data: canBo = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/can-bo"],
+  });
+  const { data: nhaCungCap = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/nha-cung-cap"],
+  });
+  const { data: trangBi = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/trang-bi"],
+  });
+  const { data: taiLieu = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/file-hop-dong"],
   });
   const navigation = [
     {
@@ -39,12 +52,14 @@ export function Sidebar() {
       href: "/can-bo",
       icon: Users,
       current: false,
+      badge: canBo.length > 0 ? canBo.length : 0,
     },
     {
       name: "Nhà cung cấp",
       href: "/nha-cung-cap",
       icon: Building2,
       current: false,
+      badge: nhaCungCap.length > 0 ? nhaCungCap.length : 0,
     },
     {
       name: "Chủ đầu tư",
@@ -57,6 +72,7 @@ export function Sidebar() {
       href: "/trang-bi",
       icon: Settings,
       current: false,
+      badge: trangBi.length > 0 ? trangBi.length : 0,
     },
     {
       name: "Thanh toán",
@@ -75,6 +91,7 @@ export function Sidebar() {
       href: "/tai-lieu",
       icon: FolderOpen,
       current: false,
+      badge: taiLieu.length > 0 ? taiLieu.length : 0,
     },
     {
       name: "Tiếp nhận",
@@ -142,7 +159,9 @@ export function Sidebar() {
             <p className="text-sm font-medium text-slate-900 truncate">
               Ngô Văn Khang
             </p>
-            <p className="text-xs text-slate-500 truncate">Quản lý hợp đồng</p>
+            <p className="text-xs text-slate-500 truncate">
+              Quản lý dự án / Vaxuco
+            </p>
           </div>
           <button className="p-2 text-slate-400 hover:text-slate-600">
             <Settings className="text-sm" />

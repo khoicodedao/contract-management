@@ -12,14 +12,14 @@ const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 interface WorldMapProps {
   data: Array<{
-    country: string;
+    country: string; // Tên phải khớp với geo.properties.name
     count: number;
     coordinates: [number, number];
   }>;
 }
 
 export default function WorldMap({ data }: WorldMapProps) {
-  const maxCount = Math.max(...data.map((d) => d.count));
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
 
   const getMarkerSize = (count: number) => {
     const minSize = 8;
@@ -32,6 +32,12 @@ export default function WorldMap({ data }: WorldMapProps) {
     if (count >= 2) return "#ea580c";
     return "#16a34a";
   };
+
+  // Map tên quốc gia => count
+  const countryColorMap = new Map<string, { count: number }>();
+  data.forEach((d) => {
+    countryColorMap.set(d.country, { count: d.count });
+  });
 
   if (!data || data.length === 0) {
     return (
@@ -55,23 +61,37 @@ export default function WorldMap({ data }: WorldMapProps) {
           <Geographies geography={geoUrl}>
             {/* @ts-ignore */}
             {({ geographies }) =>
-              geographies.map((geo: any) => (
-                <Geography
-                  key={geo.rsmKey}
-                  geography={geo}
-                  fill="#e5e7eb"
-                  stroke="#d1d5db"
-                  strokeWidth={0.5}
-                  style={{
-                    default: { outline: "none" },
-                    hover: { outline: "none", fill: "#d1d5db" },
-                    pressed: { outline: "none" },
-                  }}
-                />
-              ))
+              geographies.map((geo: any) => {
+                const name = geo.properties.name;
+                const matched = countryColorMap.get(name);
+
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={matched ? getMarkerColor(matched.count) : "#e5e7eb"}
+                    stroke="#d1d5db"
+                    strokeWidth={0.5}
+                    style={{
+                      default: { outline: "none" },
+                      hover: {
+                        outline: "none",
+                        fill: "#d1d5db",
+                        cursor: matched ? "pointer" : "default",
+                      },
+                      pressed: { outline: "none" },
+                    }}
+                  >
+                    <title>
+                      {matched ? `${name}: ${matched.count} hợp đồng` : name}
+                    </title>
+                  </Geography>
+                );
+              })
             }
           </Geographies>
 
+          {/* Optional markers */}
           {data.map((marker, index) => (
             <Marker key={index} coordinates={marker.coordinates}>
               <circle

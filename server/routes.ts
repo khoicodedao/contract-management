@@ -40,9 +40,12 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       const stats = {
         totalContracts: contracts.length,
-        activeContracts: contracts.filter((c) => c.trangThaiId === 1).length,
-        completedContracts: contracts.filter((c) => c.trangThaiId === 3).length,
-        pausedContracts: contracts.filter((c) => c.trangThaiId === 2).length,
+        activeContracts: contracts.filter((c) => c.trangThaiHopDongId === 1)
+          .length,
+        completedContracts: contracts.filter((c) => c.trangThaiHopDongId === 3)
+          .length,
+        pausedContracts: contracts.filter((c) => c.trangThaiHopDongId === 2)
+          .length,
         totalValue: contracts.reduce(
           (sum, c) => sum + (c.giaTriHopDong || 0),
           0

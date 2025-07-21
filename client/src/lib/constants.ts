@@ -7,8 +7,8 @@ export const CONTRACT_STATUS = {
 
 export const CONTRACT_STATUS_LABELS = {
   [CONTRACT_STATUS.ACTIVE]: "Đang thực hiện",
-  [CONTRACT_STATUS.COMPLETED]: "Hoàn thành", 
-  [CONTRACT_STATUS.PAUSED]: "Tạm dừng",
+  [CONTRACT_STATUS.COMPLETED]: "Đã thanh lý",
+  [CONTRACT_STATUS.PAUSED]: "Chưa thực hiện",
 } as const;
 
 export const CONTRACT_STATUS_COLORS = {
@@ -50,7 +50,7 @@ export const CURRENCY_SYMBOLS = {
 // Progress status
 export const PROGRESS_STATUS = {
   NOT_STARTED: "chưa thực hiện",
-  IN_PROGRESS: "đang thực hiện", 
+  IN_PROGRESS: "đang thực hiện",
   COMPLETED: "hoàn thành",
   OVERDUE: "quá hạn",
 } as const;
