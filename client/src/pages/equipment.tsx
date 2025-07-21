@@ -34,7 +34,9 @@ export default function Equipment() {
   const { data: equipment = [], isLoading } = useQuery<TrangBi[]>({
     queryKey: ["/api/trang-bi"],
   });
-
+  const { data: contracts = [] } = useQuery({
+    queryKey: ["/api/hop-dong"],
+  });
   const deleteEquipmentMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest("DELETE", `/api/trang-bi/${id}`);
@@ -182,9 +184,11 @@ export default function Equipment() {
                               : "Chưa xác định"}
                           </TableCell>
                           <TableCell>
-                            {item.hopDongId
-                              ? `HD-${item.hopDongId}`
-                              : "Chưa gán"}
+                            {
+                              contracts.find(
+                                (contract) => contract.id === item.hopDongId
+                              )?.soHdNgoai
+                            }
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-2">

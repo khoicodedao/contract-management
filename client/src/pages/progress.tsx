@@ -32,7 +32,7 @@ import {
   AlertTriangle,
   Clock,
 } from "lucide-react";
-import { BuocThucHien } from "@shared/schema";
+import { BuocThucHien, HopDong } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ProgressModal from "@/components/modals/progress-modal";
@@ -258,9 +258,11 @@ export default function ProgressPage() {
                               </div>
                             </TableCell>
                             <TableCell>
-                              {step.hopDongId
-                                ? `HD-${step.hopDongId}`
-                                : "Chưa gán"}
+                              {
+                                contracts.find(
+                                  (contract) => contract.id === step.hopDongId
+                                )?.soHdNgoai
+                              }
                             </TableCell>
 
                             <TableCell>{formatDate(step.ngayBatDau)}</TableCell>

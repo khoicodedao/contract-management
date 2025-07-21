@@ -39,7 +39,7 @@ import {
   FileSpreadsheet,
   ExternalLink,
 } from "lucide-react";
-import { FileHopDong } from "@shared/schema";
+import { FileHopDong, HopDong } from "@shared/schema";
 import { FILE_TYPE_LABELS } from "@/lib/constants";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -60,7 +60,9 @@ export default function Documents() {
   const { data: documents = [], isLoading } = useQuery<FileHopDong[]>({
     queryKey: ["/api/file-hop-dong"],
   });
-
+  const { data: constracts = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/hop-dong"],
+  });
   const deleteDocumentMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest(`/api/file-hop-dong/${id}`, {
@@ -333,7 +335,7 @@ export default function Documents() {
                         <TableHead>Kích thước</TableHead>
                         <TableHead>Hợp đồng</TableHead>
                         <TableHead>Ngày tải lên</TableHead>
-                        <TableHead>Hành động</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -366,9 +368,15 @@ export default function Documents() {
                               {formatFileSize(document.kichThuoc)}
                             </TableCell>
                             <TableCell>
-                              {document.hopDongId
-                                ? `HD-${document.hopDongId}`
-                                : "Chưa gán"}
+                              {document.hopDongId ? (
+                                <span>
+                                  {constracts.find(
+                                    (c) => c.id === document.hopDongId
+                                  )?.soHdNgoai || "Không xác định"}
+                                </span>
+                              ) : (
+                                "Không liên kết"
+                              )}
                             </TableCell>
                             <TableCell>
                               {formatDate(document.ngayTaiLen)}

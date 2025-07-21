@@ -251,7 +251,7 @@ export default function Suppliers() {
                       <TableHead>Tên</TableHead>
                       <TableHead>Địa chỉ</TableHead>
                       <TableHead>Quốc gia</TableHead>
-                      <TableHead>Hành động</TableHead>
+                      <TableHead></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

@@ -64,6 +64,7 @@ interface DiaDiemThongQuan {
 interface HopDong {
   id: number;
   ten: string;
+  soHdNgoai: string;
 }
 interface DieuKienGiaoHang {
   id: number;
@@ -185,7 +186,10 @@ export default function Reception() {
     const contract = contracts.find((c) => c.id === hopDongId);
     return contract?.ten || `Hợp đồng #${hopDongId}`;
   };
-
+  const getContractNumber = (hopDongId: number) => {
+    const contract = contracts.find((c) => c.id === hopDongId);
+    return contract?.soHdNgoai || `Hợp đồng #${hopDongId}`;
+  };
   const getLocationName = (reception: TiepNhan) => {
     if (reception.diaDiemThongQuanTuDo) {
       return reception.diaDiemThongQuanTuDo;
@@ -387,18 +391,22 @@ export default function Reception() {
                   <Table>
                     <TableHeader>
                       <TableRow>
+                        <TableHead>Số Hợp đồng ngoại</TableHead>
                         <TableHead>Hợp đồng</TableHead>
                         <TableHead>Tên hàng</TableHead>
                         <TableHead>Số tờ khai</TableHead>
                         <TableHead>Số vận đơn</TableHead>
                         <TableHead>Địa điểm thông quan</TableHead>
                         <TableHead>Ngày thực hiện</TableHead>
-                        <TableHead>Thao tác</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {receptions.map((reception) => (
                         <TableRow key={reception.id}>
+                          <TableCell>
+                            {getContractNumber(reception.hopDongId)}
+                          </TableCell>
                           <TableCell>
                             {getContractName(reception.hopDongId)}
                           </TableCell>
