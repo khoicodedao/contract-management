@@ -125,6 +125,7 @@ export const hopDong = sqliteTable("hop_dong", {
   ),
   canBoId: integer("can_bo_id"),
   trangThaiHopDongId: integer("trang_thai_hop_dong_id"),
+  loaiTienId: integer("loai_tien_id"),
 });
 
 // Trang bị

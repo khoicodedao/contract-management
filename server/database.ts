@@ -96,7 +96,8 @@ function createTables() {
       nha_cung_cap_id INTEGER,
       loai_ngan_sach_id INTEGER,
       can_bo_id INTEGER,
-      trang_thai_hop_dong_id INTEGER
+      trang_thai_hop_dong_id INTEGER,
+      loai_tien_id INTEGER
     );
     
     CREATE TABLE IF NOT EXISTS trang_bi (

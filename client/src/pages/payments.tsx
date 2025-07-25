@@ -325,13 +325,14 @@ export default function Payments() {
                     ({ contract, payments: contractPayments }) => {
                       const contractPaymentSummary = {
                         total: contractPayments.length,
-                        paid: contractPayments.filter((p) => p.hanThucHien)
+                        paid: contractPayments.filter((p) => p.daThanhToan)
                           .length,
-                        unpaid: contractPayments.filter((p) => !p.hanThucHien)
+                        unpaid: contractPayments.filter((p) => !p.daThanhToan)
                           .length,
                         totalAmount: contract.giaTriHopDong,
+                        loaiTienId: contract.loaiTienId,
                         paidAmount: contractPayments
-                          .filter((p) => p.hanThucHien)
+                          .filter((p) => p.daThanhToan)
                           .reduce(
                             (sum, p) =>
                               sum + (parseFloat(p.soTien || "0") || 0),
@@ -385,7 +386,12 @@ export default function Payments() {
                                     {contractPaymentSummary.paidAmount.toLocaleString(
                                       "vi-VN"
                                     )}{" "}
-                                    VND đã thanh toán
+                                    {loaiTien.find(
+                                      (lt: any) =>
+                                        lt.id ===
+                                        contractPaymentSummary.loaiTienId
+                                    )?.ten || "VND"}{" "}
+                                    đã thanh toán
                                   </Badge>
                                   <Badge
                                     variant="outline"
@@ -395,7 +401,12 @@ export default function Payments() {
                                       contractPaymentSummary.totalAmount -
                                       contractPaymentSummary.paidAmount
                                     ).toLocaleString("vi-VN")}{" "}
-                                    VND còn lại
+                                    {loaiTien.find(
+                                      (lt: any) =>
+                                        lt.id ===
+                                        contractPaymentSummary.loaiTienId
+                                    )?.ten || "VND"}{" "}
+                                    còn lại
                                   </Badge>
                                 </div>
                               </div>

@@ -246,9 +246,11 @@ export default function Contracts() {
                           </TableCell>
                           <TableCell>{formatDate(contract.ngay)}</TableCell>
                           <TableCell>
-                            {contract.nhaCungCapId
-                              ? `NCC-${contract.nhaCungCapId}`
-                              : "Chưa xác định"}
+                            <div className="font-medium text-slate-900">
+                              {nhaCungCap.find(
+                                (ncc) => ncc.id === contract.nhaCungCapId
+                              )?.ten || "Chưa có nhà cung cấp"}
+                            </div>
                           </TableCell>
                           <TableCell>
                             {getStatusBadge(contract.trangThaiHopDongId)}

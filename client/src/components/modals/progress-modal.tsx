@@ -434,9 +434,9 @@ export default function ProgressModal({
                     </FormControl>
                     <SelectContent>
                       {[
-                        { ten: "VND", id: 1 },
-                        { ten: "USD", id: 2 },
-                        { ten: "EUR", id: 3 },
+                        { ten: "VND", id: 3 },
+                        { ten: "USD", id: 1 },
+                        { ten: "EUR", id: 2 },
                       ]?.map((contract: any) => (
                         <SelectItem
                           key={contract.id}

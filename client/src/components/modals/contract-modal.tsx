@@ -62,6 +62,7 @@ export default function ContractModal({
           canBoId: contract.canBoId,
           trangThaiHopDongId: contract.trangThaiHopDongId,
           giaTriHopDong: contract.giaTriHopDong ?? 0,
+          loaiTienId: contract.loaiTienId ?? 1, // Default to VND if not specified
         }
       : {
           ten: "",
@@ -96,7 +97,9 @@ export default function ContractModal({
   const { data: trangThaiHopDong } = useQuery({
     queryKey: ["/api/trang-thai-hop-dong"],
   });
-
+  const { data: loaiTien } = useQuery({
+    queryKey: ["/api/loai-tien"],
+  });
   const createContractMutation = useMutation({
     mutationFn: async (data: InsertHopDong) => {
       if (contract) {
@@ -366,7 +369,35 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              <FormField
+                control={form.control}
+                name="loaiTienId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Loại Tiền *</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn loại tiền" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {loaiTien?.map((item: any) => (
+                          <SelectItem key={item.id} value={item.id.toString()}>
+                            <div className="flex flex-col">
+                              <span className="font-medium">{item.ten}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="canBoId"

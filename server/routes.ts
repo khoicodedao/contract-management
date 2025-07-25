@@ -37,19 +37,33 @@ export async function registerRoutes(app: Express): Promise<void> {
       const equipment = await db.select().from(schema.trangBi);
       const documents = await db.select().from(schema.fileHopDong);
       const progressSteps = await db.select().from(schema.buocThucHien);
-
+      const loaiTienList = await db.select().from(schema.loaiTien);
+      const totalValueByCurrency = loaiTienList.map((currency) => {
+        const relatedContracts = contracts.filter(
+          (c) => c.loaiTienId === currency.id
+        );
+        const total = relatedContracts.reduce(
+          (sum, c) => sum + (c.giaTriHopDong || 0),
+          0
+        );
+        return {
+          currency: currency.ten,
+          totalValue: total,
+        };
+      });
       const stats = {
         totalContracts: contracts.length,
         activeContracts: contracts.filter((c) => c.trangThaiHopDongId === 1)
           .length,
-        completedContracts: contracts.filter((c) => c.trangThaiHopDongId === 3)
+        completedContracts: contracts.filter((c) => c.trangThaiHopDongId === 2)
           .length,
-        pausedContracts: contracts.filter((c) => c.trangThaiHopDongId === 2)
+        pausedContracts: contracts.filter((c) => c.trangThaiHopDongId === 3)
           .length,
         totalValue: contracts.reduce(
           (sum, c) => sum + (c.giaTriHopDong || 0),
           0
         ),
+        totalValueByCurrency, // 👉 thêm vào đây
         totalPayments: payments.length,
         pendingPayments: payments.filter((p) => p.daThanhToan === false).length,
         completedPayments: payments.filter((p) => p.daThanhToan === true)
@@ -538,7 +552,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       // Validate dữ liệu đầu vào (nếu cần chỉnh sửa thì dùng schema riêng)
       const validatedData = insertHopDongSchema.parse(req.body);
-
+      console.log("Validated Data:", validatedData);
       const updated = await db
         .update(schema.hopDong)
         .set(validatedData)

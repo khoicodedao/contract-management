@@ -323,15 +323,6 @@ export default function Dashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Tổng giá trị:</span>
-                    <span className="text-lg font-bold text-green-600">
-                      {stats?.totalValue
-                        ? (stats.totalValue / 1000000000).toFixed(1)
-                        : "0"}{" "}
-                      tỷ VNĐ
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">
                       Hợp đồng đang hoạt động:
                     </span>
@@ -347,6 +338,31 @@ export default function Dashboard() {
                       {stats?.completedSteps || 0}/
                       {stats?.totalProgressSteps || 0} bước
                     </span>
+                  </div>
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-sm mb-2">Phí uỷ thác:</h4>
+                    {stats?.totalValueByCurrency?.map(
+                      (item: any, index: number) => (
+                        <div
+                          key={index}
+                          className="flex justify-between items-center py-1"
+                        >
+                          <div className="flex items-center">
+                            <div
+                              className="w-3 h-3 rounded-full mr-2"
+                              style={{
+                                backgroundColor: COLORS[index % COLORS.length],
+                              }}
+                            />
+                            <span className="text-xs">{item.currency}</span>
+                          </div>
+                          <span className="text-xs font-medium">
+                            {(item.totalValue / 1000000000).toFixed(1)} tỷ{" "}
+                            {item.currency}
+                          </span>
+                        </div>
+                      )
+                    )}
                   </div>
                   <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                     <h4 className="font-medium text-sm mb-2">
