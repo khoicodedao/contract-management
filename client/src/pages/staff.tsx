@@ -213,7 +213,7 @@ export default function Staff() {
                       <TableRow>
                         <TableHead>Cán bộ</TableHead>
                         <TableHead>Chức vụ</TableHead>
-                        <TableHead>Hành động</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

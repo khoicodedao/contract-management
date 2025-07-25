@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, Bell, Plus } from "lucide-react";
+import { Search, Bell, Plus, Settings } from "lucide-react";
 import { useSearchContracts } from "@/hooks/use-search-contracts";
 import { Link } from "wouter";
 
@@ -79,7 +79,7 @@ export default function Header({
             )}
           </div>
 
-          <div className="relative">
+          {/* <div className="relative">
             <Button
               variant="ghost"
               size="icon"
@@ -90,14 +90,34 @@ export default function Header({
             <Badge className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs flex items-center justify-center p-0">
               3
             </Badge>
-          </div>
-          <Button
+          </div> */}
+          {/* <Button
             onClick={onCreateContract}
             className="bg-primary text-white hover:bg-primary/90"
           >
             <Plus className="w-4 h-4 mr-2" />
             Hợp đồng mới
-          </Button>
+          </Button> */}
+          <div className="p-4  border-slate-200">
+            <div className="flex items-center space-x-3">
+              <img
+                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100"
+                alt="Avatar người dùng"
+                className="w-10 h-10 rounded-full"
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-900 truncate">
+                  Ngô Văn Khang
+                </p>
+                <p className="text-xs text-slate-500 truncate">
+                  Quản lý dự án / Vaxuco
+                </p>
+              </div>
+              {/* <button className="p-2 text-slate-400 hover:text-slate-600">
+                <Settings className="text-sm" />
+              </button> */}
+            </div>
+          </div>
         </div>
       </div>
     </header>

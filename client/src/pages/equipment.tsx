@@ -144,7 +144,7 @@ export default function Equipment() {
                         <TableHead>Đơn giá</TableHead>
                         <TableHead>Nhà cung cấp</TableHead>
                         <TableHead>Hợp đồng</TableHead>
-                        <TableHead>Hành động</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Edit, Plus } from "lucide-react";
+import { Trash2, Edit, Plus, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
@@ -72,6 +72,7 @@ interface DieuKienGiaoHang {
 }
 
 export default function Reception() {
+  const [searchTerm, setSearchTerm] = useState("");
   const [isCreateBorderGateModalOpen, setIsCreateBorderGateModalOpen] =
     useState(false);
   const openCreateBorderGate = () => setIsCreateBorderGateModalOpen(true);
@@ -216,7 +217,12 @@ export default function Reception() {
     setUseCustomLocation(false);
     setIsCreateOpen(true);
   };
-
+  const filteredReceptions = receptions.filter((reception) => {
+    const contract = contracts.find((c) => c.id === reception.hopDongId);
+    return contract?.soHdNgoai
+      ?.toLowerCase()
+      .includes(searchTerm.toLowerCase());
+  });
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
@@ -388,6 +394,16 @@ export default function Reception() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+                    <Input
+                      placeholder="Tìm theo số hợp đồng ngoại..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-80 pl-10"
+                    />
+                  </div>
+
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -402,7 +418,7 @@ export default function Reception() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {receptions.map((reception) => (
+                      {filteredReceptions.map((reception) => (
                         <TableRow key={reception.id}>
                           <TableCell>
                             {getContractNumber(reception.hopDongId)}

@@ -318,7 +318,7 @@ export default function Dashboard() {
             {/* Value Summary */}
             <Card>
               <CardHeader>
-                <CardTitle>Tổng quan giá trị hợp đồng</CardTitle>
+                <CardTitle>Giá trị thực hiện hợp đồng</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

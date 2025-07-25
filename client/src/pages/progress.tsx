@@ -243,7 +243,7 @@ export default function ProgressPage() {
                         <TableHead>Ngày bắt đầu</TableHead>
                         <TableHead>Ngày kết thúc</TableHead>
                         <TableHead>Trạng thái</TableHead>
-                        <TableHead>Hành động</TableHead>
+                        <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>

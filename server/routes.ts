@@ -51,12 +51,9 @@ export async function registerRoutes(app: Express): Promise<void> {
           0
         ),
         totalPayments: payments.length,
-        pendingPayments: payments.filter(
-          (p) => p.trangThai === "Chưa thanh toán"
-        ).length,
-        completedPayments: payments.filter(
-          (p) => p.trangThai === "Đã thanh toán"
-        ).length,
+        pendingPayments: payments.filter((p) => p.daThanhToan === false).length,
+        completedPayments: payments.filter((p) => p.daThanhToan === true)
+          .length,
         totalEquipment: equipment.length,
         totalDocuments: documents.length,
         totalProgressSteps: progressSteps.length,
@@ -109,12 +106,12 @@ export async function registerRoutes(app: Express): Promise<void> {
       const paymentStatusData = [
         {
           name: "Đã thanh toán",
-          value: payments.filter((p) => p.trangThai === "Đã thanh toán").length,
+          value: payments.filter((p) => p.daThanhToan === true).length,
         },
         {
           name: "Chưa thanh toán",
           value:
-            payments.filter((p) => p.trangThai === "Chưa thanh toán").length ||
+            payments.filter((p) => p.daThanhToan === false).length ||
             payments.length,
         },
       ];

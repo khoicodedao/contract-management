@@ -1,12 +1,28 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Eye, Edit, Trash2, Filter } from "lucide-react";
 import { HopDong } from "@shared/schema";
-import { CONTRACT_STATUS_LABELS, CONTRACT_STATUS_COLORS } from "@/lib/constants";
+import {
+  CONTRACT_STATUS_LABELS,
+  CONTRACT_STATUS_COLORS,
+} from "@/lib/constants";
 import { useState } from "react";
 
 interface ContractTableProps {
@@ -14,37 +30,38 @@ interface ContractTableProps {
   isLoading: boolean;
 }
 
-export default function ContractTable({ contracts = [], isLoading }: ContractTableProps) {
+export default function ContractTable({
+  contracts = [],
+  isLoading,
+}: ContractTableProps) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const filteredContracts = contracts.filter(contract => {
+  const filteredContracts = contracts.filter((contract) => {
     if (statusFilter === "all") return true;
     return contract.trangThaiHopDongId?.toString() === statusFilter;
   });
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(amount);
   };
 
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString('vi-VN');
+    return new Date(dateString).toLocaleDateString("vi-VN");
   };
 
   const getStatusBadge = (statusId: number | null) => {
     if (!statusId) return null;
-    
-    const label = CONTRACT_STATUS_LABELS[statusId as keyof typeof CONTRACT_STATUS_LABELS];
-    const colors = CONTRACT_STATUS_COLORS[statusId as keyof typeof CONTRACT_STATUS_COLORS];
-    
-    return (
-      <Badge className={`status-badge ${colors}`}>
-        {label}
-      </Badge>
-    );
+
+    const label =
+      CONTRACT_STATUS_LABELS[statusId as keyof typeof CONTRACT_STATUS_LABELS];
+    const colors =
+      CONTRACT_STATUS_COLORS[statusId as keyof typeof CONTRACT_STATUS_COLORS];
+
+    return <Badge className={`status-badge ${colors}`}>{label}</Badge>;
   };
 
   if (isLoading) {
@@ -103,7 +120,7 @@ export default function ContractTable({ contracts = [], isLoading }: ContractTab
                   <TableHead>Nhà cung cấp</TableHead>
                   <TableHead>Ngày ký</TableHead>
                   <TableHead>Trạng thái</TableHead>
-                  <TableHead>Hành động</TableHead>
+                  <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -121,7 +138,9 @@ export default function ContractTable({ contracts = [], isLoading }: ContractTab
                     </TableCell>
                     <TableCell>
                       <div className="text-sm text-slate-900">
-                        {contract.nhaCungCapId ? `NCC-${contract.nhaCungCapId}` : "Chưa xác định"}
+                        {contract.nhaCungCapId
+                          ? `NCC-${contract.nhaCungCapId}`
+                          : "Chưa xác định"}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -163,19 +182,27 @@ export default function ContractTable({ contracts = [], isLoading }: ContractTab
             </Table>
           </div>
         )}
-        
+
         {/* Pagination */}
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-200">
           <p className="text-sm text-slate-700">
-            Hiển thị <strong>1</strong> đến <strong>{Math.min(filteredContracts.length, 10)}</strong> trong tổng số <strong>{filteredContracts.length}</strong> kết quả
+            Hiển thị <strong>1</strong> đến{" "}
+            <strong>{Math.min(filteredContracts.length, 10)}</strong> trong tổng
+            số <strong>{filteredContracts.length}</strong> kết quả
           </p>
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="sm" disabled>
               Trước
             </Button>
-            <Button variant="default" size="sm">1</Button>
-            <Button variant="ghost" size="sm">2</Button>
-            <Button variant="ghost" size="sm">3</Button>
+            <Button variant="default" size="sm">
+              1
+            </Button>
+            <Button variant="ghost" size="sm">
+              2
+            </Button>
+            <Button variant="ghost" size="sm">
+              3
+            </Button>
             <Button variant="ghost" size="sm">
               Sau
             </Button>
