@@ -237,12 +237,18 @@ export default function Reception() {
             <div className="space-y-8">
               <div className="flex justify-between items-center">
                 <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={openCreateDialog}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Thêm tiếp nhận
-                    </Button>
-                  </DialogTrigger>
+                  <div>
+                    <div className="flex space-x-2">
+                      <Button onClick={openCreateDialog}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Thêm tiếp nhận
+                      </Button>
+                      <Button onClick={openCreateBorderGate}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Thêm địa điểm thông quan
+                      </Button>
+                    </div>
+                  </div>
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
                       <DialogTitle>Thêm bản ghi tiếp nhận mới</DialogTitle>
@@ -672,10 +678,7 @@ export default function Reception() {
                   )}
                 </DialogContent>
               </Dialog>
-              <Button onClick={openCreateBorderGate}>
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm địa điểm thông quan
-              </Button>
+
               <BorderGate
                 isOpen={isCreateBorderGateModalOpen}
                 onClose={closeCreateBorderGate}

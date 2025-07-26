@@ -33,6 +33,12 @@ export function Sidebar() {
   const { data: taiLieu = [] } = useQuery<HopDong[]>({
     queryKey: ["/api/file-hop-dong"],
   });
+  const { data: chuDauTu = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/chu-dau-tu"],
+  });
+  const { data: tiepNhan = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/tiep-nhan"],
+  });
   const navigation = [
     {
       name: "Tổng quan",
@@ -66,6 +72,7 @@ export function Sidebar() {
       href: "/chu-dau-tu",
       icon: Users,
       current: false,
+      badge: chuDauTu.length > 0 ? chuDauTu.length : 0,
     },
     {
       name: "Trang bị",
@@ -98,6 +105,7 @@ export function Sidebar() {
       href: "/tiep-nhan",
       icon: Inbox,
       current: false,
+      badge: tiepNhan.length > 0 ? tiepNhan.length : 0,
     },
     {
       name: "Loại ngân sách",
