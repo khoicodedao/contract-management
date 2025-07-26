@@ -40,6 +40,7 @@ import { apiRequest } from "@/lib/queryClient";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 import BorderGate from "@/components/modals/border_gate-modal";
+import { BuocThucHien } from "@shared/schema";
 interface TiepNhan {
   id: number;
   hopDongId: number;
@@ -94,11 +95,14 @@ export default function Reception() {
     queryKey: ["/api/dia-diem-thong-quan"],
   });
 
-  const { data: contracts = [] } = useQuery<HopDong[]>({
+  const { data: contracts = [] } = useQuery<any[]>({
     queryKey: ["/api/hop-dong"],
   });
   const { data: incoterms = [] } = useQuery<DieuKienGiaoHang[]>({
     queryKey: ["/api/dieu-kien-giao-hang"],
+  });
+  const { data: steps = [] } = useQuery<BuocThucHien[]>({
+    queryKey: ["/api/buoc-thuc-hien"],
   });
 
   const createMutation = useMutation({
@@ -117,7 +121,45 @@ export default function Reception() {
       });
     },
   });
-
+  const createProgressMutation = useMutation({
+    mutationFn: async (data: Omit<TiepNhan, "id">) => {
+      const constract = contracts.find((c) => c.id === data.hopDongId);
+      const thuTuMax = steps
+        .filter((item) => item.hopDongId === data.hopDongId)
+        .reduce((max, item) => {
+          return item.thuTu > max ? item.thuTu : max;
+        }, 0);
+      const thuTu = thuTuMax + 1;
+      const progressData = {
+        hopDongId: data.hopDongId,
+        ten: `Tiếp nhận ${data.tenHang}`,
+        moTa: `Tiếp nhận hàng hóa ${
+          data.tenHang
+        } theo hợp đồng ${getContractName(data.hopDongId)}, số tờ khai ${
+          data.soToKhai
+        } và số vận đơn ${data.soVanDon}`,
+        ngayBatDau: data.ngayThucHien,
+        ngayKetThuc: data.ngayThucHien,
+        ngayBatDauThucTe: data.ngayThucHien,
+        ngayKetThucThucTe: data.ngayThucHien,
+        trangThai: "Hoàn thành",
+        thuTu: thuTu,
+        canBoPhuTrachId: constract?.canBoId || 1,
+      };
+      await apiRequest("POST", "/api/buoc-thuc-hien", progressData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/buoc-thuc-hien"] });
+      // setIsCreateOpen(false);
+      // toast({ description: "Đã tạo bản ghi tiếp nhận thành công" });
+    },
+    onError: () => {
+      // toast({
+      //   variant: "destructive",
+      //   description: "Lỗi khi tạo bản ghi tiếp nhận",
+      // });
+    },
+  });
   const updateMutation = useMutation({
     mutationFn: async (data: TiepNhan) => {
       await apiRequest("PUT", `/api/tiep-nhan/${data.id}`, data);
