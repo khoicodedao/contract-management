@@ -38,7 +38,9 @@ function createTables() {
       chuc_vu_nguoi_lien_he TEXT,
       mo_ta TEXT,
       ma_quoc_gia TEXT,
-      anh TEXT
+      anh TEXT,
+      latitude REAL,
+      longitude REAL
     );
     
     CREATE TABLE IF NOT EXISTS chu_dau_tu (

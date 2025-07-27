@@ -32,6 +32,8 @@ export const nhaCungCap = sqliteTable("nha_cung_cap", {
   moTa: text("mo_ta"),
   maQuocGia: text("ma_quoc_gia"),
   anh: text("anh"),
+  latitude: real("latitude"),
+  longitude: real("longitude"),
 });
 
 // Chủ đầu tư

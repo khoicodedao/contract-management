@@ -604,7 +604,10 @@ export default function Reception() {
                         </Label>
                         <Select
                           name="dieuKienGiaoHangId"
-                          defaultValue={editingReception.dieuKienGiaoHangId.toString()}
+                          defaultValue={
+                            editingReception.dieuKienGiaoHangId?.toString() ||
+                            ""
+                          }
                           required
                         >
                           <SelectTrigger>

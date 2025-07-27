@@ -58,6 +58,7 @@ const imageToBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
+import getCountryFlag from "@/lib/getCountryFlag";
 export default function Suppliers() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -80,6 +81,8 @@ export default function Suppliers() {
       diaChi: "",
       maQuocGia: "",
       anh: "",
+      latitude: null,
+      longitude: null,
     },
   });
 
@@ -163,6 +166,8 @@ export default function Suppliers() {
       diaChi: supplier.diaChi || "",
       maQuocGia: supplier.maQuocGia || "",
       anh: supplier.anh || "",
+      latitude: supplier.latitude || null,
+      longitude: supplier.longitude || null,
     });
     setEditingSupplier(supplier);
     setIsEditModalOpen(true);
@@ -188,21 +193,6 @@ export default function Suppliers() {
     } else {
       createSupplierMutation.mutate(data);
     }
-  };
-
-  const getCountryFlag = (countryCode: string | null) => {
-    if (!countryCode) return "🌐";
-    const flags: { [key: string]: string } = {
-      VN: "🇻🇳",
-      US: "🇺🇸",
-      CN: "🇨🇳",
-      JP: "🇯🇵",
-      KR: "🇰🇷",
-      DE: "🇩🇪",
-      FR: "🇫🇷",
-      GB: "🇬🇧",
-    };
-    return flags[countryCode.toUpperCase()] || "🌐";
   };
 
   const getSupplierAvatar = (anh?: string | null) => {
@@ -267,7 +257,9 @@ export default function Suppliers() {
                         <TableCell>{supplier.ten}</TableCell>
                         <TableCell>{supplier.diaChi}</TableCell>
                         <TableCell>
-                          {getCountryFlag(supplier.maQuocGia)}{" "}
+                          <span className="text-2xl">
+                            {getCountryFlag(supplier.maQuocGia)}{" "}
+                          </span>
                           {supplier.maQuocGia}
                         </TableCell>
                         <TableCell>
@@ -381,6 +373,48 @@ export default function Suppliers() {
                   />
                 )}
               </FormItem>
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vĩ độ</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Vĩ độ..."
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Kinh độ</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Kinh độ..."
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) =>
+                          field.onChange(parseFloat(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <div className="flex justify-end space-x-4">
                 <Button
                   type="button"

@@ -21,7 +21,7 @@ import {
 } from "../shared/schema.js";
 import multer from "multer";
 import path from "path";
-
+import getCountryFlag from "@/lib/getCountryFlag.js";
 const upload = multer({
   storage: multer.memoryStorage(), // Lưu file trong RAM (có thể đổi thành diskStorage)
   limits: {
@@ -151,69 +151,44 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       // Supplier statistics by country
       const suppliers = await db.select().from(schema.nhaCungCap);
-      const supplierCountryData = [
-        {
-          name: "Singapore",
-          value: suppliers.filter((s) => s.diaChi.includes("Singapore")).length,
-        },
-        {
-          name: "Tây Ban Nha",
-          value: suppliers.filter(
-            (s) =>
-              s.diaChi.includes("Tây Ban Nha") || s.diaChi.includes("Madrid")
-          ).length,
-        },
-        {
-          name: "CH Séc",
-          value: suppliers.filter(
-            (s) => s.diaChi.includes("CH Séc") || s.diaChi.includes("Praha")
-          ).length,
-        },
-        {
-          name: "Đức",
-          value: suppliers.filter(
-            (s) => s.diaChi.includes("Đức") || s.diaChi.includes("Berlin")
-          ).length,
-        },
-        {
-          name: "Áo",
-          value: suppliers.filter(
-            (s) => s.diaChi.includes("Áo") || s.diaChi.includes("Vienna")
-          ).length,
-        },
-        {
-          name: "Thụy Sĩ",
-          value: suppliers.filter(
-            (s) => s.diaChi.includes("Thụy Sĩ") || s.diaChi.includes("Zurich")
-          ).length,
-        },
-      ].filter((item) => item.value > 0);
+
+      const supplierCountryMap = new Map<string, number>();
+
+      for (const supplier of suppliers) {
+        const code = supplier.maQuocGia;
+        if (!code) continue; // Bỏ qua nếu thiếu mã quốc gia
+
+        supplierCountryMap.set(code, (supplierCountryMap.get(code) ?? 0) + 1);
+      }
+
+      const supplierCountryData = Array.from(supplierCountryMap.entries())
+        .map(([name, value]) => ({ name: name + getCountryFlag(name), value }))
+        .filter((item) => item.value > 0);
 
       // World map data for countries with suppliers and contracts
+      const supplierMap = new Map<
+        string,
+        { count: number; suppliers: typeof suppliers }
+      >();
+      for (const supplier of suppliers) {
+        if (!supplier.maQuocGia) continue;
+
+        if (!supplierMap.has(supplier.maQuocGia)) {
+          supplierMap.set(supplier.maQuocGia, { count: 0, suppliers: [] });
+        }
+
+        const group = supplierMap.get(supplier.maQuocGia)!;
+        group.suppliers.push(supplier);
+        group.count++;
+      }
+
       const worldMapData = [];
 
-      // Process each country that has suppliers
-      for (const countryData of supplierCountryData) {
-        const countryName = countryData.name;
-        const countrySuppliers = suppliers.filter((s) => {
-          if (countryName === "Singapore")
-            return s.diaChi.includes("Singapore");
-          if (countryName === "Tây Ban Nha")
-            return (
-              s.diaChi.includes("Tây Ban Nha") || s.diaChi.includes("Madrid")
-            );
-          if (countryName === "CH Séc")
-            return s.diaChi.includes("CH Séc") || s.diaChi.includes("Praha");
-          if (countryName === "Đức")
-            return s.diaChi.includes("Đức") || s.diaChi.includes("Berlin");
-          if (countryName === "Áo")
-            return s.diaChi.includes("Áo") || s.diaChi.includes("Vienna");
-          if (countryName === "Thụy Sĩ")
-            return s.diaChi.includes("Thụy Sĩ") || s.diaChi.includes("Zurich");
-          return false;
-        });
-
-        // Count contracts for this country's suppliers
+      for (const [
+        countryCode,
+        { suppliers: countrySuppliers },
+      ] of supplierMap.entries()) {
+        // Đếm hợp đồng liên quan
         const contractCount = contracts.filter((contract) =>
           countrySuppliers.some(
             (supplier) => supplier.id === contract.nhaCungCapId
@@ -221,22 +196,25 @@ export async function registerRoutes(app: Express): Promise<void> {
         ).length;
 
         if (contractCount > 0) {
-          // Map country coordinates
-          const coordinates = {
-            Singapore: [103.8198, 1.3521],
-            "Tây Ban Nha": [-3.7038, 40.4168],
-            "CH Séc": [14.4378, 50.0755],
-            Đức: [13.405, 52.52],
-            Áo: [16.3738, 48.2082],
-            "Thụy Sĩ": [8.5417, 47.3769],
-          };
+          // Lấy tọa độ trung bình từ các supplier trong quốc gia đó
+          const latitudes = countrySuppliers
+            .map((s) => s.latitude)
+            .filter((v) => typeof v === "number");
+          const longitudes = countrySuppliers
+            .map((s) => s.longitude)
+            .filter((v) => typeof v === "number");
 
-          if (coordinates[countryName]) {
+          if (latitudes.length && longitudes.length) {
+            const avgLat =
+              latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
+            const avgLng =
+              longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
+
             worldMapData.push({
-              country: countryName,
+              country: countryCode + getCountryFlag(countryCode), // vẫn dùng mã quốc gia làm tên
               count: contractCount,
               suppliers: countrySuppliers.length,
-              coordinates: coordinates[countryName],
+              coordinates: [avgLng, avgLat],
             });
           }
         }

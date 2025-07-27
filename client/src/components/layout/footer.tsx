@@ -1,7 +1,7 @@
 import { CanBo, NhaCungCap } from "@shared/schema";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
-
+import getCountryFlag from "@/lib/getCountryFlag";
 export default function Footer() {
   const queryClient = useQueryClient();
 
@@ -50,19 +50,10 @@ export default function Footer() {
         <div className="w-1/3 flex items-center space-x-2 justify-end">
           <span className="text-xs text-slate-500 mr-4">Supplier by</span>
           {/* Contributor avatars */}
-          <div className="flex flex-wrap justify-center gap-2">
+          <div className="flex flex-wrap justify-center gap-2 text-3xl">
             {suppliers
-              .filter((ncc) => ncc.anh) // chỉ hiển thị nếu có ảnh
-              .map((ncc) => (
-                <img
-                  key={ncc.id}
-                  src={`data:image/png;base64,${ncc.anh}`}
-                  alt={ncc.ten}
-                  title={ncc.ten}
-                  className="w-8 h-8 rounded-full border hover:scale-110 transition"
-                  style={{ marginLeft: "-1rem" }}
-                />
-              ))}
+              .filter((ncc) => ncc.maQuocGia) // chỉ hiển thị nếu có ảnh
+              .map((ncc) => getCountryFlag(ncc.maQuocGia))}
           </div>
         </div>
       </div>
