@@ -53,7 +53,14 @@ export default function Footer() {
           <div className="flex flex-wrap justify-center gap-2 text-3xl">
             {suppliers
               .filter((ncc) => ncc.maQuocGia) // chỉ hiển thị nếu có ảnh
-              .map((ncc) => getCountryFlag(ncc.maQuocGia))}
+              .map((ncc) => (
+                <img
+                  src={getCountryFlag(ncc.maQuocGia)}
+                  alt="Singapore flag"
+                  width={40}
+                  height={30}
+                />
+              ))}
           </div>
         </div>
       </div>

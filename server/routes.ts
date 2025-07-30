@@ -21,7 +21,6 @@ import {
 } from "../shared/schema.js";
 import multer from "multer";
 import path from "path";
-import getCountryFlag from "@/lib/getCountryFlag.js";
 const upload = multer({
   storage: multer.memoryStorage(), // Lưu file trong RAM (có thể đổi thành diskStorage)
   limits: {
@@ -162,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
 
       const supplierCountryData = Array.from(supplierCountryMap.entries())
-        .map(([name, value]) => ({ name: name + getCountryFlag(name), value }))
+        .map(([name, value]) => ({ name: name, value }))
         .filter((item) => item.value > 0);
 
       // World map data for countries with suppliers and contracts
@@ -211,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<void> {
               longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
 
             worldMapData.push({
-              country: countryCode + getCountryFlag(countryCode), // vẫn dùng mã quốc gia làm tên
+              country: countryCode, // vẫn dùng mã quốc gia làm tên
               count: contractCount,
               suppliers: countrySuppliers.length,
               coordinates: [avgLng, avgLat],

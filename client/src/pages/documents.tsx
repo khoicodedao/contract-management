@@ -44,7 +44,7 @@ import { FILE_TYPE_LABELS } from "@/lib/constants";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import DocumentModal from "@/components/modals/document-modal";
-
+import DocumentViewerModal from "@/components/modals/document-view-modal";
 export default function Documents() {
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -65,9 +65,7 @@ export default function Documents() {
   });
   const deleteDocumentMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/file-hop-dong/${id}`, {
-        method: "DELETE",
-      });
+      return await apiRequest("DELETE", `/api/file-hop-dong/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/file-hop-dong"] });
@@ -76,7 +74,8 @@ export default function Documents() {
         description: "Tài liệu đã được xóa",
       });
     },
-    onError: () => {
+    onError: (e) => {
+      console.log(e);
       toast({
         title: "Lỗi",
         description: "Không thể xóa tài liệu",
@@ -139,6 +138,7 @@ export default function Documents() {
   };
 
   const handleDeleteDocument = (id: number) => {
+    console.log(id);
     if (window.confirm("Bạn có chắc chắn muốn xóa tài liệu này không?")) {
       deleteDocumentMutation.mutate(id);
     }
@@ -452,134 +452,16 @@ export default function Documents() {
         )}
 
         {/* Document Viewer Modal */}
-        <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-          <DialogContent className="max-w-4xl h-[80vh]">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                {selectedDocument?.tenFile || "Xem tài liệu"}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 overflow-auto">
-              {selectedDocument && (
-                <div className="space-y-4">
-                  {/* Document Info */}
-                  <div className="bg-slate-50 p-4 rounded-lg">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="font-medium text-slate-600">
-                          Tên file:
-                        </span>
-                        <p className="text-slate-900">
-                          {selectedDocument.tenFile}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-medium text-slate-600">
-                          Kích thước:
-                        </span>
-                        <p className="text-slate-900">
-                          {formatFileSize(selectedDocument.kichThuoc)}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-medium text-slate-600">
-                          Loại file:
-                        </span>
-                        <p className="text-slate-900">
-                          {getFileTypeLabel(selectedDocument.tenFile)}
-                        </p>
-                      </div>
-                      <div>
-                        <span className="font-medium text-slate-600">
-                          Ngày tải lên:
-                        </span>
-                        <p className="text-slate-900">
-                          {formatDate(selectedDocument.ngayTaiLen)}
-                        </p>
-                      </div>
-                      {selectedDocument.ghiChu && (
-                        <div className="col-span-2">
-                          <span className="font-medium text-slate-600">
-                            Ghi chú:
-                          </span>
-                          <p className="text-slate-900">
-                            {selectedDocument.ghiChu}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Document Preview/Actions */}
-                  <div className="border-2 border-dashed border-slate-200 rounded-lg p-8 text-center">
-                    <div className="w-16 h-16 bg-slate-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                      {(() => {
-                        const FileIcon = getFileIcon(selectedDocument.loaiFile);
-                        return <FileIcon className="w-8 h-8 text-slate-600" />;
-                      })()}
-                    </div>
-                    <h3 className="text-lg font-medium text-slate-900 mb-2">
-                      {selectedDocument.tenFile}
-                    </h3>
-                    <p className="text-slate-600 mb-4">
-                      {getFileTypeLabel(selectedDocument.tenFile)} •{" "}
-                      {formatFileSize(selectedDocument.kichThuoc)}
-                    </p>
-
-                    <div className="flex justify-center gap-3">
-                      <Button
-                        onClick={() => handleDownloadDocument(selectedDocument)}
-                        className="bg-primary text-white hover:bg-primary/90"
-                      >
-                        <Download className="w-4 h-4 mr-2" />
-                        Tải xuống
-                      </Button>
-
-                      {selectedDocument.duongDan && (
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            if (selectedDocument.duongDan) {
-                              window.open(selectedDocument.duongDan, "_blank");
-                            }
-                          }}
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Mở trong tab mới
-                        </Button>
-                      )}
-                    </div>
-
-                    {/* Image Preview for image files */}
-                    {selectedDocument.loaiFile?.startsWith("image/") &&
-                      selectedDocument.noiDung && (
-                        <div className="mt-6">
-                          <img
-                            src={`data:${selectedDocument.loaiFile};base64,${selectedDocument.noiDung}`}
-                            alt={selectedDocument.tenFile || "Document preview"}
-                            className="max-w-full h-auto max-h-96 border rounded-lg mx-auto"
-                          />
-                        </div>
-                      )}
-
-                    {/* PDF Preview for PDF files */}
-                    {selectedDocument.loaiFile?.includes("pdf") &&
-                      selectedDocument.duongDan && (
-                        <div className="mt-6">
-                          <iframe
-                            src={`${selectedDocument.duongDan}#toolbar=0`}
-                            className="w-full h-96 border rounded-lg"
-                            title="PDF Preview"
-                          />
-                        </div>
-                      )}
-                  </div>
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+        {selectedDocument && (
+          <DocumentViewerModal
+            isOpen={isViewModalOpen}
+            onClose={() => {
+              setIsViewModalOpen(false);
+              setSelectedDocument(null);
+            }}
+            document={selectedDocument}
+          />
+        )}
       </div>
     </div>
   );

@@ -257,10 +257,16 @@ export default function Suppliers() {
                         <TableCell>{supplier.ten}</TableCell>
                         <TableCell>{supplier.diaChi}</TableCell>
                         <TableCell>
-                          <span className="text-2xl">
-                            {getCountryFlag(supplier.maQuocGia)}{" "}
-                          </span>
-                          {supplier.maQuocGia}
+                          <div className="flex justify-center items-center">
+                            {" "}
+                            <img
+                              src={getCountryFlag(supplier.maQuocGia)}
+                              alt="Singapore flag"
+                              width={40}
+                              height={30}
+                            />
+                            {supplier.maQuocGia}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
