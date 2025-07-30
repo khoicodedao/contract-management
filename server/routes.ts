@@ -188,10 +188,13 @@ export async function registerRoutes(app: Express): Promise<void> {
         if (!supplier.maQuocGia) continue;
 
         if (!supplierMap.has(supplier.maQuocGia)) {
-          supplierMap.set(supplier.maQuocGia, { count: 0, suppliers: [] });
+          supplierMap.set(supplier.diaChi, {
+            count: 0,
+            suppliers: [],
+          });
         }
 
-        const group = supplierMap.get(supplier.maQuocGia)!;
+        const group = supplierMap.get(supplier.diaChi)!;
         group.suppliers.push(supplier);
         group.count++;
       }
@@ -200,6 +203,7 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       for (const [
         countryCode,
+
         { suppliers: countrySuppliers },
       ] of supplierMap.entries()) {
         // Đếm hợp đồng liên quan
@@ -211,26 +215,12 @@ export async function registerRoutes(app: Express): Promise<void> {
 
         if (contractCount > 0) {
           // Lấy tọa độ trung bình từ các supplier trong quốc gia đó
-          const latitudes = countrySuppliers
-            .map((s) => s.latitude)
-            .filter((v) => typeof v === "number");
-          const longitudes = countrySuppliers
-            .map((s) => s.longitude)
-            .filter((v) => typeof v === "number");
 
-          if (latitudes.length && longitudes.length) {
-            const avgLat =
-              latitudes.reduce((a, b) => a + b, 0) / latitudes.length;
-            const avgLng =
-              longitudes.reduce((a, b) => a + b, 0) / longitudes.length;
-
-            worldMapData.push({
-              country: countryCode, // vẫn dùng mã quốc gia làm tên
-              count: contractCount,
-              suppliers: countrySuppliers.length,
-              coordinates: [avgLng, avgLat],
-            });
-          }
+          worldMapData.push({
+            country: countryCode, // vẫn dùng mã quốc gia làm tên
+            count: contractCount,
+            suppliers: countrySuppliers.length,
+          });
         }
       }
 

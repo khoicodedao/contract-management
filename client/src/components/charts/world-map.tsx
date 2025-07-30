@@ -3,42 +3,19 @@ import {
   ComposableMap,
   Geographies,
   Geography,
-  Marker,
   ZoomableGroup,
-  //@ts-ignore
 } from "react-simple-maps";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 interface WorldMapProps {
   data: Array<{
-    country: string; // Tên phải khớp với geo.properties.name
+    country: string; // Tên quốc gia khớp geo.properties.name
     count: number;
-    coordinates: [number, number];
   }>;
 }
 
 export default function WorldMap({ data }: WorldMapProps) {
-  const maxCount = Math.max(...data.map((d) => d.count), 1);
-
-  const getMarkerSize = (count: number) => {
-    const minSize = 8;
-    const maxSize = 25;
-    return minSize + (count / maxCount) * (maxSize - minSize);
-  };
-
-  const getMarkerColor = (count: number) => {
-    if (count >= 3) return "#dc2626";
-    if (count >= 2) return "#ea580c";
-    return "#16a34a";
-  };
-
-  // Map tên quốc gia => count
-  const countryColorMap = new Map<string, { count: number }>();
-  data.forEach((d) => {
-    countryColorMap.set(d.country, { count: d.count });
-  });
-
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-96 bg-gray-50 rounded-lg flex items-center justify-center">
@@ -46,6 +23,21 @@ export default function WorldMap({ data }: WorldMapProps) {
       </div>
     );
   }
+
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
+
+  const getFillColor = (count: number) => {
+    if (count >= 3) return "#dc2626"; // đỏ
+    if (count === 2) return "#ea580c"; // cam
+    if (count === 1) return "#16a34a"; // xanh
+    return "#e5e7eb"; // xám nhạt
+  };
+
+  // Tạo Map để truy nhanh
+  const countryCountMap = new Map<string, number>();
+  data.forEach((d) => {
+    countryCountMap.set(d.country, d.count);
+  });
 
   return (
     <div className="w-full h-96 bg-gray-50 rounded-lg overflow-hidden relative">
@@ -63,69 +55,35 @@ export default function WorldMap({ data }: WorldMapProps) {
             {({ geographies }) =>
               geographies.map((geo: any) => {
                 const name = geo.properties.name;
-                const matched = countryColorMap.get(name);
+                const count = countryCountMap.get(name) || 0;
+
+                const fill = count > 0 ? getFillColor(count) : "#e5e7eb";
 
                 return (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill={matched ? getMarkerColor(matched.count) : "#e5e7eb"}
+                    fill={fill}
                     stroke="#d1d5db"
                     strokeWidth={0.5}
                     style={{
                       default: { outline: "none" },
                       hover: {
                         outline: "none",
-                        fill: "#d1d5db",
-                        cursor: matched ? "pointer" : "default",
+                        cursor: count > 0 ? "pointer" : "default",
+                        // ❌ Không thay đổi fill để giữ nguyên màu gốc
                       },
                       pressed: { outline: "none" },
                     }}
                   >
                     <title>
-                      {matched ? `${name}: ${matched.count} hợp đồng` : name}
+                      {count > 0 ? `${name}: ${count} hợp đồng` : name}
                     </title>
                   </Geography>
                 );
               })
             }
           </Geographies>
-
-          {/* Optional markers */}
-          {data.map((marker, index) => (
-            <Marker key={index} coordinates={marker.coordinates}>
-              <circle
-                r={getMarkerSize(marker.count)}
-                fill={getMarkerColor(marker.count)}
-                fillOpacity={0.8}
-                stroke="#ffffff"
-                strokeWidth={2}
-              />
-              <text
-                textAnchor="middle"
-                y={getMarkerSize(marker.count) + 15}
-                style={{
-                  fontFamily: "system-ui",
-                  fontSize: "11px",
-                  fontWeight: "500",
-                  fill: "#374151",
-                }}
-              >
-                {marker.country}
-              </text>
-              <text
-                textAnchor="middle"
-                y={getMarkerSize(marker.count) + 28}
-                style={{
-                  fontFamily: "system-ui",
-                  fontSize: "10px",
-                  fill: "#6b7280",
-                }}
-              >
-                {marker.count} hợp đồng
-              </text>
-            </Marker>
-          ))}
         </ZoomableGroup>
       </ComposableMap>
 

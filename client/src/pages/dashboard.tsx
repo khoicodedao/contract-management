@@ -396,32 +396,16 @@ export default function Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="mt-4 p-4">
-                    <h4 className="font-medium text-sm mb-2">
-                      Giá trị ủy thác:
+                  <div className="mt-4 p-4 bg-slate-50 rounded-lg border">
+                    <h4 className="font-semibold text-sm text-gray-700 mb-1">
+                      Tổng giá trị ủy thác
                     </h4>
-                    {stats?.totalUyThacByCurrency?.map(
-                      (item: any, index: number) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center py-1"
-                        >
-                          <div className="flex items-center">
-                            <div
-                              className="w-3 h-3 rounded-full mr-2"
-                              style={{
-                                backgroundColor: COLORS[index % COLORS.length],
-                              }}
-                            />
-                            <span className="text-xs">{item.currency}</span>
-                          </div>
-                          <span className="text-xs font-medium">
-                            <span className="mr-1">{item.totalValue} </span>
-                            {item.currency}
-                          </span>
-                        </div>
-                      )
-                    )}
+                    <p className="text-xl font-bold text-slate-900">
+                      {stats?.totalUyThacByCurrency
+                        ?.reduce((sum, item) => sum + item.totalValue, 0)
+                        .toLocaleString("vi-VN")}{" "}
+                      VND
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -441,7 +425,7 @@ export default function Dashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <WorldMap data={chartData.worldMap} />
+                <WorldMap data={chartData?.worldMap} />
               </CardContent>
             </Card>
           )}

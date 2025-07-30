@@ -24,7 +24,7 @@ export const canBo = sqliteTable("can_bo", {
 export const nhaCungCap = sqliteTable("nha_cung_cap", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   ten: text("ten").notNull(),
-  diaChi: text("dia_chi"),
+  diaChi: text("dia_chi").notNull(),
   soDienThoai: text("so_dien_thoai"),
   email: text("email"),
   nguoiLienHe: text("nguoi_lien_he"),
