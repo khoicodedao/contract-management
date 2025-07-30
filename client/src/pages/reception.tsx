@@ -107,6 +107,7 @@ export default function Reception() {
 
   const createMutation = useMutation({
     mutationFn: async (data: Omit<TiepNhan, "id">) => {
+      // createProgressMutation(data);
       await apiRequest("POST", "/api/tiep-nhan", data);
     },
     onSuccess: () => {
@@ -222,6 +223,7 @@ export default function Reception() {
       updateMutation.mutate({ ...data, id: editingReception.id });
     } else {
       createMutation.mutate(data);
+      createProgressMutation.mutate(data);
     }
   };
 
