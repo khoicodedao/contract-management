@@ -63,6 +63,8 @@ export default function ContractModal({
           trangThaiHopDongId: contract.trangThaiHopDongId,
           giaTriHopDong: contract.giaTriHopDong ?? 0,
           loaiTienId: contract.loaiTienId ?? 1, // Default to VND if not specified
+          tyGia: contract.tyGia,
+          phiUyThac: contract.phiUyThac,
         }
       : {
           ten: "",
@@ -394,6 +396,52 @@ export default function ContractModal({
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="phiUyThac"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phí ủy thác*</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={100000}
+                        placeholder="VD: 100000000"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          field.onChange(isNaN(value) ? 0 : value);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tyGia"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tỷ giá*</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={0.1}
+                        placeholder="VD: 1.2"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          field.onChange(isNaN(value) ? 0 : value);
+                        }}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -378,6 +378,16 @@ export default function ContractViewModal({
                     {formatDate(contract.ngay)}
                   </p>
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Phí ủy thác
+                  </label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {parseFloat(contract?.phiUyThac?.toString() || "1") *
+                      parseFloat(contract?.tyGia?.toString() || "1")}{" "}
+                    VND
+                  </p>
+                </div>
               </div>
             </div>
 

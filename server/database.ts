@@ -99,7 +99,9 @@ function createTables() {
       loai_ngan_sach_id INTEGER,
       can_bo_id INTEGER,
       trang_thai_hop_dong_id INTEGER,
-      loai_tien_id INTEGER
+      loai_tien_id INTEGER,
+      ty_gia REAL,
+      phi_uy_thac REAL
     );
     
     CREATE TABLE IF NOT EXISTS trang_bi (

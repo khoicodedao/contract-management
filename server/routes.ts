@@ -50,6 +50,20 @@ export async function registerRoutes(app: Express): Promise<void> {
           totalValue: total,
         };
       });
+      const totalUyThacByCurrency = loaiTienList.map((currency) => {
+        const relatedContracts = contracts.filter(
+          (c) => c.loaiTienId === currency.id
+        );
+        const total = relatedContracts.reduce((sum, c) => {
+          const phiUyThac = parseFloat(c.phiUyThac?.toString() || "0");
+          const tyGia = parseFloat(c.tyGia?.toString() || "1"); // default 1 nếu không có tỷ giá
+          return sum + phiUyThac * tyGia;
+        }, 0);
+        return {
+          currency: currency.ten,
+          totalValue: total,
+        };
+      });
       const stats = {
         totalContracts: contracts.length,
         activeContracts: contracts.filter((c) => c.trangThaiHopDongId === 1)
@@ -62,6 +76,7 @@ export async function registerRoutes(app: Express): Promise<void> {
           (sum, c) => sum + (c.giaTriHopDong || 0),
           0
         ),
+        totalUyThacByCurrency,
         totalValueByCurrency, // 👉 thêm vào đây
         totalPayments: payments.length,
         pendingPayments: payments.filter((p) => p.daThanhToan === false).length,

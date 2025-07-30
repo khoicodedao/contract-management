@@ -27,8 +27,13 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { insertThanhToanSchema, InsertThanhToan } from "@shared/schema";
+import {
+  insertThanhToanSchema,
+  InsertThanhToan,
+  loaiTien,
+} from "@shared/schema";
 import { Checkbox } from "@/components/ui/checkbox";
+import { BuocThucHien } from "@shared/schema";
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -43,7 +48,6 @@ export default function PaymentModal({
 }: PaymentModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
   const form = useForm<InsertThanhToan>({
     resolver: zodResolver(insertThanhToanSchema),
     defaultValues: payment
@@ -83,6 +87,9 @@ export default function PaymentModal({
   const { data: paymentTypes } = useQuery({
     queryKey: ["/api/loai-thanh-toan"],
   });
+  const { data: steps = [] } = useQuery<BuocThucHien[]>({
+    queryKey: ["/api/buoc-thuc-hien"],
+  });
 
   const createPaymentMutation = useMutation({
     mutationFn: async (data: InsertThanhToan) => {
@@ -111,9 +118,50 @@ export default function PaymentModal({
       });
     },
   });
-
+  const getContractName = (hopDongId: number) => {
+    const contract = contracts.find((c) => c.id === hopDongId);
+    return contract?.ten || `Hợp đồng #${hopDongId}`;
+  };
+  const createProgressMutation = useMutation({
+    mutationFn: async (data: Omit<InsertThanhToan, "id">) => {
+      const constract = contracts.find((c) => c.id === data.hopDongId);
+      const thuTuMax = steps
+        .filter((item) => item.hopDongId === data.hopDongId)
+        .reduce((max, item) => {
+          return item.thuTu > max ? item.thuTu : max;
+        }, 0);
+      const thuTu = thuTuMax + 1;
+      const progressData = {
+        hopDongId: data.hopDongId,
+        ten: data.noiDung,
+        moTa: `Thanh toán số tiền  ${data.soTien} ${
+          loaiTien.find((t) => t.id === data.loaiTienId)?.ten
+        } hợp đồng ${getContractName(data.hopDongId)} `,
+        ngayBatDau: data.ngayDenHan,
+        ngayKetThuc: data.hanThucHien,
+        ngayBatDauThucTe: data.hanThucHien,
+        ngayKetThucThucTe: data.hanThucHien,
+        trangThai: "Hoàn thành",
+        thuTu: thuTu,
+        canBoPhuTrachId: constract?.canBoId || 1,
+      };
+      await apiRequest("POST", "/api/buoc-thuc-hien", progressData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/buoc-thuc-hien"] });
+      // setIsCreateOpen(false);
+      // toast({ description: "Đã tạo bản ghi tiếp nhận thành công" });
+    },
+    onError: () => {
+      // toast({
+      //   variant: "destructive",
+      //   description: "Lỗi khi tạo bản ghi tiếp nhận",
+      // });
+    },
+  });
   const onSubmit = (data: InsertThanhToan) => {
     createPaymentMutation.mutate(data);
+    createProgressMutation.mutate(data);
   };
 
   return (

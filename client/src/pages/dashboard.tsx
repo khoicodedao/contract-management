@@ -41,10 +41,6 @@ export default function Dashboard() {
   const { data: chartData, isLoading: isChartsLoading } = useQuery({
     queryKey: ["/api/dashboard/charts"],
   });
-
-  console.log("Dashboard Stats:", stats);
-  console.log("Chart Data:", chartData);
-
   if (isLoading) {
     return (
       <div className="flex h-screen overflow-hidden">
@@ -339,9 +335,72 @@ export default function Dashboard() {
                       {stats?.totalProgressSteps || 0} bước
                     </span>
                   </div>
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-sm mb-2">Phí uỷ thác:</h4>
-                    {stats?.totalValueByCurrency?.map(
+                  <div className="flex">
+                    <div className="flex-1">
+                      <div className="mt-4 p-4">
+                        <h4 className="font-medium text-sm mb-2">
+                          Giá trị hợp đồng theo tiền tệ:
+                        </h4>
+                        {stats?.totalValueByCurrency?.map(
+                          (item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center py-1"
+                            >
+                              <div className="flex items-center">
+                                <div
+                                  className="w-3 h-3 rounded-full mr-2"
+                                  style={{
+                                    backgroundColor:
+                                      COLORS[index % COLORS.length],
+                                  }}
+                                />
+                                <span className="text-xs">{item.currency}</span>
+                              </div>
+                              <span className="text-xs font-medium">
+                                {(item.totalValue / 1000000000).toFixed(1)} tỷ{" "}
+                                {item.currency}
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="mt-4 p-4 ">
+                        <h4 className="font-medium text-sm mb-2">
+                          Chi tiết loại hợp đồng:
+                        </h4>
+                        {chartData?.contractTypes?.map(
+                          (item: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center py-1"
+                            >
+                              <div className="flex items-center">
+                                <div
+                                  className="w-3 h-3 rounded-full mr-2"
+                                  style={{
+                                    backgroundColor:
+                                      COLORS[index % COLORS.length],
+                                  }}
+                                />
+                                <span className="text-xs">{item.name}</span>
+                              </div>
+                              <span className="text-xs font-medium">
+                                {item.value} hợp đồng
+                              </span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-4">
+                    <h4 className="font-medium text-sm mb-2">
+                      Giá trị ủy thác:
+                    </h4>
+                    {stats?.totalUyThacByCurrency?.map(
                       (item: any, index: number) => (
                         <div
                           key={index}
@@ -357,34 +416,8 @@ export default function Dashboard() {
                             <span className="text-xs">{item.currency}</span>
                           </div>
                           <span className="text-xs font-medium">
-                            {(item.totalValue / 1000000000).toFixed(1)} tỷ{" "}
+                            <span className="mr-1">{item.totalValue} </span>
                             {item.currency}
-                          </span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                  <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-sm mb-2">
-                      Chi tiết loại hợp đồng:
-                    </h4>
-                    {chartData?.contractTypes?.map(
-                      (item: any, index: number) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center py-1"
-                        >
-                          <div className="flex items-center">
-                            <div
-                              className="w-3 h-3 rounded-full mr-2"
-                              style={{
-                                backgroundColor: COLORS[index % COLORS.length],
-                              }}
-                            />
-                            <span className="text-xs">{item.name}</span>
-                          </div>
-                          <span className="text-xs font-medium">
-                            {item.value} hợp đồng
                           </span>
                         </div>
                       )
