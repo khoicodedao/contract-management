@@ -16,22 +16,121 @@ import Progress from "@/pages/progress";
 import Documents from "@/pages/documents";
 import NotFound from "@/pages/not-found";
 import Footer from "./components/layout/footer";
+import LoginPage from "@/pages/login"; // 👈 thêm trang login
+import ProtectedRoute from "./lib/protected-route";
+import Export from "@/pages/export";
 function Router() {
   console.log("Current pathname:", window.location.hash); // 👈 debug ở đây
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/hop-dong" component={Contracts} />
-      <Route path="/hop-dong/:id" component={Contracts} />
-      <Route path="/can-bo" component={Staff} />
-      <Route path="/nha-cung-cap" component={Suppliers} />
-      <Route path="/chu-dau-tu" component={Investors} />
-      <Route path="/tiep-nhan" component={Reception} />
-      <Route path="/trang-bi" component={Equipment} />
-      <Route path="/loai-ngan-sach" component={BudgetTypes} />
-      <Route path="/thanh-toan" component={Payments} />
-      <Route path="/tien-do" component={Progress} />
-      <Route path="/tai-lieu" component={Documents} />
+      <Route path="/login" component={LoginPage} />
+
+      {/* protected routes */}
+      <Route
+        path="/"
+        component={() => (
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/hop-dong"
+        component={() => (
+          <ProtectedRoute>
+            <Contracts />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/hop-dong/:id"
+        component={() => (
+          <ProtectedRoute>
+            <Contracts />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/can-bo"
+        component={() => (
+          <ProtectedRoute>
+            <Staff />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/nha-cung-cap"
+        component={() => (
+          <ProtectedRoute>
+            <Suppliers />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/chu-dau-tu"
+        component={() => (
+          <ProtectedRoute>
+            <Investors />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/tiep-nhan"
+        component={() => (
+          <ProtectedRoute>
+            <Reception />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/trang-bi"
+        component={() => (
+          <ProtectedRoute>
+            <Equipment />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/loai-ngan-sach"
+        component={() => (
+          <ProtectedRoute>
+            <BudgetTypes />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/thanh-toan"
+        component={() => (
+          <ProtectedRoute>
+            <Payments />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/tien-do"
+        component={() => (
+          <ProtectedRoute>
+            <Progress />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/tai-lieu"
+        component={() => (
+          <ProtectedRoute>
+            <Documents />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/xuat-du-lieu"
+        component={() => (
+          <ProtectedRoute>
+            <Export />
+          </ProtectedRoute>
+        )}
+      />
+
       <Route component={NotFound} />
     </Switch>
   );

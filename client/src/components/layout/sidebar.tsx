@@ -12,6 +12,7 @@ import {
   BarChart3,
   Inbox,
   DollarSign,
+  FileSpreadsheet,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { HopDong } from "@shared/schema";
@@ -111,6 +112,12 @@ export function Sidebar() {
       name: "Loại ngân sách",
       href: "/loai-ngan-sach",
       icon: DollarSign,
+      current: false,
+    },
+    {
+      name: "Xuất báo cáo",
+      href: "/xuat-du-lieu",
+      icon: FileSpreadsheet,
       current: false,
     },
   ];

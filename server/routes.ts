@@ -1127,4 +1127,50 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Lỗi server" });
     }
   });
+  // File: server/index.ts hoặc server/api/export.ts (tuỳ vào cấu trúc dự án bạn)
+
+  app.get("/api/export/hop-dong", async (req, res) => {
+    try {
+      const data = await db
+        .select({
+          hopDong: {
+            ten: schema.hopDong.ten,
+            soHdNoi: schema.hopDong.soHdNoi,
+            soHdNgoai: schema.hopDong.soHdNgoai,
+            ngay: schema.hopDong.ngay,
+            giaTriHopDong: schema.hopDong.giaTriHopDong,
+            moTa: schema.hopDong.moTa,
+            phiUyThac: schema.hopDong.phiUyThac,
+            tyGia: schema.hopDong.tyGia,
+          },
+          canBo: {
+            ten: schema.canBo.ten,
+            email: schema.canBo.email,
+          },
+          nhaCungCap: {
+            ten: schema.nhaCungCap.ten,
+            diaChi: schema.nhaCungCap.diaChi,
+            soDienThoai: schema.nhaCungCap.soDienThoai,
+          },
+          chuDauTu: {
+            ten: schema.chuDauTu.ten,
+          },
+        })
+        .from(schema.hopDong)
+        .leftJoin(schema.canBo, eq(schema.hopDong.canBoId, schema.canBo.id))
+        .leftJoin(
+          schema.nhaCungCap,
+          eq(schema.hopDong.nhaCungCapId, schema.nhaCungCap.id)
+        )
+        .leftJoin(
+          schema.chuDauTu,
+          eq(schema.hopDong.chuDauTuId, schema.chuDauTu.id)
+        );
+
+      res.json(data);
+    } catch (error) {
+      console.error("Export hop dong error:", error);
+      res.status(500).json({ error: "Lỗi server khi export hợp đồng" });
+    }
+  });
 }
