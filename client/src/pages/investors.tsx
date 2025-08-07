@@ -29,7 +29,9 @@ import { ChuDauTu, HopDong } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { InvestorModal } from "@/components/modals/investor-modal";
-
+const getInvesterAvatar = (anh?: string | null) => {
+  return anh ? `data:image/jpeg;base64,${anh}` : "/default-avatar.png";
+};
 export default function InvestorsPage() {
   const [searchTerm, setSearchTerm] = React.useState("");
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -280,7 +282,15 @@ export default function InvestorsPage() {
                           <TableCell>
                             <div className="flex items-center space-x-3">
                               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                <Building2 className="w-5 h-5 text-blue-600" />
+                                {investor.anh?.length > 0 ? (
+                                  <img
+                                    src={getInvesterAvatar(investor.anh)}
+                                    alt="avatar"
+                                    className="w-10 h-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <Building2 className="w-5 h-5 text-blue-600" />
+                                )}
                               </div>
                               <div>
                                 <div className="font-medium">

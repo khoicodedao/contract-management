@@ -15,6 +15,9 @@ type Step = {
   trangThai?: string;
   ghiChu?: string;
   canBoPhuTrachId?: string;
+  chiPhi?: string;
+  diaDiem?: string;
+  loaiTienId?: string;
 };
 
 type Staff = {
@@ -26,6 +29,7 @@ type Staff = {
 type Props = {
   contractProgressSteps: Step[];
   canBo: Staff[];
+  getLoaiTien: any;
 };
 
 const formatDate = (dateStr?: string) => {
@@ -39,6 +43,7 @@ const formatDate = (dateStr?: string) => {
 const ContractProgressTimeline: React.FC<Props> = ({
   contractProgressSteps,
   canBo,
+  getLoaiTien,
 }) => {
   const sortedSteps = contractProgressSteps.sort(
     (a, b) => (a.thuTu || 0) - (b.thuTu || 0)
@@ -97,6 +102,13 @@ const ContractProgressTimeline: React.FC<Props> = ({
               <p className="text-sm text-gray-600 whitespace-pre-line mt-1">
                 {step.moTa}
                 {step.ghiChu ? `\n\n📝 Ghi chú: ${step.ghiChu}` : ""}
+              </p>
+              <p className="text-sm text-gray-600">
+                {step.diaDiem && `📍 Địa điểm: ${step.diaDiem}`}
+              </p>
+              <p className="text-sm text-gray-600">
+                {step.chiPhi &&
+                  `💰 Chi phí: ${step.chiPhi} ${getLoaiTien(step.loaiTienId)}`}
               </p>
             </VerticalTimelineElement>
           );

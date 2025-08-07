@@ -356,10 +356,11 @@ export default function ContractViewModal({
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">
-                    Số HĐ nội bộ
+                    Giá trị hợp đồng
                   </label>
                   <p className="mt-1 text-sm text-gray-900">
-                    {contract.soHdNoi || "-"}
+                    {contract.giaTriHopDong || "-"}{" "}
+                    {getCurrencyName(contract.loaiTienId)}
                   </p>
                 </div>
                 <div>
@@ -409,6 +410,7 @@ export default function ContractViewModal({
             <ContractProgressTimeline
               contractProgressSteps={contractProgressSteps}
               canBo={canBo}
+              getLoaiTien={getCurrencyName}
             />
 
             <Separator />
@@ -428,7 +430,9 @@ export default function ContractViewModal({
                       </p>
                     </div>
                     <div className="text-center">
-                      <p className="text-sm text-slate-600">Tổng giá trị</p>
+                      <p className="text-sm text-slate-600">
+                        Tổng giá trị các lần thanh toán:{" "}
+                      </p>
                       <p className="text-xl font-bold text-green-600">
                         {contractPayments
                           .reduce(
@@ -437,7 +441,7 @@ export default function ContractViewModal({
                             0
                           )
                           .toLocaleString("vi-VN")}{" "}
-                        VND
+                        {getCurrencyName(contract.loaiTienId)}
                       </p>
                     </div>
                     <div className="text-center">

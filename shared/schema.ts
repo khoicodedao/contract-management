@@ -231,6 +231,9 @@ export const buocThucHien = sqliteTable("buoc_thuc_hien", {
   trangThai: text("trang_thai"),
   thuTu: integer("thu_tu"),
   canBoPhuTrachId: integer("can_bo_phu_trach_id"),
+  chiPhi: text("chi_phi"),
+  diaDiem: text("dia_diem"),
+  loaiTienId: integer("loai_tien_id"),
 });
 
 // User table for authentication

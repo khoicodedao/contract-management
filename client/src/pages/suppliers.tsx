@@ -337,14 +337,45 @@ export default function Suppliers() {
                 name="diaChi"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Địa chỉ</FormLabel>
+                    <FormLabel>Địa chỉ (Quốc gia)</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nhập địa chỉ" {...field} />
+                      <select
+                        className="w-full p-2 border rounded text-sm"
+                        value={field.value}
+                        onChange={field.onChange}
+                      >
+                        <option value="">Chọn quốc gia</option>
+                        <option value="Vietnam">Vietnam</option>
+                        <option value="United States of America">
+                          United States
+                        </option>
+                        <option value="France">France</option>
+                        <option value="Germany">Germany</option>
+                        <option value="China">China</option>
+                        <option value="Japan">Japan</option>
+                        <option value="India">India</option>
+                        <option value="Russia">Russia</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="South Korea">South Korea</option>
+                        <option value="Thailand">Thailand</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Brazil">Brazil</option>
+                        <option value="Indonesia">Indonesia</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Malaysia">Malaysia</option>
+                        <option value="Philippines">Philippines</option>
+                        <option value="Mexico">Mexico</option>
+                        <option value="Italy">Italy</option>
+                        <option value="Spain">Spain</option>
+                        <option value="Netherlands">Netherlands</option>
+                      </select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="maQuocGia"

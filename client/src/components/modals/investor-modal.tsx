@@ -2,7 +2,12 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,20 +22,28 @@ interface InvestorModalProps {
   investor?: ChuDauTu | null;
 }
 
-export function InvestorModal({ isOpen, onClose, investor }: InvestorModalProps) {
+export function InvestorModal({
+  isOpen,
+  onClose,
+  investor,
+}: InvestorModalProps) {
   const { toast } = useToast();
   const isEditing = Boolean(investor);
+
+  const [selectedImage, setSelectedImage] = React.useState<File | null>(null);
+  const [preview, setPreview] = React.useState<string | null>(null);
 
   const form = useForm<InsertChuDauTu>({
     resolver: zodResolver(insertChuDauTuSchema),
     defaultValues: {
-      ten: investor?.ten || "",
-      diaChi: investor?.diaChi || "",
-      soDienThoai: investor?.soDienThoai || "",
-      email: investor?.email || "",
-      nguoiDaiDien: investor?.nguoiDaiDien || "",
-      chucVuNguoiDaiDien: investor?.chucVuNguoiDaiDien || "",
-      moTa: investor?.moTa || "",
+      ten: "",
+      diaChi: "",
+      soDienThoai: "",
+      email: "",
+      nguoiDaiDien: "",
+      chucVuNguoiDaiDien: "",
+      moTa: "",
+      anh: "",
     },
   });
 
@@ -44,7 +57,11 @@ export function InvestorModal({ isOpen, onClose, investor }: InvestorModalProps)
         nguoiDaiDien: investor.nguoiDaiDien || "",
         chucVuNguoiDaiDien: investor.chucVuNguoiDaiDien || "",
         moTa: investor.moTa || "",
+        anh: investor.anh || "",
       });
+      if (investor.anh) {
+        setPreview(`data:image/jpeg;base64,${investor.anh}`);
+      }
     } else {
       form.reset({
         ten: "",
@@ -54,9 +71,22 @@ export function InvestorModal({ isOpen, onClose, investor }: InvestorModalProps)
         nguoiDaiDien: "",
         chucVuNguoiDaiDien: "",
         moTa: "",
+        anh: "",
       });
+      setPreview(null);
     }
   }, [investor, form]);
+
+  React.useEffect(() => {
+    if (!selectedImage) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result?.toString().split(",")[1] || "";
+      form.setValue("anh", base64);
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(selectedImage);
+  }, [selectedImage]);
 
   const createMutation = useMutation({
     mutationFn: async (data: InsertChuDauTu) => {
@@ -136,7 +166,6 @@ export function InvestorModal({ isOpen, onClose, investor }: InvestorModalProps)
                 </p>
               )}
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="soDienThoai">Số điện thoại</Label>
               <Input
@@ -175,7 +204,6 @@ export function InvestorModal({ isOpen, onClose, investor }: InvestorModalProps)
                 placeholder="Nhập tên người đại diện"
               />
             </div>
-
             <div className="space-y-2">
               <Label htmlFor="chucVuNguoiDaiDien">Chức vụ người đại diện</Label>
               <Input
@@ -194,6 +222,27 @@ export function InvestorModal({ isOpen, onClose, investor }: InvestorModalProps)
               placeholder="Nhập mô tả về chủ đầu tư"
               rows={3}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="anh">Ảnh logo (tùy chọn)</Label>
+            <Input
+              id="anh"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files?.[0]) {
+                  setSelectedImage(e.target.files[0]);
+                }
+              }}
+            />
+            {preview && (
+              <img
+                src={preview}
+                alt="Preview"
+                className="mt-2 w-20 h-20 object-cover rounded"
+              />
+            )}
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">

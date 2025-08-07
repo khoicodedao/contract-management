@@ -146,7 +146,12 @@ function createTables() {
       ngay_ket_thuc_thuc_te TEXT,
       trang_thai TEXT,
       thu_tu INTEGER,
-      can_bo_phu_trach_id INTEGER
+      can_bo_phu_trach_id INTEGER,
+      chi_phi TEXT,
+      dia_diem TEXT,
+      ghi_chu TEXT,
+      loai_tien_id INTEGER
+
     );
     
     CREATE TABLE IF NOT EXISTS file_hop_dong (

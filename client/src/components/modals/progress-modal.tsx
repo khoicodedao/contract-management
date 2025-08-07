@@ -68,6 +68,8 @@ export default function ProgressModal({
           ngayKetThucThucTe: progress.ngayKetThucThucTe || "",
           canhBao: progress.canhBao || false,
           canBoPhuTrachId: progress.canBoPhuTrachId,
+          chiPhi: progress.chiPhi,
+          diaDiem: progress.diaDiem,
         }
       : {
           hopDongId: 0,
@@ -81,6 +83,7 @@ export default function ProgressModal({
           ngayBatDauThucTe: "",
           ngayKetThucThucTe: "",
           canhBao: false,
+          chiPhi: "",
         },
   });
 

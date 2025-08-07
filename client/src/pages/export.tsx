@@ -10,6 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
+
 const fieldOptions = [
   {
     group: "Hợp đồng",
@@ -73,8 +74,10 @@ export default function ExportHopDongView() {
       const row: Record<string, any> = {};
       for (const group of fieldOptions) {
         const selected = selectedFields[group.key] || [];
-        for (const field of selected) {
-          row[`${group.group} - ${field}`] = item[group.key]?.[field] || "";
+        for (const fieldKey of selected) {
+          const fieldMeta = group.fields.find((f) => f.key === fieldKey);
+          const label = fieldMeta?.label || fieldKey;
+          row[`${label}`] = item[group.key]?.[fieldKey] || "";
         }
       }
       return row;
@@ -85,12 +88,15 @@ export default function ExportHopDongView() {
     const buffer = XLSX.write(wb, { type: "array", bookType: "xlsx" });
     saveAs(new Blob([buffer]), "hop_dong_export.xlsx");
   };
+
   const previewData = exportData.slice(0, 5).map((item) => {
     const row: Record<string, any> = {};
     for (const group of fieldOptions) {
       const selected = selectedFields[group.key] || [];
-      for (const field of selected) {
-        row[`${group.group} - ${field}`] = item[group.key]?.[field] || "";
+      for (const fieldKey of selected) {
+        const fieldMeta = group.fields.find((f) => f.key === fieldKey);
+        const label = fieldMeta?.label || fieldKey;
+        row[`${label}`] = item[group.key]?.[fieldKey] || "";
       }
     }
     return row;
@@ -132,6 +138,7 @@ export default function ExportHopDongView() {
                 </div>
               </div>
             ))}
+
             {Object.values(selectedFields).some((arr) => arr.length > 0) &&
               previewData.length > 0 && (
                 <div className="mt-6">
