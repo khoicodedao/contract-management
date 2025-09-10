@@ -3,6 +3,7 @@ import { Server } from "http";
 import { eq, ilike, sql } from "drizzle-orm";
 import { db } from "./database.js";
 import * as schema from "../shared/schema.js";
+
 import {
   insertLoaiHopDongSchema,
   insertCanBoSchema,
@@ -19,6 +20,7 @@ import {
   insertDiaDiemThongQuanSchema,
   insertTiepNhanSchema,
   insertCapTienSchema,
+  updateCapTienSchema,
 } from "../shared/schema.js";
 import multer from "multer";
 import path from "path";
@@ -1262,9 +1264,10 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.get("/api/export/hop-dong", async (req, res) => {
     try {
-      const data = await db
+      const rows = await db
         .select({
           hopDong: {
+            id: schema.hopDong.id,
             ten: schema.hopDong.ten,
             soHdNoi: schema.hopDong.soHdNoi,
             soHdNgoai: schema.hopDong.soHdNgoai,
@@ -1286,6 +1289,15 @@ export async function registerRoutes(app: Express): Promise<void> {
           chuDauTu: {
             ten: schema.chuDauTu.ten,
           },
+          capTien: {
+            id: schema.capTien.id,
+            ngayCap: schema.capTien.ngayCap,
+            soTien: schema.capTien.soTien,
+            loaiTienId: schema.capTien.loaiTienId,
+            tyGia: schema.capTien.tyGia,
+            ghiChu: schema.capTien.ghiChu,
+            hopDongId: schema.capTien.hopDongId,
+          },
         })
         .from(schema.hopDong)
         .leftJoin(schema.canBo, eq(schema.hopDong.canBoId, schema.canBo.id))
@@ -1296,9 +1308,40 @@ export async function registerRoutes(app: Express): Promise<void> {
         .leftJoin(
           schema.chuDauTu,
           eq(schema.hopDong.chuDauTuId, schema.chuDauTu.id)
+        )
+        .leftJoin(
+          schema.capTien,
+          eq(schema.capTien.hopDongId, schema.hopDong.id)
         );
 
-      res.json(data);
+      // Gom các bản ghi capTien vào từng hợp đồng
+      const result = Object.values(
+        rows.reduce((acc: any, row: any) => {
+          const hdId = row.hopDong.id;
+          if (!acc[hdId]) {
+            acc[hdId] = {
+              hopDong: row.hopDong,
+              canBo: row.canBo,
+              nhaCungCap: row.nhaCungCap,
+              chuDauTu: row.chuDauTu,
+              capTien: [],
+            };
+          }
+          if (row.capTien?.id) {
+            acc[hdId].capTien.push({
+              id: row.capTien.id,
+              ngayCap: row.capTien.ngayCap,
+              soTien: row.capTien.soTien,
+              loaiTienId: row.capTien.loaiTienId,
+              tyGia: row.capTien.tyGia,
+              ghiChu: row.capTien.ghiChu,
+            });
+          }
+          return acc;
+        }, {})
+      );
+
+      res.json(result);
     } catch (error) {
       console.error("Export hop dong error:", error);
       res.status(500).json({ error: "Lỗi server khi export hợp đồng" });

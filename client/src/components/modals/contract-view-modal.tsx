@@ -411,6 +411,7 @@ export default function ContractViewModal({
               contractProgressSteps={contractProgressSteps}
               canBo={canBo}
               getLoaiTien={getCurrencyName}
+              contractId={contract.id}
             />
 
             <Separator />

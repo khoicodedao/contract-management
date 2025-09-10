@@ -1,12 +1,13 @@
 // File: ExportHopDongView.tsx
-import { useEffect, useState } from "react";
+"use client";
+
+import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useQuery } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
@@ -48,6 +49,17 @@ const fieldOptions = [
     key: "chuDauTu",
     fields: [{ key: "ten", label: "Chủ đầu tư" }],
   },
+  {
+    group: "Cấp tiền",
+    key: "capTien",
+    fields: [
+      { key: "ngayCap", label: "Ngày cấp" },
+      { key: "soTien", label: "Số tiền" },
+      { key: "loaiTien", label: "Loại tiền" },
+      { key: "tyGia", label: "Tỷ giá" },
+      { key: "ghiChu", label: "Ghi chú" },
+    ],
+  },
 ];
 
 export default function ExportHopDongView() {
@@ -69,19 +81,51 @@ export default function ExportHopDongView() {
     });
   };
 
+  const buildGroupCell = (group: any, item: any) => {
+    const selected = selectedFields[group.key] || [];
+    if (selected.length === 0) return "";
+
+    // Nếu là cấp tiền (mảng nhiều dòng)
+    if (group.key === "capTien" && Array.isArray(item.capTien)) {
+      return item.capTien
+        .map((ct: any, idx: number) =>
+          selected
+            .map((fieldKey) => {
+              const fieldMeta = group.fields.find((f) => f.key === fieldKey);
+              const label = fieldMeta?.label || fieldKey;
+              return `${label}: ${ct[fieldKey] ?? ""}`;
+            })
+            .join(" | ")
+        )
+        .join("\n"); // xuống dòng mỗi lần cấp
+    }
+
+    // Các group khác (object 1 cấp)
+    if (item[group.key]) {
+      return selected
+        .map((fieldKey) => {
+          const fieldMeta = group.fields.find((f) => f.key === fieldKey);
+          const label = fieldMeta?.label || fieldKey;
+          return `${label}: ${item[group.key][fieldKey] ?? ""}`;
+        })
+        .join("\n"); // xuống dòng trong cùng 1 ô
+    }
+
+    return "";
+  };
+
   const handleExport = () => {
     const rows = exportData.map((item) => {
       const row: Record<string, any> = {};
       for (const group of fieldOptions) {
-        const selected = selectedFields[group.key] || [];
-        for (const fieldKey of selected) {
-          const fieldMeta = group.fields.find((f) => f.key === fieldKey);
-          const label = fieldMeta?.label || fieldKey;
-          row[`${label}`] = item[group.key]?.[fieldKey] || "";
+        const groupValue = buildGroupCell(group, item);
+        if (groupValue) {
+          row[group.group] = groupValue;
         }
       }
       return row;
     });
+
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "HopDongExport");
@@ -92,11 +136,9 @@ export default function ExportHopDongView() {
   const previewData = exportData.slice(0, 5).map((item) => {
     const row: Record<string, any> = {};
     for (const group of fieldOptions) {
-      const selected = selectedFields[group.key] || [];
-      for (const fieldKey of selected) {
-        const fieldMeta = group.fields.find((f) => f.key === fieldKey);
-        const label = fieldMeta?.label || fieldKey;
-        row[`${label}`] = item[group.key]?.[fieldKey] || "";
+      const groupValue = buildGroupCell(group, item);
+      if (groupValue) {
+        row[group.group] = groupValue;
       }
     }
     return row;
@@ -107,8 +149,8 @@ export default function ExportHopDongView() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
-          title="Quản lý thanh toán"
-          subtitle="Theo dõi và quản lý các khoản thanh toán"
+          title="Xuất dữ liệu hợp đồng"
+          subtitle="Chọn trường và xuất dữ liệu hợp đồng ra Excel"
           onCreateContract={() => {}}
         />
         <main className="flex-1 overflow-auto p-6">
@@ -163,7 +205,10 @@ export default function ExportHopDongView() {
                         {previewData.map((row, idx) => (
                           <tr key={idx} className="border-t">
                             {Object.values(row).map((cell, i) => (
-                              <td key={i} className="border px-2 py-1">
+                              <td
+                                key={i}
+                                className="border px-2 py-1 whitespace-pre-line"
+                              >
                                 {cell}
                               </td>
                             ))}

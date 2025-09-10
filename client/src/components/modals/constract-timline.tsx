@@ -25,6 +25,7 @@ type Step = {
 
 type CapTien = {
   id: string;
+  hopDongId: number;
   ngayCap: string;
   soTien: number;
   loaiTienId: number;
@@ -40,6 +41,7 @@ type Staff = {
 
 type Props = {
   contractProgressSteps: Step[];
+  contractId: string | number;
   canBo: Staff[];
   getLoaiTien: (id?: string | number | null) => string;
 };
@@ -56,6 +58,7 @@ const ContractProgressTimeline: React.FC<Props> = ({
   contractProgressSteps,
   canBo,
   getLoaiTien,
+  contractId,
 }) => {
   const sortedSteps = [...contractProgressSteps].sort(
     (a, b) => (a.thuTu || 0) - (b.thuTu || 0)
@@ -66,7 +69,12 @@ const ContractProgressTimeline: React.FC<Props> = ({
     queryKey: ["/api/cap-tien"],
   });
 
-  const sortedCapTien = [...capTienList].sort(
+  // 🔑 Lọc cấp tiền theo hợp đồng hiện tại
+  const filteredCapTien = capTienList.filter(
+    (ct) => ct.hopDongId === Number(contractId)
+  );
+
+  const sortedCapTien = [...filteredCapTien].sort(
     (a, b) => new Date(a.ngayCap).getTime() - new Date(b.ngayCap).getTime()
   );
 
@@ -142,7 +150,7 @@ const ContractProgressTimeline: React.FC<Props> = ({
 
       {/* Timeline cấp tiền */}
       <h3 className="text-lg font-semibold mb-3 flex items-center mt-8">
-        💵 Lịch sử cấp tiền ({capTienList.length} lần)
+        💵 Lịch sử cấp tiền ({filteredCapTien.length} lần)
       </h3>
 
       {isLoading ? (
