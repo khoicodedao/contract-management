@@ -224,6 +224,7 @@ export const buocThucHien = sqliteTable("buoc_thuc_hien", {
   hopDongId: integer("hop_dong_id").notNull(),
   ten: text("ten").notNull(),
   moTa: text("mo_ta"),
+  ghiChu: text("ghi_chu"),
   ngayBatDau: text("ngay_bat_dau"),
   ngayKetThuc: text("ngay_ket_thuc"),
   ngayBatDauThucTe: text("ngay_bat_dau_thuc_te"),
@@ -233,9 +234,32 @@ export const buocThucHien = sqliteTable("buoc_thuc_hien", {
   canBoPhuTrachId: integer("can_bo_phu_trach_id"),
   chiPhi: text("chi_phi"),
   diaDiem: text("dia_diem"),
+  tyGia: real("ty_gia"),
   loaiTienId: integer("loai_tien_id"),
 });
 
+export const capTien = sqliteTable("cap_tien", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  ngayCap: text("ngay_cap").notNull(),
+  hopDongId: integer("hop_dong_id").notNull(),
+  soTien: real("so_tien").notNull(),
+  loaiTienId: integer("loai_tien_id").notNull(),
+  tyGia: real("ty_gia"),
+  ghiChu: text("ghi_chu"),
+});
+
+export type InsertCapTien = typeof capTien.$inferInsert;
+
+export const insertCapTienSchema = z.object({
+  ngayCap: z.string().min(1, "Ngày cấp bắt buộc"),
+  hopDongId: z.number().int().min(1, "Hợp đồng bắt buộc"),
+  soTien: z.number().min(0, "Số tiền phải lớn hơn 0"),
+  loaiTienId: z.number().int().min(1, "Loại tiền bắt buộc"),
+  tyGia: z.number().nullable().optional(),
+  ghiChu: z.string().optional(),
+});
+
+export const updateCapTienSchema = insertCapTienSchema.partial();
 // User table for authentication
 export const users = sqliteTable("users", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -367,3 +391,4 @@ export type ThanhToan = typeof thanhToan.$inferSelect;
 export type HopDongTienDo = typeof hopDongTienDo.$inferSelect;
 export type FileHopDong = typeof fileHopDong.$inferSelect;
 export type BuocThucHien = typeof buocThucHien.$inferSelect;
+export type CapTien = typeof capTien.$inferSelect;

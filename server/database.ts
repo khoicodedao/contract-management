@@ -118,6 +118,19 @@ function createTables() {
       ngay_mua TEXT,
       bao_hanh TEXT
     );
+
+    CREATE TABLE IF NOT EXISTS cap_tien (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ngay_cap TEXT NOT NULL,              
+  hop_dong_id INTEGER NOT NULL,       
+  so_tien REAL NOT NULL,               
+  loai_tien_id INTEGER NOT NULL,      
+  ty_gia REAL,                         
+  ghi_chu TEXT,                       
+  FOREIGN KEY (hop_dong_id) REFERENCES hop_dong(id),
+  FOREIGN KEY (loai_tien_id) REFERENCES loai_tien(id)
+);
+
     
     CREATE TABLE IF NOT EXISTS thanh_toan (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -148,6 +161,7 @@ function createTables() {
       thu_tu INTEGER,
       can_bo_phu_trach_id INTEGER,
       chi_phi TEXT,
+      ty_gia REAL,
       dia_diem TEXT,
       ghi_chu TEXT,
       loai_tien_id INTEGER

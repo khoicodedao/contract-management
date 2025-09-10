@@ -23,6 +23,7 @@ import {
 } from "recharts";
 import { FileText, Package, CreditCard, Clock, Globe } from "lucide-react";
 import WorldMap from "@/components/charts/world-map";
+import React from "react";
 
 const COLORS = [
   "#0088FE",
@@ -41,6 +42,27 @@ export default function Dashboard() {
   const { data: chartData, isLoading: isChartsLoading } = useQuery({
     queryKey: ["/api/dashboard/charts"],
   });
+
+  const { data: equipment = [] } = useQuery<any[]>({
+    queryKey: ["/api/trang-bi"],
+  });
+  const { data: equipmentTypes } = useQuery({
+    queryKey: ["/api/loai-trang-bi"],
+  });
+  const equipmentChartData = React.useMemo(() => {
+    if (!equipment || !equipmentTypes) return [];
+
+    return equipmentTypes.map((type: any) => {
+      const count = equipment.filter(
+        (eq: any) => eq.loaiTrangBiId === type.id
+      ).length;
+
+      return {
+        name: type.ten,
+        value: count,
+      };
+    });
+  }, [equipment, equipmentTypes]);
   if (isLoading) {
     return (
       <div className="flex h-screen overflow-hidden">
@@ -201,15 +223,15 @@ export default function Dashboard() {
             {/* Contract Types Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle>Số lượng hợp đồng theo loại hợp đồng</CardTitle>
+                <CardTitle>Số lượng trang bị theo loại</CardTitle>
               </CardHeader>
               <CardContent>
-                {!isChartsLoading && chartData?.contractTypes ? (
+                {equipmentChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={chartData.contractTypes}>
+                    <BarChart data={equipmentChartData}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
-                      <YAxis />
+                      <YAxis allowDecimals={false} />
                       <Tooltip />
                       <Bar dataKey="value" fill="#3b82f6" />
                     </BarChart>

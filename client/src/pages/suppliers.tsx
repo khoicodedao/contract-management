@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
@@ -29,16 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import {
-  Eye,
-  Edit,
-  Trash2,
-  Search,
-  Plus,
-  Building2,
-  MapPin,
-} from "lucide-react";
+import { Edit, Trash2, Search, Plus } from "lucide-react";
 import {
   NhaCungCap,
   insertNhaCungCapSchema,
@@ -46,6 +38,7 @@ import {
 } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import getCountryFlag from "@/lib/getCountryFlag";
 
 const imageToBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -58,7 +51,44 @@ const imageToBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
-import getCountryFlag from "@/lib/getCountryFlag";
+// Danh sách quốc gia (ISO 3166)
+const countries = [
+  { name: "Vietnam", code: "VN" },
+  { name: "United States", code: "US" },
+  { name: "France", code: "FR" },
+  { name: "Germany", code: "DE" },
+  { name: "China", code: "CN" },
+  { name: "Japan", code: "JP" },
+  { name: "India", code: "IN" },
+  { name: "Russia", code: "RU" },
+  { name: "United Kingdom", code: "GB" },
+  { name: "South Korea", code: "KR" },
+  { name: "Thailand", code: "TH" },
+  { name: "Canada", code: "CA" },
+  { name: "Australia", code: "AU" },
+  { name: "Brazil", code: "BR" },
+  { name: "Indonesia", code: "ID" },
+  { name: "Singapore", code: "SG" },
+  { name: "Malaysia", code: "MY" },
+  { name: "Philippines", code: "PH" },
+  { name: "Mexico", code: "MX" },
+  { name: "Italy", code: "IT" },
+  { name: "Spain", code: "ES" },
+  { name: "Netherlands", code: "NL" },
+  { name: "Argentina", code: "AR" },
+  { name: "Turkey", code: "TR" },
+  { name: "Sweden", code: "SE" },
+  { name: "Norway", code: "NO" },
+  { name: "Switzerland", code: "CH" },
+  { name: "Poland", code: "PL" },
+  { name: "Portugal", code: "PT" },
+  { name: "South Africa", code: "ZA" },
+  { name: "New Zealand", code: "NZ" },
+  { name: "Saudi Arabia", code: "SA" },
+  { name: "United Arab Emirates", code: "AE" },
+  { name: "Qatar", code: "QA" },
+];
+
 export default function Suppliers() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -97,20 +127,10 @@ export default function Suppliers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nha-cung-cap"] });
-      toast({
-        title: "Thành công",
-        description: "Nhà cung cấp đã được thêm thành công",
-      });
+      toast({ title: "Thành công", description: "Đã thêm nhà cung cấp" });
       form.reset();
       setSelectedImage(null);
       setIsCreateModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Lỗi",
-        description: "Không thể thêm nhà cung cấp",
-        variant: "destructive",
-      });
     },
   });
 
@@ -125,21 +145,11 @@ export default function Suppliers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nha-cung-cap"] });
-      toast({
-        title: "Cập nhật thành công",
-        description: "Thông tin nhà cung cấp đã được cập nhật",
-      });
+      toast({ title: "Thành công", description: "Đã cập nhật nhà cung cấp" });
       form.reset();
       setSelectedImage(null);
       setEditingSupplier(null);
       setIsEditModalOpen(false);
-    },
-    onError: () => {
-      toast({
-        title: "Lỗi",
-        description: "Không thể cập nhật nhà cung cấp",
-        variant: "destructive",
-      });
     },
   });
 
@@ -149,14 +159,7 @@ export default function Suppliers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/nha-cung-cap"] });
-      toast({ title: "Thành công", description: "Nhà cung cấp đã được xóa" });
-    },
-    onError: () => {
-      toast({
-        title: "Lỗi",
-        description: "Không thể xóa nhà cung cấp",
-        variant: "destructive",
-      });
+      toast({ title: "Thành công", description: "Đã xóa nhà cung cấp" });
     },
   });
 
@@ -257,13 +260,12 @@ export default function Suppliers() {
                         <TableCell>{supplier.ten}</TableCell>
                         <TableCell>{supplier.diaChi}</TableCell>
                         <TableCell>
-                          <div className="flex justify-center items-center">
-                            {" "}
+                          <div className="flex items-center space-x-2">
                             <img
                               src={getCountryFlag(supplier.maQuocGia)}
-                              alt="Singapore flag"
-                              width={40}
-                              height={30}
+                              alt={supplier.maQuocGia}
+                              width={24}
+                              height={18}
                             />
                             {supplier.maQuocGia}
                           </div>
@@ -296,7 +298,7 @@ export default function Suppliers() {
         </main>
       </div>
 
-      {/* Modal for Create/Edit */}
+      {/* Modal */}
       <Dialog
         open={isCreateModalOpen || isEditModalOpen}
         onOpenChange={(open) => {
@@ -312,9 +314,7 @@ export default function Suppliers() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {editingSupplier
-                ? "Cập nhật nhà cung cấp"
-                : "Thêm nhà cung cấp mới"}
+              {editingSupplier ? "Cập nhật nhà cung cấp" : "Thêm nhà cung cấp"}
             </DialogTitle>
           </DialogHeader>
           <Form {...form}>
@@ -332,43 +332,34 @@ export default function Suppliers() {
                   </FormItem>
                 )}
               />
+
+              {/* Chọn quốc gia */}
               <FormField
                 control={form.control}
                 name="diaChi"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Địa chỉ (Quốc gia)</FormLabel>
+                    <FormLabel>Quốc gia</FormLabel>
                     <FormControl>
                       <select
                         className="w-full p-2 border rounded text-sm"
                         value={field.value}
-                        onChange={field.onChange}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          const found = countries.find(
+                            (c) => c.name === e.target.value
+                          );
+                          if (found) {
+                            form.setValue("maQuocGia", found.code);
+                          }
+                        }}
                       >
-                        <option value="">Chọn quốc gia</option>
-                        <option value="Vietnam">Vietnam</option>
-                        <option value="United States of America">
-                          United States
-                        </option>
-                        <option value="France">France</option>
-                        <option value="Germany">Germany</option>
-                        <option value="China">China</option>
-                        <option value="Japan">Japan</option>
-                        <option value="India">India</option>
-                        <option value="Russia">Russia</option>
-                        <option value="United Kingdom">United Kingdom</option>
-                        <option value="South Korea">South Korea</option>
-                        <option value="Thailand">Thailand</option>
-                        <option value="Canada">Canada</option>
-                        <option value="Australia">Australia</option>
-                        <option value="Brazil">Brazil</option>
-                        <option value="Indonesia">Indonesia</option>
-                        <option value="Singapore">Singapore</option>
-                        <option value="Malaysia">Malaysia</option>
-                        <option value="Philippines">Philippines</option>
-                        <option value="Mexico">Mexico</option>
-                        <option value="Italy">Italy</option>
-                        <option value="Spain">Spain</option>
-                        <option value="Netherlands">Netherlands</option>
+                        <option value="">-- Chọn quốc gia --</option>
+                        {countries.map((c) => (
+                          <option key={c.code} value={c.name}>
+                            {c.name}
+                          </option>
+                        ))}
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -376,6 +367,7 @@ export default function Suppliers() {
                 )}
               />
 
+              {/* Tự động điền mã quốc gia */}
               <FormField
                 control={form.control}
                 name="maQuocGia"
@@ -383,12 +375,13 @@ export default function Suppliers() {
                   <FormItem>
                     <FormLabel>Mã quốc gia</FormLabel>
                     <FormControl>
-                      <Input placeholder="VN, US, CN..." {...field} />
+                      <Input {...field} readOnly />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormItem>
                 <FormLabel>Ảnh logo (tùy chọn)</FormLabel>
                 <FormControl>
@@ -410,48 +403,7 @@ export default function Suppliers() {
                   />
                 )}
               </FormItem>
-              <FormField
-                control={form.control}
-                name="latitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Vĩ độ</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Vĩ độ..."
-                        {...field}
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="longitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Kinh độ</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="Kinh độ..."
-                        {...field}
-                        value={field.value ?? ""}
-                        onChange={(e) =>
-                          field.onChange(parseFloat(e.target.value))
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+
               <div className="flex justify-end space-x-4">
                 <Button
                   type="button"
@@ -473,10 +425,10 @@ export default function Suppliers() {
                   {editingSupplier
                     ? updateSupplierMutation.isPending
                       ? "Đang cập nhật..."
-                      : "Cập nhật nhà cung cấp"
+                      : "Cập nhật"
                     : createSupplierMutation.isPending
                     ? "Đang thêm..."
-                    : "Thêm nhà cung cấp"}
+                    : "Thêm mới"}
                 </Button>
               </div>
             </form>

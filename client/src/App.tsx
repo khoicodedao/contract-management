@@ -7,6 +7,7 @@ import Dashboard from "@/pages/dashboard";
 import Contracts from "@/pages/contracts";
 import Staff from "@/pages/staff";
 import Suppliers from "@/pages/suppliers";
+import SupplyMoney from "@/pages/supply-money";
 import Investors from "@/pages/investors";
 import Reception from "@/pages/reception";
 import Equipment from "@/pages/equipment";
@@ -130,7 +131,14 @@ function Router() {
           </ProtectedRoute>
         )}
       />
-
+      <Route
+        path="/cap-tien"
+        component={() => (
+          <ProtectedRoute>
+            <SupplyMoney />
+          </ProtectedRoute>
+        )}
+      />
       <Route component={NotFound} />
     </Switch>
   );

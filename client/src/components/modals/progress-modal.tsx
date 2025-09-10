@@ -66,10 +66,11 @@ export default function ProgressModal({
           ngayKetThuc: progress.ngayKetThuc || "",
           ngayBatDauThucTe: progress.ngayBatDauThucTe || "",
           ngayKetThucThucTe: progress.ngayKetThucThucTe || "",
-          canhBao: progress.canhBao || false,
           canBoPhuTrachId: progress.canBoPhuTrachId,
           chiPhi: progress.chiPhi,
+          tyGia: progress.tyGia,
           diaDiem: progress.diaDiem,
+          loaiTienId: progress.loaiTienId,
         }
       : {
           hopDongId: 0,
@@ -82,8 +83,9 @@ export default function ProgressModal({
           ngayKetThuc: "",
           ngayBatDauThucTe: "",
           ngayKetThucThucTe: "",
-          canhBao: false,
+          tyGia: null,
           chiPhi: "",
+          loaiTienId: null,
         },
   });
 
@@ -401,7 +403,11 @@ export default function ProgressModal({
                 <FormItem>
                   <FormLabel>Chi phí</FormLabel>
                   <FormControl>
-                    <Input placeholder="Nhập chi phí..." {...field} />
+                    <Input
+                      type="number"
+                      placeholder="Nhập chi phí..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -456,6 +462,29 @@ export default function ProgressModal({
             />
             <FormField
               control={form.control}
+              name="tyGia"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tỷ giá*</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      step={0.1}
+                      placeholder="VD: 1.2"
+                      {...field}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        field.onChange(isNaN(value) ? 0 : value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="ghiChu"
               render={({ field }) => (
                 <FormItem>
@@ -464,25 +493,6 @@ export default function ProgressModal({
                     <Textarea placeholder="Nhập ghi chú..." {...field} />
                   </FormControl>
                   <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="canhBao"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      disabled={mode === "view"}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Cảnh báo khi quá hạn</FormLabel>
-                  </div>
                 </FormItem>
               )}
             />

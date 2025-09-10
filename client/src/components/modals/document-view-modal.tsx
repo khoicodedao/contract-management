@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -8,11 +10,14 @@ import {
 import { Document, Page, pdfjs } from "react-pdf";
 import mammoth from "mammoth";
 import { Button } from "@/components/ui/button";
-import { FileText, Download, ExternalLink } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { FileHopDong } from "@shared/schema";
 
-// Cấu hình react-pdf worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// import pdf worker từ node_modules (react-pdf v6+)
+import pdfWorker from "pdfjs-dist/build/pdf.worker?url";
+
+// cấu hình worker
+pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 interface Props {
   isOpen: boolean;
@@ -26,6 +31,7 @@ export default function DocumentViewerModal({
   document,
 }: Props) {
   const [docxHtml, setDocxHtml] = useState("");
+  const [numPages, setNumPages] = useState<number>(0);
 
   useEffect(() => {
     const loadDocxFromBase64 = async () => {
@@ -91,24 +97,29 @@ export default function DocumentViewerModal({
             Tải xuống
           </Button>
         </div>
-
         <div className="bg-white border rounded p-4">
-          {document.tenFile?.endsWith(".pdf") && (
-            <div className="flex justify-center">
-              <Document file={getBase64Url()}>
-                <Page pageNumber={1} width={600} />
+          {document.tenFile?.toLowerCase().endsWith(".pdf") ? (
+            <div className="flex flex-col items-center">
+              <Document
+                file={getBase64Url()}
+                onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                loading={<p>Đang tải PDF...</p>}
+              >
+                {Array.from(new Array(numPages), (_, index) => (
+                  <Page
+                    key={`page_${index + 1}`}
+                    pageNumber={index + 1}
+                    width={600}
+                  />
+                ))}
               </Document>
             </div>
-          )}
-
-          {document.tenFile?.endsWith(".docx") && (
+          ) : document.tenFile?.toLowerCase().endsWith(".docx") ? (
             <div
               className="prose max-w-none"
               dangerouslySetInnerHTML={{ __html: docxHtml }}
             />
-          )}
-
-          {!document.tenFile?.match(/\.(pdf|docx)$/) && (
+          ) : (
             <p className="text-muted-foreground text-center">
               Không thể xem trước loại file này.
             </p>

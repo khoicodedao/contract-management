@@ -1,9 +1,12 @@
+"use client";
+
 import React from "react";
 import {
   VerticalTimeline,
   VerticalTimelineElement,
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
+import { useQuery } from "@tanstack/react-query";
 
 type Step = {
   id: string;
@@ -20,6 +23,15 @@ type Step = {
   loaiTienId?: string;
 };
 
+type CapTien = {
+  id: string;
+  ngayCap: string;
+  soTien: number;
+  loaiTienId: number;
+  tyGia?: number | null;
+  ghiChu?: string | null;
+};
+
 type Staff = {
   id: string;
   ten: string;
@@ -29,7 +41,7 @@ type Staff = {
 type Props = {
   contractProgressSteps: Step[];
   canBo: Staff[];
-  getLoaiTien: any;
+  getLoaiTien: (id?: string | number | null) => string;
 };
 
 const formatDate = (dateStr?: string) => {
@@ -45,22 +57,32 @@ const ContractProgressTimeline: React.FC<Props> = ({
   canBo,
   getLoaiTien,
 }) => {
-  const sortedSteps = contractProgressSteps.sort(
+  const sortedSteps = [...contractProgressSteps].sort(
     (a, b) => (a.thuTu || 0) - (b.thuTu || 0)
+  );
+
+  // 🔑 Query danh sách cấp tiền từ API
+  const { data: capTienList = [], isLoading } = useQuery<CapTien[]>({
+    queryKey: ["/api/cap-tien"],
+  });
+
+  const sortedCapTien = [...capTienList].sort(
+    (a, b) => new Date(a.ngayCap).getTime() - new Date(b.ngayCap).getTime()
   );
 
   return (
     <div>
+      {/* Timeline bước thực hiện */}
       <h3 className="text-lg font-semibold mb-3 flex items-center">
         🗂️ Tiến độ thực hiện ({contractProgressSteps.length} bước)
       </h3>
 
       <VerticalTimeline lineColor="#0ea5e9">
-        {sortedSteps.map((step, index) => {
+        {sortedSteps.map((step) => {
           const staff = canBo.find((c) => c.id === step.canBoPhuTrachId);
           return (
             <VerticalTimelineElement
-              key={step.id}
+              key={`step-${step.id}`}
               contentStyle={{
                 background: "#e0f2fe",
                 color: "#0f172a",
@@ -103,17 +125,60 @@ const ContractProgressTimeline: React.FC<Props> = ({
                 {step.moTa}
                 {step.ghiChu ? `\n\n📝 Ghi chú: ${step.ghiChu}` : ""}
               </p>
-              <p className="text-sm text-gray-600">
-                {step.diaDiem && `📍 Địa điểm: ${step.diaDiem}`}
-              </p>
-              <p className="text-sm text-gray-600">
-                {step.chiPhi &&
-                  `💰 Chi phí: ${step.chiPhi} ${getLoaiTien(step.loaiTienId)}`}
-              </p>
+              {step.diaDiem && (
+                <p className="text-sm text-gray-600">
+                  📍 Địa điểm: {step.diaDiem}
+                </p>
+              )}
+              {step.chiPhi && (
+                <p className="text-sm text-gray-600">
+                  💰 Chi phí: {step.chiPhi} {getLoaiTien(step.loaiTienId)}
+                </p>
+              )}
             </VerticalTimelineElement>
           );
         })}
       </VerticalTimeline>
+
+      {/* Timeline cấp tiền */}
+      <h3 className="text-lg font-semibold mb-3 flex items-center mt-8">
+        💵 Lịch sử cấp tiền ({capTienList.length} lần)
+      </h3>
+
+      {isLoading ? (
+        <p className="text-gray-500 text-sm">Đang tải dữ liệu cấp tiền...</p>
+      ) : (
+        <VerticalTimeline lineColor="#16a34a">
+          {sortedCapTien.map((ct) => (
+            <VerticalTimelineElement
+              key={`capTien-${ct.id}`}
+              contentStyle={{
+                background: "#dcfce7",
+                color: "#14532d",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+              }}
+              contentArrowStyle={{ borderRight: "7px solid #dcfce7" }}
+              date={formatDate(ct.ngayCap)}
+              iconStyle={{
+                background: "#16a34a",
+                color: "#fff",
+              }}
+              icon={<span className="text-lg font-bold">₫</span>}
+            >
+              <h4 className="text-md font-bold mb-1">
+                Cấp {ct.soTien.toLocaleString("vi-VN")}{" "}
+                {getLoaiTien(ct.loaiTienId)}
+              </h4>
+              {ct.tyGia && (
+                <p className="text-sm text-gray-700">🔄 Tỷ giá: {ct.tyGia}</p>
+              )}
+              {ct.ghiChu && (
+                <p className="text-sm text-gray-600 mt-1">📝 {ct.ghiChu}</p>
+              )}
+            </VerticalTimelineElement>
+          ))}
+        </VerticalTimeline>
+      )}
     </div>
   );
 };

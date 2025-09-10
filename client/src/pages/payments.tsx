@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Sidebar from "@/components/layout/sidebar";
@@ -30,6 +32,43 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import React from "react";
 import PaymentModal from "@/components/modals/payment-modal";
+const getPaymentStatus = (
+  hanHopDong: string | null,
+  hanThucHien: string | null,
+  daThanhToan: boolean
+) => {
+  if (daThanhToan) {
+    return { label: "Đã thanh toán", color: "bg-green-100 text-green-800" };
+  }
+
+  const now = new Date();
+  const deadline = hanThucHien
+    ? new Date(hanThucHien)
+    : hanHopDong
+    ? new Date(hanHopDong)
+    : null;
+
+  if (!deadline)
+    return { label: "Chưa xác định", color: "bg-gray-100 text-gray-800" };
+
+  const diff = deadline.getTime() - now.getTime();
+  const daysLeft = diff / (1000 * 60 * 60 * 24);
+
+  if (daysLeft < 0) {
+    return { label: "Quá hạn", color: "bg-red-100 text-red-800" };
+  }
+
+  if (daysLeft <= 7) {
+    return { label: "Sắp đến hạn", color: "bg-yellow-100 text-yellow-800" };
+  }
+
+  if (daysLeft > 30) {
+    return { label: "Bình thường", color: "bg-blue-100 text-blue-800" };
+  }
+
+  // default fallback (<=30 ngày nhưng >7 ngày)
+  return { label: "Trong hạn", color: "bg-green-100 text-green-800" };
+};
 
 export default function Payments() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -82,43 +121,71 @@ export default function Payments() {
     },
   });
 
-  // Group payments by contract
+  // Hàm lấy trạng thái thanh toán
+  const getPaymentStatus = (
+    hanHopDong: string | null,
+    hanThucHien: string | null,
+    daThanhToan: boolean
+  ) => {
+    const now = new Date();
+    const deadline = hanThucHien
+      ? new Date(hanThucHien)
+      : hanHopDong
+      ? new Date(hanHopDong)
+      : null;
+
+    if (!deadline)
+      return { label: "Chưa xác định", color: "bg-gray-100 text-gray-800" };
+
+    if (!daThanhToan && deadline < now)
+      return { label: "Quá hạn", color: "bg-red-100 text-red-800" };
+
+    if (
+      !daThanhToan &&
+      deadline.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000
+    )
+      return { label: "Sắp đến hạn", color: "bg-yellow-100 text-yellow-800" };
+
+    return { label: "Bình thường", color: "bg-green-100 text-green-800" };
+  };
+
+  // Gom nhóm thanh toán theo hợp đồng
   const paymentsByContract = React.useMemo(() => {
     if (!payments.length || !contracts.length) return [];
-
     const contractGroups = contracts.map((contract) => {
       const contractPayments = payments.filter(
         (payment) => payment.hopDongId === contract.id
       );
-      return {
-        contract,
-        payments: contractPayments,
-      };
+      return { contract, payments: contractPayments };
     });
-
     return contractGroups.filter((group) => group.payments.length > 0);
   }, [payments, contracts]);
 
+  // Lọc theo search + trạng thái
   const filteredPaymentsByContract = paymentsByContract
-    .map(({ contract, payments: contractPayments }) => {
-      const filteredPayments = contractPayments.filter((payment) => {
+    .map(({ contract, payments }) => {
+      const filteredPayments = payments.filter((payment) => {
         const matchesSearch =
           !searchTerm ||
           payment.ghiChu?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           contract.ten?.toLowerCase().includes(searchTerm.toLowerCase());
 
+        const { label } = getPaymentStatus(
+          payment.hanHopDong,
+          payment.hanThucHien,
+          payment.daThanhToan ?? false
+        );
+
         const matchesStatus =
           statusFilter === "all" ||
-          (statusFilter === "paid" && payment.hanThucHien) ||
-          (statusFilter === "unpaid" && !payment.hanThucHien);
+          (statusFilter === "normal" && label === "Bình thường") ||
+          (statusFilter === "due_soon" && label === "Sắp đến hạn") ||
+          (statusFilter === "overdue" && label === "Quá hạn");
 
         return matchesSearch && matchesStatus;
       });
 
-      return {
-        contract,
-        payments: filteredPayments,
-      };
+      return { contract, payments: filteredPayments };
     })
     .filter((group) => group.payments.length > 0);
 
@@ -152,32 +219,7 @@ export default function Payments() {
       <Badge className="bg-orange-100 text-orange-800">Chưa thanh toán</Badge>
     );
   };
-  const getPaymentStatus = (
-    hanHopDong: string | null,
-    hanThucHien: string | null,
-    daThanhToan: boolean
-  ) => {
-    const now = new Date();
-    const deadline = hanThucHien
-      ? new Date(hanThucHien)
-      : hanHopDong
-      ? new Date(hanHopDong)
-      : null;
 
-    if (!deadline)
-      return { label: "Chưa xác định", color: "bg-gray-100 text-gray-800" };
-
-    if (!daThanhToan && deadline < now)
-      return { label: "Quá hạn", color: "bg-red-100 text-red-800" };
-
-    if (
-      !daThanhToan &&
-      deadline.getTime() - now.getTime() < 7 * 24 * 60 * 60 * 1000
-    )
-      return { label: "Sắp đến hạn", color: "bg-yellow-100 text-yellow-800" };
-
-    return { label: "Bình thường", color: "bg-green-100 text-green-800" };
-  };
   const overdueCount = payments.filter((p) => {
     const status = getPaymentStatus(p.hanHopDong, p.hanThucHien, p.daThanhToan);
     return status.label === "Quá hạn";
@@ -194,6 +236,7 @@ export default function Payments() {
         />
 
         <main className="flex-1 overflow-auto p-6">
+          {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Card>
               <CardContent className="p-6">
@@ -225,7 +268,8 @@ export default function Payments() {
                         payments.filter((p) => {
                           const status = getPaymentStatus(
                             p.hanHopDong,
-                            p.hanThucHien
+                            p.hanThucHien,
+                            p.daThanhToan
                           );
                           return status.label === "Sắp đến hạn";
                         }).length
@@ -258,6 +302,7 @@ export default function Payments() {
             </Card>
           </div>
 
+          {/* Payment List */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -414,7 +459,7 @@ export default function Payments() {
                                   className="flex items-start space-x-4 p-4 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
                                 >
                                   <div className="flex-shrink-0 mt-1">
-                                    {payment.hanThucHien ? (
+                                    {payment.daThanhToan ? (
                                       <CheckSquare className="h-5 w-5 text-green-600" />
                                     ) : (
                                       <Clock className="h-5 w-5 text-orange-600" />

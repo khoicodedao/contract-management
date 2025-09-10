@@ -39,9 +39,6 @@ export function InvestorModal({
       ten: "",
       diaChi: "",
       soDienThoai: "",
-      email: "",
-      nguoiDaiDien: "",
-      chucVuNguoiDaiDien: "",
       moTa: "",
       anh: "",
     },
@@ -53,9 +50,6 @@ export function InvestorModal({
         ten: investor.ten || "",
         diaChi: investor.diaChi || "",
         soDienThoai: investor.soDienThoai || "",
-        email: investor.email || "",
-        nguoiDaiDien: investor.nguoiDaiDien || "",
-        chucVuNguoiDaiDien: investor.chucVuNguoiDaiDien || "",
         moTa: investor.moTa || "",
         anh: investor.anh || "",
       });
@@ -67,9 +61,7 @@ export function InvestorModal({
         ten: "",
         diaChi: "",
         soDienThoai: "",
-        email: "",
-        nguoiDaiDien: "",
-        chucVuNguoiDaiDien: "",
+
         moTa: "",
         anh: "",
       });
@@ -183,35 +175,6 @@ export function InvestorModal({
               {...form.register("diaChi")}
               placeholder="Nhập địa chỉ"
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              {...form.register("email")}
-              placeholder="Nhập email"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="nguoiDaiDien">Người đại diện</Label>
-              <Input
-                id="nguoiDaiDien"
-                {...form.register("nguoiDaiDien")}
-                placeholder="Nhập tên người đại diện"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="chucVuNguoiDaiDien">Chức vụ người đại diện</Label>
-              <Input
-                id="chucVuNguoiDaiDien"
-                {...form.register("chucVuNguoiDaiDien")}
-                placeholder="Nhập chức vụ"
-              />
-            </div>
           </div>
 
           <div className="space-y-2">

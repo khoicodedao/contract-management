@@ -18,6 +18,7 @@ import {
   insertHopDongTienDoSchema,
   insertDiaDiemThongQuanSchema,
   insertTiepNhanSchema,
+  insertCapTienSchema,
 } from "../shared/schema.js";
 import multer from "multer";
 import path from "path";
@@ -466,6 +467,71 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Tạo loại ngân sách mới
+  app.post("/api/loai-ngan-sach", async (req, res) => {
+    try {
+      const { ten } = req.body;
+      if (!ten) {
+        return res
+          .status(400)
+          .json({ error: "Tên loại ngân sách là bắt buộc" });
+      }
+
+      const [newItem] = await db
+        .insert(schema.loaiNganSach)
+        .values({ ten })
+        .returning();
+
+      res.status(201).json(newItem);
+    } catch (error) {
+      console.error("Error creating loai ngan sach:", error);
+      res.status(500).json({ error: "Lỗi server" });
+    }
+  });
+
+  // Cập nhật loại ngân sách
+  app.put("/api/loai-ngan-sach/:id", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+      const { ten } = req.body;
+
+      const [updated] = await db
+        .update(schema.loaiNganSach)
+        .set({ ten })
+        .where(eq(schema.loaiNganSach.id, id))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ error: "Không tìm thấy loại ngân sách" });
+      }
+
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating loai ngan sach:", error);
+      res.status(500).json({ error: "Lỗi server" });
+    }
+  });
+
+  // Xóa loại ngân sách
+  app.delete("/api/loai-ngan-sach/:id", async (req, res) => {
+    try {
+      const id = Number(req.params.id);
+
+      const [deleted] = await db
+        .delete(schema.loaiNganSach)
+        .where(eq(schema.loaiNganSach.id, id))
+        .returning();
+
+      if (!deleted) {
+        return res.status(404).json({ error: "Không tìm thấy loại ngân sách" });
+      }
+
+      res.json({ message: "Đã xóa thành công", deleted });
+    } catch (error) {
+      console.error("Error deleting loai ngan sach:", error);
+      res.status(500).json({ error: "Lỗi server" });
+    }
+  });
   // Loại tiền routes
   app.get("/api/loai-tien", async (req, res) => {
     try {
@@ -702,6 +768,71 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ error: "Lỗi khi xóa bước thực hiện" });
     }
   });
+
+  // Lấy tất cả bản ghi cấp tiền
+  app.get("/api/cap-tien", async (req, res) => {
+    try {
+      const items = await db.select().from(schema.capTien);
+      res.json(items);
+    } catch (error) {
+      console.error("Error fetching cap tien:", error);
+      res.status(500).json({ error: "Lỗi server" });
+    }
+  });
+
+  // Thêm mới bản ghi cấp tiền
+  app.post("/api/cap-tien", async (req, res) => {
+    try {
+      const validatedData = insertCapTienSchema.parse(req.body);
+      const items = await db
+        .insert(schema.capTien)
+        .values(validatedData)
+        .returning();
+      res.status(201).json(items[0]);
+    } catch (error) {
+      console.error("Error creating cap tien:", error);
+      res.status(500).json({ error: "Lỗi khi tạo cấp tiền" });
+    }
+  });
+
+  // Cập nhật bản ghi cấp tiền theo id
+  app.put("/api/cap-tien/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = updateCapTienSchema.parse(req.body);
+      const updated = await db
+        .update(schema.capTien)
+        .set(validatedData)
+        .where(eq(schema.capTien.id, id))
+        .returning();
+      if (updated.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy cấp tiền" });
+      }
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Error updating cap tien:", error);
+      res.status(500).json({ error: "Lỗi khi cập nhật cấp tiền" });
+    }
+  });
+
+  // Xóa bản ghi cấp tiền theo id
+  app.delete("/api/cap-tien/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await db
+        .delete(schema.capTien)
+        .where(eq(schema.capTien.id, id))
+        .returning();
+      if (deleted.length === 0) {
+        return res.status(404).json({ error: "Không tìm thấy cấp tiền" });
+      }
+      res.json({ message: "Xóa thành công", item: deleted[0] });
+    } catch (error) {
+      console.error("Error deleting cap tien:", error);
+      res.status(500).json({ error: "Lỗi khi xóa cấp tiền" });
+    }
+  });
+
   // Trang bị routes
   app.get("/api/trang-bi", async (req, res) => {
     try {

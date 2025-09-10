@@ -215,12 +215,9 @@ export default function Contracts() {
                         <TableRow key={contract.id} className="table-row">
                           <TableCell>
                             <div>
-                              <div className="font-medium">
-                                {contract.soHdNoi || "Chưa có"}
-                              </div>
                               {contract.soHdNgoai && (
-                                <div className="text-sm text-slate-500">
-                                  Ngoài: {contract.soHdNgoai}
+                                <div className="font-medium">
+                                  {contract.soHdNgoai}
                                 </div>
                               )}
                             </div>

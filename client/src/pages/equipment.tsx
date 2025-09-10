@@ -37,6 +37,10 @@ export default function Equipment() {
   const { data: contracts = [] } = useQuery({
     queryKey: ["/api/hop-dong"],
   });
+
+  const { data: nhaCungCap } = useQuery({
+    queryKey: ["/api/nha-cung-cap"],
+  });
   const deleteEquipmentMutation = useMutation({
     mutationFn: async (id: number) => {
       return await apiRequest("DELETE", `/api/trang-bi/${id}`);
@@ -73,11 +77,21 @@ export default function Equipment() {
   );
 
   const formatCurrency = (amount: string | null, currencyId: number | null) => {
-    if (!amount) return "-";
+    if (!amount || !currencyId) return "-";
     const value = parseFloat(amount);
+
+    // map id sang mã tiền tệ ISO 4217
+    const currencyMap: Record<number, string> = {
+      1: "USD",
+      2: "EUR",
+      3: "VND",
+    };
+
+    const currencyCode = currencyMap[currencyId] || "VND";
+
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
-      currency: currencyId === 2 ? "USD" : "VND",
+      currency: currencyCode,
     }).format(value);
   };
 
@@ -180,7 +194,9 @@ export default function Equipment() {
                           </TableCell>
                           <TableCell>
                             {item.nhaCungCapId
-                              ? `NCC-${item.nhaCungCapId}`
+                              ? nhaCungCap.find(
+                                  (ncc: any) => ncc.id === item.nhaCungCapId
+                                )?.ten || `NCC-${item.nhaCungCapId}`
                               : "Chưa xác định"}
                           </TableCell>
                           <TableCell>

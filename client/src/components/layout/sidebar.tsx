@@ -40,6 +40,9 @@ export function Sidebar() {
   const { data: tiepNhan = [] } = useQuery<HopDong[]>({
     queryKey: ["/api/tiep-nhan"],
   });
+  const { data: loaiNganSach = [] } = useQuery<HopDong[]>({
+    queryKey: ["/api/loai-ngan-sach"],
+  });
   const navigation = [
     {
       name: "Tổng quan",
@@ -52,35 +55,35 @@ export function Sidebar() {
       href: "/hop-dong",
       icon: File,
       current: false,
-      badge: contracts.length > 0 ? contracts.length : 0,
+      badge: contracts.length > 0 ? contracts.length : "",
     },
     {
       name: "Cán bộ",
       href: "/can-bo",
       icon: Users,
       current: false,
-      badge: canBo.length > 0 ? canBo.length : 0,
+      badge: canBo.length > 0 ? canBo.length : "",
     },
     {
       name: "Nhà cung cấp",
       href: "/nha-cung-cap",
       icon: Building2,
       current: false,
-      badge: nhaCungCap.length > 0 ? nhaCungCap.length : 0,
+      badge: nhaCungCap.length > 0 ? nhaCungCap.length : "",
     },
     {
       name: "Chủ đầu tư",
       href: "/chu-dau-tu",
       icon: Users,
       current: false,
-      badge: chuDauTu.length > 0 ? chuDauTu.length : 0,
+      badge: chuDauTu.length > 0 ? chuDauTu.length : "",
     },
     {
       name: "Trang bị",
       href: "/trang-bi",
       icon: Settings,
       current: false,
-      badge: trangBi.length > 0 ? trangBi.length : 0,
+      badge: trangBi.length > 0 ? trangBi.length : "",
     },
     {
       name: "Thanh toán",
@@ -95,24 +98,31 @@ export function Sidebar() {
       current: false,
     },
     {
+      name: "Cấp tiền",
+      href: "/cap-tien",
+      icon: DollarSign,
+      current: false,
+    },
+    {
       name: "Tài liệu",
       href: "/tai-lieu",
       icon: FolderOpen,
       current: false,
-      badge: taiLieu.length > 0 ? taiLieu.length : 0,
+      badge: taiLieu.length > 0 ? taiLieu.length : "",
     },
     {
       name: "Tiếp nhận",
       href: "/tiep-nhan",
       icon: Inbox,
       current: false,
-      badge: tiepNhan.length > 0 ? tiepNhan.length : 0,
+      badge: tiepNhan.length > 0 ? tiepNhan.length : "",
     },
     {
       name: "Loại ngân sách",
       href: "/loai-ngan-sach",
       icon: DollarSign,
       current: false,
+      badge: loaiNganSach.length > 0 ? loaiNganSach.length : "",
     },
     {
       name: "Xuất báo cáo",

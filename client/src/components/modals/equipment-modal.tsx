@@ -1,12 +1,30 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertTrangBiSchema, InsertTrangBi } from "@shared/schema";
@@ -17,32 +35,43 @@ interface EquipmentModalProps {
   equipment?: any;
 }
 
-export default function EquipmentModal({ isOpen, onClose, equipment }: EquipmentModalProps) {
+export default function EquipmentModal({
+  isOpen,
+  onClose,
+  equipment,
+}: EquipmentModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
+  const { data: nhaCungCap } = useQuery({
+    queryKey: ["/api/nha-cung-cap"],
+  });
   const form = useForm<InsertTrangBi>({
     resolver: zodResolver(insertTrangBiSchema),
-    defaultValues: equipment ? {
-      hopDongId: equipment.hopDongId || 0,
-      ten: equipment.ten || "",
-      moTa: equipment.moTa || "",
-      soLuong: equipment.soLuong || 1,
-      donGia: equipment.donGia || "",
-      loaiTrangBiId: equipment.loaiTrangBiId,
-      trangThai: equipment.trangThai || "",
-      ngayMua: equipment.ngayMua || "",
-      baoHanh: equipment.baoHanh || "",
-    } : {
-      hopDongId: 0,
-      ten: "",
-      moTa: "",
-      soLuong: 1,
-      donGia: "",
-      trangThai: "",
-      ngayMua: "",
-      baoHanh: "",
-    },
+    defaultValues: equipment
+      ? {
+          hopDongId: equipment.hopDongId || 0,
+          ten: equipment.ten || "",
+          moTa: equipment.moTa || "",
+          soLuong: equipment.soLuong || 1,
+          donGia: equipment.donGia || "",
+          loaiTrangBiId: equipment.loaiTrangBiId,
+          trangThai: equipment.trangThai || "",
+          ngayMua: equipment.ngayMua || "",
+          baoHanh: equipment.baoHanh || "",
+          nhaCungCapId: equipment.nhaCungCapId,
+          loaiTienId: equipment.loaiTienId ?? 1, // Default to VND if not specified
+        }
+      : {
+          hopDongId: 0,
+          ten: "",
+          moTa: "",
+          soLuong: 1,
+          donGia: "",
+          trangThai: "",
+          ngayMua: "",
+          baoHanh: "",
+          nhaCungCapId: null,
+        },
   });
 
   const { data: contracts } = useQuery({
@@ -51,6 +80,9 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
 
   const { data: equipmentTypes } = useQuery({
     queryKey: ["/api/loai-trang-bi"],
+  });
+  const { data: loaiTien } = useQuery({
+    queryKey: ["/api/loai-tien"],
   });
 
   const createEquipmentMutation = useMutation({
@@ -65,7 +97,9 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
       queryClient.invalidateQueries({ queryKey: ["/api/trang-bi"] });
       toast({
         title: "Thành công",
-        description: equipment ? "Trang bị đã được cập nhật" : "Trang bị đã được tạo",
+        description: equipment
+          ? "Trang bị đã được cập nhật"
+          : "Trang bị đã được tạo",
       });
       onClose();
       form.reset();
@@ -87,7 +121,9 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{equipment ? "Chỉnh sửa trang bị" : "Thêm trang bị mới"}</DialogTitle>
+          <DialogTitle>
+            {equipment ? "Chỉnh sửa trang bị" : "Thêm trang bị mới"}
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -98,7 +134,10 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Hợp đồng</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                  >
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Chọn hợp đồng" />
@@ -106,8 +145,11 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                     </FormControl>
                     <SelectContent>
                       {contracts?.map((contract: any) => (
-                        <SelectItem key={contract.id} value={contract.id.toString()}>
-                          {contract.ten}
+                        <SelectItem
+                          key={contract.id}
+                          value={contract.id.toString()}
+                        >
+                          {contract.soHdNgoai}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -138,7 +180,10 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Loại trang bị</FormLabel>
-                    <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
+                    <Select
+                      onValueChange={(value) => field.onChange(parseInt(value))}
+                      value={field.value?.toString()}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn loại trang bị" />
@@ -157,7 +202,38 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                 )}
               />
             </div>
-
+            <FormField
+              control={form.control}
+              name="nhaCungCapId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nhà cung cấp *</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Chọn nhà cung cấp" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {nhaCungCap?.map((item: any) => (
+                        <SelectItem key={item.id} value={item.id.toString()}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{item.ten}</span>
+                            <span className="text-xs text-gray-500">
+                              {item.diaChi}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="moTa"
@@ -180,11 +256,13 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                   <FormItem>
                     <FormLabel>Số lượng</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        placeholder="Số lượng" 
+                      <Input
+                        type="number"
+                        placeholder="Số lượng"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
+                        onChange={(e) =>
+                          field.onChange(parseInt(e.target.value))
+                        }
                       />
                     </FormControl>
                     <FormMessage />
@@ -206,7 +284,35 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                 )}
               />
             </div>
-
+            <FormField
+              control={form.control}
+              name="loaiTienId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Loại Tiền *</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(parseInt(value))}
+                    value={field.value?.toString()}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Chọn loại tiền" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {loaiTien?.map((item: any) => (
+                        <SelectItem key={item.id} value={item.id.toString()}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{item.ten}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
@@ -214,7 +320,10 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Trạng thái</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value || ""}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value || ""}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Chọn trạng thái" />
@@ -222,7 +331,9 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Mới">Mới</SelectItem>
-                        <SelectItem value="Đang sử dụng">Đang sử dụng</SelectItem>
+                        <SelectItem value="Đang sử dụng">
+                          Đang sử dụng
+                        </SelectItem>
                         <SelectItem value="Bảo trì">Bảo trì</SelectItem>
                         <SelectItem value="Hỏng">Hỏng</SelectItem>
                         <SelectItem value="Thanh lý">Thanh lý</SelectItem>
@@ -266,8 +377,15 @@ export default function EquipmentModal({ isOpen, onClose, equipment }: Equipment
               <Button type="button" variant="outline" onClick={onClose}>
                 Hủy
               </Button>
-              <Button type="submit" disabled={createEquipmentMutation.isPending}>
-                {createEquipmentMutation.isPending ? "Đang lưu..." : (equipment ? "Cập nhật" : "Thêm mới")}
+              <Button
+                type="submit"
+                disabled={createEquipmentMutation.isPending}
+              >
+                {createEquipmentMutation.isPending
+                  ? "Đang lưu..."
+                  : equipment
+                  ? "Cập nhật"
+                  : "Thêm mới"}
               </Button>
             </div>
           </form>
