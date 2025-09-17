@@ -120,3 +120,7 @@
 .notification-info {
   @apply bg-blue-50 border-blue-500;
 }
+
+.flex.h-screen.overflow-hidden {
+  height: calc(100vh - 65px) !important;
+}

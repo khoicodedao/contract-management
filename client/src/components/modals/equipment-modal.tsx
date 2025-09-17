@@ -277,7 +277,18 @@ export default function EquipmentModal({
                   <FormItem>
                     <FormLabel>Đơn giá</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nhập đơn giá" {...field} />
+                      <Input
+                        type="number"
+                        placeholder="Nhập đơn giá"
+                        value={field.value ?? ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === ""
+                              ? undefined
+                              : Number(e.target.value)
+                          )
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

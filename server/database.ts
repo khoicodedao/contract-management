@@ -285,12 +285,39 @@ export async function initializeDatabase() {
     ]);
 
   // Insert equipment types
+  // Insert equipment types
   await db
     .insert(schema.loaiTrangBi)
     .values([
       { ten: "Trang bị Công nghệ thông tin" },
       { ten: "Trang bị điện tử" },
       { ten: "Trang bị Hoá học" },
+      { ten: "Lục quân" },
+      { ten: "Chính trị" },
+      { ten: "Không quân" },
+      { ten: "Phòng không" },
+      { ten: "Hải quân" },
+      { ten: "Tình báo" },
+      { ten: "Biên phòng" },
+      { ten: "Quân y" },
+      { ten: "Doanh trại" },
+      { ten: "Vận tải" },
+      { ten: "Xăng dầu" },
+      { ten: "Quân nhu" },
+      { ten: "Quân khí" },
+      { ten: "Tuyên huấn" },
+      { ten: "Bảo vệ an ninh" },
+      { ten: "Gìn giữ hoà bình" },
+      { ten: "Tài chính" },
+      { ten: "Đối ngoại" },
+      { ten: "Cảnh sát biển" },
+      { ten: "Công binh" },
+      { ten: "Thông tin liên lạc" },
+      { ten: "Tác chiến điện tử" },
+      { ten: "Địa hình quân sự" },
+      { ten: "Pháo binh" },
+      { ten: "Tăng thiết giáp" },
+      { ten: "Phòng hoá" },
     ]);
 
   // Insert contract statuses
@@ -303,7 +330,7 @@ export async function initializeDatabase() {
   // Insert sample staff
   await db.insert(schema.canBo).values([
     {
-      ten: "Ngô Văn Khang",
+      ten: "Quản trị viên",
       chucVu: "Trưởng phòng",
       soDienThoai: "0123456789",
       email: "ngovankang@customs.gov.vn",

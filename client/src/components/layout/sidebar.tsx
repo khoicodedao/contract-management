@@ -136,7 +136,10 @@ export function Sidebar() {
   return (
     <div className="w-64 bg-white shadow-sm border-r border-slate-200 flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-slate-200">
+      <div
+        className="p-6 border-b border-slate-200"
+        style={{ paddingTop: "40px" }}
+      >
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
             <File className="text-white text-lg" />

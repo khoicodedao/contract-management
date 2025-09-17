@@ -180,6 +180,7 @@ export default function Dashboard() {
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             {/* Contract Types Pie Chart */}
+            {/* Contract Types Chart (đổi thành BarChart) */}
             <Card>
               <CardHeader>
                 <CardTitle>Số lượng hợp đồng theo loại hợp đồng</CardTitle>
@@ -187,30 +188,22 @@ export default function Dashboard() {
               <CardContent>
                 {!isChartsLoading && chartData?.contractTypes ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={chartData.contractTypes}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, percent }) =>
-                          `${name} ${(percent * 100).toFixed(0)}%`
-                        }
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
+                    <BarChart data={chartData.contractTypes}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis allowDecimals={false} />
+                      <Tooltip />
+                      <Bar dataKey="value" fill="#3b82f6">
                         {chartData.contractTypes.map(
                           (_: any, index: number) => (
                             <Cell
-                              key={`cell-${index}`}
+                              key={`cell-contract-${index}`}
                               fill={COLORS[index % COLORS.length]}
                             />
                           )
                         )}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
+                      </Bar>
+                    </BarChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-[300px] flex items-center justify-center">
@@ -220,7 +213,8 @@ export default function Dashboard() {
               </CardContent>
             </Card>
 
-            {/* Contract Types Bar Chart */}
+            {/* Equipment Types Chart (đổi thành PieChart) */}
+            {/* Equipment Types Chart (PieChart) */}
             <Card>
               <CardHeader>
                 <CardTitle>Số lượng trang bị theo loại</CardTitle>
@@ -228,13 +222,30 @@ export default function Dashboard() {
               <CardContent>
                 {equipmentChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={equipmentChartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis allowDecimals={false} />
+                    <PieChart>
+                      <Pie
+                        data={equipmentChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, value, percent }) =>
+                          value > 0
+                            ? `${name} ${(percent * 100).toFixed(0)}%`
+                            : ""
+                        }
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {equipmentChartData.map((_: any, index: number) => (
+                          <Cell
+                            key={`cell-eq-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
+                        ))}
+                      </Pie>
                       <Tooltip />
-                      <Bar dataKey="value" fill="#3b82f6" />
-                    </BarChart>
+                    </PieChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="h-[300px] flex items-center justify-center">

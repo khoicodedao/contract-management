@@ -35,7 +35,7 @@ export async function seedDatabase() {
 
     // Create sample staff - 12 customs officers
     const staff = [
-      { ten: "Ngô Văn Khang", chucVu: "Trưởng phòng", anh: null },
+      { ten: "Quản trị viên", chucVu: "Trưởng phòng", anh: null },
       { ten: "Nguyễn Văn Sáu", chucVu: "Phó trưởng phòng", anh: null },
       { ten: "Hoàng Văn Công", chucVu: "Trợ lý", anh: null },
       { ten: "Phan Quân", chucVu: "Trợ lý", anh: null },
