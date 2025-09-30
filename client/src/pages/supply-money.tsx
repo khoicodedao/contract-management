@@ -56,7 +56,6 @@ export default function CapTienPage() {
     queryKey: ["/api/loai-tien"],
   });
 
-  // Mutation xóa cấp tiền
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/cap-tien/${id}`);
@@ -73,7 +72,6 @@ export default function CapTienPage() {
     },
   });
 
-  // Mở modal
   const handleOpenModal = (
     mode: "create" | "edit" | "view",
     record?: CapTien
@@ -82,23 +80,17 @@ export default function CapTienPage() {
     setSelectedRecord(record || null);
   };
 
-  // Đóng modal
   const handleCloseModal = () => {
     setModalMode(null);
     setSelectedRecord(null);
   };
 
-  // Xóa cấp tiền
   const handleDelete = (id: number) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa cấp tiền này không?")) {
       deleteMutation.mutate(id);
     }
   };
-  const getCurrencyName = (currencyId: number | null) => {
-    const currency = loaiTien.find((item: any) => item.id === currencyId);
-    return currency?.ten || "VND";
-  };
-  // Lọc bản ghi theo từ khóa tìm kiếm
+
   const filteredRecords = useMemo(() => {
     if (!searchTerm) return capTienList;
     return capTienList.filter(
@@ -111,20 +103,14 @@ export default function CapTienPage() {
     );
   }, [capTienList, searchTerm, contracts]);
 
-  // Định dạng ngày
   const formatDate = (date: string | null) =>
     date ? new Date(date).toLocaleDateString("vi-VN") : "-";
 
-  // Định dạng tiền tệ
-  const formatCurrency = (amount: number, loaiTienId: number) => {
-    const code = loaiTien.find((lt) => lt.id === loaiTienId)?.ten || "VND"; // Đảm bảo là "VND" thay vì "VNĐ"
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: code,
-    }).format(amount);
+  const getCurrencyName = (currencyId: number | null) => {
+    const currency = loaiTien.find((item: any) => item.id === currencyId);
+    return currency?.ten || "VND";
   };
-
-  // Hàm xuất dữ liệu ra Excel
+  // Export function
   const handleExport = () => {
     const filteredCapTien = capTienList.filter((capTien) =>
       selectedContracts.includes(capTien.hopDongId)
@@ -159,10 +145,6 @@ export default function CapTienPage() {
           "Số tiền": record.soTien + getCurrencyName(record.loaiTienId),
           "Tỷ giá": record.tyGia ?? "-",
           "Ghi chú": record.ghiChu,
-          "Cấp tiền": `${formatDate(record.ngayCap)} | ${formatCurrency(
-            record.soTien,
-            record.loaiTienId
-          )} | ${record.tyGia ?? "-"} | ${record.ghiChu}`,
         };
         rows.push(row);
       });
@@ -225,7 +207,17 @@ export default function CapTienPage() {
                         <TableHead>Số tiền</TableHead>
                         <TableHead>Tỷ giá</TableHead>
                         <TableHead>Ghi chú</TableHead>
-                        <TableHead></TableHead>
+                        <TableHead>
+                          <input
+                            type="checkbox"
+                            onChange={(e) => {
+                              const selected = e.target.checked
+                                ? contracts.map((c) => c.id)
+                                : [];
+                              setSelectedContracts(selected);
+                            }}
+                          />
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -244,21 +236,20 @@ export default function CapTienPage() {
                           <TableCell>{record.tyGia ?? "-"}</TableCell>
                           <TableCell>{record.ghiChu}</TableCell>
                           <TableCell>
-                            <div className="flex items-center space-x-2">
-                              <IconBtn
-                                icon={<Eye />}
-                                onClick={() => handleOpenModal("view", record)}
-                              />
-                              <IconBtn
-                                icon={<Edit />}
-                                onClick={() => handleOpenModal("edit", record)}
-                              />
-                              <IconBtn
-                                icon={<Trash2 />}
-                                onClick={() => handleDelete(record.id)}
-                                className="text-red-600"
-                              />
-                            </div>
+                            <input
+                              type="checkbox"
+                              checked={selectedContracts.includes(
+                                record.hopDongId
+                              )}
+                              onChange={(e) => {
+                                const newSelected = e.target.checked
+                                  ? [...selectedContracts, record.hopDongId]
+                                  : selectedContracts.filter(
+                                      (id) => id !== record.hopDongId
+                                    );
+                                setSelectedContracts(newSelected);
+                              }}
+                            />
                           </TableCell>
                         </TableRow>
                       ))}
