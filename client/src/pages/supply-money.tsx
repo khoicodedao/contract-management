@@ -55,7 +55,12 @@ export default function CapTienPage() {
   const { data: loaiTien = [] } = useQuery<LoaiTien[]>({
     queryKey: ["/api/loai-tien"],
   });
-
+  const { data: chuDauTu = [] } = useQuery<any[]>({
+    queryKey: ["/api/chu-dau-tu"],
+  });
+  const { data: canBo = [] } = useQuery<any[]>({
+    queryKey: ["/api/can-bo"],
+  });
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/cap-tien/${id}`);
@@ -110,7 +115,8 @@ export default function CapTienPage() {
     const currency = loaiTien.find((item: any) => item.id === currencyId);
     return currency?.ten || "VND";
   };
-  // Export function
+
+  // Hàm xuất Excel
   const handleExport = () => {
     const filteredCapTien = capTienList.filter((capTien) =>
       selectedContracts.includes(capTien.hopDongId)
@@ -124,20 +130,32 @@ export default function CapTienPage() {
           acc[contract.soHdNgoai] = {
             contract: contract.soHdNgoai,
             records: [],
+            chuDauTuId: contract.chuDauTuId,
+            canBoId: contract.canBoId,
+            tenHopDong: contract.ten, // Thêm tên hợp đồng vào
           };
         }
         acc[contract.soHdNgoai].records.push(capTien);
       }
       return acc;
-    }, {} as Record<string, { contract: string; records: CapTien[] }>);
+    }, {} as Record<string, { contract: string; records: CapTien[]; chuDauTuId: number; canBoId: number; tenHopDong: string }>);
 
     const rows = [];
 
     // Duyệt qua các hợp đồng đã nhóm
     for (const contractId in groupedByContract) {
-      const { contract, records } = groupedByContract[contractId];
+      const { contract, records, chuDauTuId, canBoId, tenHopDong } =
+        groupedByContract[contractId];
 
-      // Tạo các dòng cho mỗi hợp đồng, chỉ hiển thị Số HĐ ngoài 1 lần
+      // Lấy tên chủ đầu tư và cán bộ
+      const chuDauTuName = chuDauTuId
+        ? chuDauTu.find((c) => c.id === chuDauTuId)?.ten
+        : "-";
+      const canBoName = canBoId
+        ? canBo.find((c) => c.id === canBoId)?.ten
+        : "-";
+
+      // Tạo các dòng cho mỗi hợp đồng, chỉ hiển thị Số HĐ ngoài, tên chủ đầu tư và cán bộ 1 lần
       records.forEach((record, idx) => {
         const row = {
           "Số HĐ ngoài": idx === 0 ? contract : "", // Hiển thị Số HĐ ngoài chỉ ở dòng đầu tiên
@@ -145,6 +163,9 @@ export default function CapTienPage() {
           "Số tiền": record.soTien + getCurrencyName(record.loaiTienId),
           "Tỷ giá": record.tyGia ?? "-",
           "Ghi chú": record.ghiChu,
+          "Tên Hợp đồng": idx === 0 ? tenHopDong : "", // Hiển thị tên hợp đồng chỉ 1 lần
+          "Tên Chủ đầu tư": idx === 0 ? chuDauTuName : "", // Hiển thị tên chủ đầu tư chỉ 1 lần
+          "Tên Cán bộ": idx === 0 ? canBoName : "", // Hiển thị tên cán bộ chỉ 1 lần
         };
         rows.push(row);
       });
@@ -204,9 +225,12 @@ export default function CapTienPage() {
                       <TableRow>
                         <TableHead>Ngày cấp</TableHead>
                         <TableHead>Hợp đồng</TableHead>
+                        <TableHead>Tên Hợp đồng</TableHead>{" "}
+                        {/* Cột tên hợp đồng */}
                         <TableHead>Số tiền</TableHead>
                         <TableHead>Tỷ giá</TableHead>
                         <TableHead>Ghi chú</TableHead>
+                        <TableHead></TableHead>
                         <TableHead>
                           <input
                             type="checkbox"
@@ -231,10 +255,37 @@ export default function CapTienPage() {
                             }
                           </TableCell>
                           <TableCell>
+                            {
+                              contracts.find((c) => c.id === record.hopDongId)
+                                ?.ten
+                            }{" "}
+                            {/* Tên hợp đồng */}
+                          </TableCell>
+                          <TableCell>
                             {record.soTien} {getCurrencyName(record.loaiTienId)}
                           </TableCell>
                           <TableCell>{record.tyGia ?? "-"}</TableCell>
                           <TableCell>{record.ghiChu}</TableCell>
+                          <TableCell>
+                            {/* Nút sửa */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleOpenModal("edit", record)}
+                              className="h-8 w-8 text-blue-600"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            {/* Nút xóa */}
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(record.id)}
+                              className="h-8 w-8 text-red-600"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
                           <TableCell>
                             <input
                               type="checkbox"
