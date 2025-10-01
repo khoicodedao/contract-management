@@ -1,4 +1,3 @@
-// File: ExportHopDongView.tsx
 "use client";
 
 import { useState } from "react";
@@ -60,11 +59,43 @@ const fieldOptions = [
       { key: "ghiChu", label: "Ghi chú" },
     ],
   },
+  {
+    group: "Tiến độ",
+    key: "buocThucHien",
+    fields: [
+      { key: "ten", label: "Tên tiến độ" },
+      { key: "ngayBatDau", label: "Ngày bắt đầu" },
+      { key: "ngayKetThuc", label: "Ngày kết thúc" },
+      { key: "trangThai", label: "Trạng thái" },
+    ],
+  },
+  {
+    group: "Tiếp nhận",
+    key: "tiepNhan",
+    fields: [
+      { key: "tenHang", label: "Tên hàng" },
+      { key: "soToKhai", label: "Số tờ khai" },
+      { key: "soVanDon", label: "Số vận đơn" },
+      { key: "soHoaDon", label: "Số hóa đơn" },
+      { key: "soPhieuDongGoi", label: "Số phiếu đóng gói" },
+      { key: "soBaoHiem", label: "Số bảo hiểm" },
+      { key: "diaDiemThongQuan", label: "Địa điểm thông quan" },
+      { key: "ngayThucHien", label: "Ngày thực hiện" },
+    ],
+  },
 ];
 
 export default function ExportHopDongView() {
   const { data: exportData = [] } = useQuery<any[]>({
     queryKey: ["/api/export/hop-dong"],
+  });
+
+  const { data: buocThucHien = [] } = useQuery<any[]>({
+    queryKey: ["/api/buoc-thuc-hien"],
+  });
+
+  const { data: tiepNhan = [] } = useQuery<any[]>({
+    queryKey: ["/api/tiep-nhan"],
   });
 
   const [selectedFields, setSelectedFields] = useState<
@@ -98,6 +129,36 @@ export default function ExportHopDongView() {
             .join(" | ")
         )
         .join("\n"); // xuống dòng mỗi lần cấp
+    }
+
+    // Nếu là tiến độ (mảng nhiều dòng)
+    if (group.key === "buocThucHien" && Array.isArray(buocThucHien)) {
+      return buocThucHien
+        .map((step: any, idx: number) =>
+          selected
+            .map((fieldKey) => {
+              const fieldMeta = group.fields.find((f) => f.key === fieldKey);
+              const label = fieldMeta?.label || fieldKey;
+              return `${label}: ${step[fieldKey] ?? ""}`;
+            })
+            .join(" | ")
+        )
+        .join("\n"); // xuống dòng mỗi lần bước
+    }
+
+    // Nếu là tiếp nhận (mảng nhiều dòng)
+    if (group.key === "tiepNhan" && Array.isArray(tiepNhan)) {
+      return tiepNhan
+        .map((tn: any, idx: number) =>
+          selected
+            .map((fieldKey) => {
+              const fieldMeta = group.fields.find((f) => f.key === fieldKey);
+              const label = fieldMeta?.label || fieldKey;
+              return `${label}: ${tn[fieldKey] ?? ""}`;
+            })
+            .join(" | ")
+        )
+        .join("\n"); // xuống dòng mỗi lần tiếp nhận
     }
 
     // Các group khác (object 1 cấp)

@@ -41,6 +41,8 @@ import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 import BorderGate from "@/components/modals/border_gate-modal";
 import { BuocThucHien } from "@shared/schema";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 interface TiepNhan {
   id: number;
   hopDongId: number;
@@ -73,6 +75,31 @@ interface DieuKienGiaoHang {
 }
 
 export default function Reception() {
+  const handleExport = () => {
+    const rows = receptions.map((r) => {
+      const contract = contracts.find((c) => c.id === r.hopDongId);
+      return {
+        "Số hợp đồng ngoại": contract?.soHdNgoai || "-",
+        "Tên hợp đồng": contract?.ten || "-",
+        "Tên hàng": r.tenHang,
+        "Số tờ khai": r.soToKhai || "-",
+        "Số vận đơn": r.soVanDon || "-",
+        "Số phiếu đóng gói": r.soPhieuDongGoi || "-",
+        "Số hóa đơn": r.soHoaDon || "-",
+        "Số bảo hiểm": r.soBaoHiem || "-",
+        "Địa điểm thông quan": getLocationName(r),
+        "Ngày thực hiện": new Date(r.ngayThucHien).toLocaleDateString(),
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "TiepNhan");
+
+    const buffer = XLSX.write(wb, { type: "array", bookType: "xlsx" });
+    saveAs(new Blob([buffer]), "tiep_nhan_export.xlsx");
+  };
+
   const [searchTerm, setSearchTerm] = useState("");
   const [isCreateBorderGateModalOpen, setIsCreateBorderGateModalOpen] =
     useState(false);
@@ -287,6 +314,7 @@ export default function Reception() {
                         <Plus className="h-4 w-4 mr-2" />
                         Thêm tiếp nhận
                       </Button>
+                      <Button onClick={handleExport}>Xuất Excel</Button>
                       <Button onClick={openCreateBorderGate}>
                         <Plus className="h-4 w-4 mr-2" />
                         Thêm địa điểm thông quan
