@@ -275,7 +275,7 @@ export default function PaymentModal({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="loaiHinhThucThanhToanId"
@@ -307,7 +307,7 @@ export default function PaymentModal({
                 )}
               />
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="loaiThanhToanId"
                 render={({ field }) => (
@@ -333,7 +333,7 @@ export default function PaymentModal({
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
             <div className="grid grid-cols-2 gap-4">

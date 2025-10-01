@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import {
   Select,
   SelectContent,
@@ -26,6 +28,7 @@ import {
   Clock,
   CreditCard,
   Calendar,
+  Download,
 } from "lucide-react";
 import { ThanhToan } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
@@ -88,7 +91,9 @@ export default function Payments() {
   const { data: contracts = [] } = useQuery({
     queryKey: ["/api/hop-dong"],
   });
-
+  const { data: chuDauTu = [] } = useQuery<any[]>({
+    queryKey: ["/api/chu-dau-tu"],
+  });
   const { data: loaiTien = [] } = useQuery({
     queryKey: ["/api/loai-tien"],
   });
@@ -99,6 +104,9 @@ export default function Payments() {
 
   const { data: loaiHinhThucThanhToan = [] } = useQuery({
     queryKey: ["/api/loai-hinh-thuc-thanh-toan"],
+  });
+  const { data: canBo = [] } = useQuery<any[]>({
+    queryKey: ["/api/can-bo"],
   });
 
   const deletePaymentMutation = useMutation({
@@ -224,6 +232,65 @@ export default function Payments() {
     const status = getPaymentStatus(p.hanHopDong, p.hanThucHien, p.daThanhToan);
     return status.label === "Quá hạn";
   }).length;
+  // Hàm xuất Excel
+  const handleExport = () => {
+    const groupedByContract = paymentsByContract.reduce(
+      (acc, { contract, payments }) => {
+        if (!payments.length) return acc;
+
+        acc[contract.soHdNgoai] = acc[contract.soHdNgoai] || [];
+        payments.forEach((payment) => {
+          // Lấy thông tin chủ đầu tư và cán bộ theo dõi
+          const chuDauTuName = contract.chuDauTuId
+            ? chuDauTu.find((c) => c.id === contract.chuDauTuId)?.ten
+            : "-";
+          const canBoName = contract.canBoId
+            ? canBo.find((c) => c.id === contract.canBoId)?.ten
+            : "-";
+
+          // Lấy thông tin loại tiền và tỷ giá từ hợp đồng và thanh toán
+          const currencyName =
+            loaiTien.find((lt) => lt.id === contract.loaiTienId)?.ten || "VND";
+          const tyGia = contract.tyGia ?? "-";
+
+          acc[contract.soHdNgoai].push({
+            "Số hợp đồng ngoài": contract.soHdNgoai,
+            "Chủ đầu tư": chuDauTuName,
+            "Tên hợp đồng": contract.ten,
+            "Tên cán bộ theo dõi": canBoName,
+            "Nội dung thanh toán": payment.noiDung,
+            "Số tiền": payment.soTien,
+            "Loại tiền": currencyName,
+            "Ngày thanh toán": payment.ngayThanhToan,
+            "Tỷ giá": tyGia,
+            "Trạng thái thanh toán": payment.daThanhToan
+              ? "Đã thanh toán"
+              : "Chưa thanh toán",
+            "Hạn hợp đồng": contract.hanHopDong,
+            "Hạn thực hiện": payment.hanThucHien,
+            "Ghi chú": payment.ghiChu,
+          });
+        });
+        return acc;
+      },
+      {} as Record<string, any[]>
+    );
+
+    const rows = [];
+    // Duyệt qua từng hợp đồng và thêm dữ liệu vào bảng
+    for (const contract in groupedByContract) {
+      groupedByContract[contract].forEach((payment) => {
+        rows.push(payment);
+      });
+    }
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "ThanhToanExport");
+
+    const buffer = XLSX.write(wb, { type: "array", bookType: "xlsx" });
+    saveAs(new Blob([buffer]), "thanh_toan_export.xlsx");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -307,10 +374,15 @@ export default function Payments() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle>Danh sách thanh toán</CardTitle>
-                <Button onClick={() => setIsCreateModalOpen(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Thêm thanh toán
-                </Button>
+                <div>
+                  <Button onClick={() => setIsCreateModalOpen(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Thêm thanh toán
+                  </Button>
+                  <Button onClick={handleExport} className=" ml-6 mt-6">
+                    <Download className="w-4 h-4 mr-2" /> Xuất Excel
+                  </Button>
+                </div>
               </div>
 
               <div className="flex items-center space-x-4 mt-4">
