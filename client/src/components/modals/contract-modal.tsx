@@ -65,6 +65,7 @@ export default function ContractModal({
           loaiTienId: contract.loaiTienId ?? 1, // Default to VND if not specified
           tyGia: contract.tyGia,
           phiUyThac: contract.phiUyThac,
+          thueNhaThau: contract.thueNhaThau,
         }
       : {
           ten: "",
@@ -515,6 +516,29 @@ export default function ContractModal({
               />
             </div>
 
+            <FormField
+              control={form.control}
+              name="thueNhaThau"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Thuế nhà thầu*</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      min={0}
+                      step={1}
+                      placeholder="VD: 100000000"
+                      {...field}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        field.onChange(isNaN(value) ? 0 : value);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="moTa"

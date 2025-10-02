@@ -130,6 +130,7 @@ export const hopDong = sqliteTable("hop_dong", {
   loaiTienId: integer("loai_tien_id"),
   tyGia: real("ty_gia"),
   phiUyThac: real("phi_uy_thac"),
+  thueNhaThau: real("thue_nha_thau"),
 });
 
 // Trang bị

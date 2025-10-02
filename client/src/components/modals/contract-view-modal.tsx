@@ -71,12 +71,13 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import ContractProgressTimeline from "./constract-timline";
+import { CapTienTimeline } from "./captien-timeline";
 interface ContractViewModalProps {
   isOpen: boolean;
   onClose: () => void;
   contract: HopDong;
 }
-
+import { ProgressTimeline } from "./progress-timeline";
 export default function ContractViewModal({
   isOpen,
   onClose,
@@ -327,7 +328,7 @@ export default function ContractViewModal({
         <Tabs defaultValue="info" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="info">Thông tin</TabsTrigger>
-            <TabsTrigger value="payments">Thanh toán</TabsTrigger>
+            <TabsTrigger value="payments">Tài chính</TabsTrigger>
             <TabsTrigger value="files">Tài liệu</TabsTrigger>
             <TabsTrigger value="reception">Tiếp nhận</TabsTrigger>
           </TabsList>
@@ -389,6 +390,40 @@ export default function ContractViewModal({
                     VND
                   </p>
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Loại ngân sách
+                  </label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {loaiNganSach.find(
+                      (item: any) => item.id === contract.loaiNganSachId
+                    )?.ten || "Chưa xác định"}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Loại tiền
+                  </label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {getCurrencyName(contract.loaiTienId)}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Tỷ giá
+                  </label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {contract.tyGia || "1"}
+                  </p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-600">
+                    Thuế nhà thầu
+                  </label>
+                  <p className="mt-1 text-sm text-gray-900">
+                    {contract.thueNhaThau || "0"} %
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -407,7 +442,7 @@ export default function ContractViewModal({
             <Separator />
 
             {/* Progress Tree */}
-            <ContractProgressTimeline
+            <ProgressTimeline
               contractProgressSteps={contractProgressSteps}
               canBo={canBo}
               getLoaiTien={getCurrencyName}
@@ -776,6 +811,12 @@ export default function ContractViewModal({
                 ))
               )}
             </div>
+            <CapTienTimeline
+              contractProgressSteps={contractProgressSteps}
+              canBo={canBo}
+              getLoaiTien={getCurrencyName}
+              contractId={contract.id}
+            />
           </TabsContent>
 
           {/* Files Tab */}
