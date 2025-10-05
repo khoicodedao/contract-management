@@ -29,13 +29,20 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { insertHopDongSchema, InsertHopDong } from "@shared/schema";
-import { CloudUpload, X } from "lucide-react";
+// import { CloudUpload, X } from "lucide-react";
 
 interface ContractModalProps {
   isOpen: boolean;
   onClose: () => void;
   contract?: any;
 }
+
+const HINH_THUC_HOP_DONG_OPTIONS = [
+  "Đấu thầu rộng rãi",
+  "Chỉ định thầu",
+  "Đàm phán trực tiếp",
+  "Đàm phán gián tiếp",
+];
 
 export default function ContractModal({
   isOpen,
@@ -62,10 +69,15 @@ export default function ContractModal({
           canBoId: contract.canBoId,
           trangThaiHopDongId: contract.trangThaiHopDongId,
           giaTriHopDong: contract.giaTriHopDong ?? 0,
-          loaiTienId: contract.loaiTienId ?? 1, // Default to VND if not specified
+          loaiTienId: contract.loaiTienId ?? 1,
           tyGia: contract.tyGia,
           phiUyThac: contract.phiUyThac,
           thueNhaThau: contract.thueNhaThau,
+          // ---- các trường mới ----
+          hinhThucHopDong: contract.hinhThucHopDong || undefined,
+          hinhThucGiaoHang: contract.hinhThucGiaoHang || "",
+          thuTruongPhuTrach: contract.thuTruongPhuTrach || "",
+          soLanGiaoHang: contract.soLanGiaoHang ?? undefined,
         }
       : {
           ten: "",
@@ -73,36 +85,27 @@ export default function ContractModal({
           soHdNoi: "",
           soHdNgoai: "",
           ngay: new Date().toISOString().split("T")[0],
+          // ---- default cho trường mới (nếu cần) ----
+          hinhThucHopDong: undefined,
+          hinhThucGiaoHang: "",
+          thuTruongPhuTrach: "",
+          soLanGiaoHang: undefined,
         },
   });
 
   // Fetch reference data
-  const { data: loaiHopDong } = useQuery({
-    queryKey: ["/api/loai-hop-dong"],
-  });
-
-  const { data: nhaCungCap } = useQuery({
-    queryKey: ["/api/nha-cung-cap"],
-  });
-
-  const { data: chuDauTu } = useQuery({
-    queryKey: ["/api/chu-dau-tu"],
-  });
-
-  const { data: canBo } = useQuery({
-    queryKey: ["/api/can-bo"],
-  });
-
+  const { data: loaiHopDong } = useQuery({ queryKey: ["/api/loai-hop-dong"] });
+  const { data: nhaCungCap } = useQuery({ queryKey: ["/api/nha-cung-cap"] });
+  const { data: chuDauTu } = useQuery({ queryKey: ["/api/chu-dau-tu"] });
+  const { data: canBo } = useQuery({ queryKey: ["/api/can-bo"] });
   const { data: loaiNganSach } = useQuery({
     queryKey: ["/api/loai-ngan-sach"],
   });
-
   const { data: trangThaiHopDong } = useQuery({
     queryKey: ["/api/trang-thai-hop-dong"],
   });
-  const { data: loaiTien } = useQuery({
-    queryKey: ["/api/loai-tien"],
-  });
+  const { data: loaiTien } = useQuery({ queryKey: ["/api/loai-tien"] });
+
   const createContractMutation = useMutation({
     mutationFn: async (data: InsertHopDong) => {
       if (contract) {
@@ -124,7 +127,7 @@ export default function ContractModal({
       setSelectedFiles([]);
       onClose();
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Lỗi",
         description: "Không thể tạo hợp đồng. Vui lòng thử lại.",
@@ -167,6 +170,7 @@ export default function ContractModal({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Tên HĐ */}
               <FormField
                 control={form.control}
                 name="ten"
@@ -180,7 +184,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Số HĐ nội */}
               <FormField
                 control={form.control}
                 name="soHdNoi"
@@ -194,7 +198,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Số HĐ ngoại */}
               <FormField
                 control={form.control}
                 name="soHdNgoai"
@@ -208,7 +212,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Ngày ký */}
               <FormField
                 control={form.control}
                 name="ngay"
@@ -222,7 +226,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Loại HĐ (ref) */}
               <FormField
                 control={form.control}
                 name="loaiHopDongId"
@@ -250,6 +254,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              {/* Trạng thái HĐ (ref) */}
               <FormField
                 control={form.control}
                 name="trangThaiHopDongId"
@@ -283,7 +288,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Nhà cung cấp (ref) */}
               <FormField
                 control={form.control}
                 name="nhaCungCapId"
@@ -316,7 +321,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Chủ đầu tư (ref) */}
               <FormField
                 control={form.control}
                 name="chuDauTuId"
@@ -349,12 +354,13 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              {/* Giá trị HĐ */}
               <FormField
                 control={form.control}
                 name="giaTriHopDong"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Giá trị hợp đồng*</FormLabel>
+                    <FormLabel>Trị giá hàng hoá, dịch vụ *</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -372,6 +378,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              {/* Loại tiền (ref) */}
               <FormField
                 control={form.control}
                 name="loaiTienId"
@@ -401,12 +408,13 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              {/* Phí ủy thác */}
               <FormField
                 control={form.control}
                 name="phiUyThac"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Phí ủy thác*</FormLabel>
+                    <FormLabel>Phí ủy thác *</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -424,12 +432,13 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              {/* Tỷ giá */}
               <FormField
                 control={form.control}
                 name="tyGia"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tỷ giá*</FormLabel>
+                    <FormLabel>Tỷ giá *</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -447,6 +456,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+              {/* Cán bộ phụ trách (ref) */}
               <FormField
                 control={form.control}
                 name="canBoId"
@@ -484,7 +494,7 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
-
+              {/* Loại ngân sách (ref) */}
               <FormField
                 control={form.control}
                 name="loaiNganSachId"
@@ -514,14 +524,111 @@ export default function ContractModal({
                   </FormItem>
                 )}
               />
+
+              {/* ========= CÁC TRƯỜNG MỚI THEO SCHEMA ========= */}
+
+              {/* Hình thức hợp đồng (select text) */}
+              <FormField
+                control={form.control}
+                name="hinhThucHopDong"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hình thức hợp đồng</FormLabel>
+                    <Select
+                      onValueChange={(value) => field.onChange(value)}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chọn hình thức" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {HINH_THUC_HOP_DONG_OPTIONS.map((opt) => (
+                          <SelectItem key={opt} value={opt}>
+                            {opt}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Hình thức giao hàng (text) */}
+              <FormField
+                control={form.control}
+                name="hinhThucGiaoHang"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Hình thức giao hàng</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="VD: Giao từng đợt, FOB/CIF, giao tại kho..."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Thủ trưởng phụ trách (text) */}
+              <FormField
+                control={form.control}
+                name="thuTruongPhuTrach"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Thủ trưởng phụ trách</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Họ tên người phụ trách" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Số lần giao hàng (int) */}
+              <FormField
+                control={form.control}
+                name="soLanGiaoHang"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Số lần giao hàng</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={1}
+                        placeholder="VD: 3"
+                        value={field.value?.toString() ?? ""}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          // cho phép để trống => undefined
+                          if (v === "") {
+                            field.onChange(undefined);
+                          } else {
+                            const num = parseInt(v, 10);
+                            field.onChange(Number.isNaN(num) ? undefined : num);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* ========= HẾT CÁC TRƯỜNG MỚI ========= */}
             </div>
 
+            {/* Thuế nhà thầu */}
             <FormField
               control={form.control}
               name="thueNhaThau"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Thuế nhà thầu*</FormLabel>
+                  <FormLabel>Thuế nhà thầu *</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -539,6 +646,8 @@ export default function ContractModal({
                 </FormItem>
               )}
             />
+
+            {/* Mô tả */}
             <FormField
               control={form.control}
               name="moTa"
@@ -556,13 +665,18 @@ export default function ContractModal({
                 </FormItem>
               )}
             />
+
             <div className="flex justify-end space-x-4 pt-6 border-t border-slate-200">
               <Button type="button" variant="outline" onClick={onClose}>
                 Hủy
               </Button>
               <Button type="submit" disabled={createContractMutation.isPending}>
                 {createContractMutation.isPending
-                  ? "Đang tạo..."
+                  ? contract
+                    ? "Đang lưu..."
+                    : "Đang tạo..."
+                  : contract
+                  ? "Lưu thay đổi"
                   : "Tạo hợp đồng"}
               </Button>
             </div>

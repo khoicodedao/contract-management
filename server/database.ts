@@ -102,7 +102,11 @@ function createTables() {
       loai_tien_id INTEGER,
       ty_gia REAL,
       phi_uy_thac REAL,
-      thue_nha_thau REAL
+      thue_nha_thau REAL,
+      thu_truong_phu_trach TEXT,
+      so_lan_giao_hang INTEGER,
+      hinh_thuc_hop_dong TEXT,
+      hinh_thuc_giao_hang TEXT
     );
     
     CREATE TABLE IF NOT EXISTS trang_bi (
