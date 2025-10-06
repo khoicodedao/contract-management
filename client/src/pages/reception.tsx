@@ -56,6 +56,9 @@ interface TiepNhan {
   diaDiemThongQuanTuDo?: string;
   ngayThucHien: string;
   dieuKienGiaoHangId: number;
+  trongLuong?: number;
+  soKien?: number;
+  giaTriHoaDon?: number;
 }
 
 interface DiaDiemThongQuan {
@@ -89,6 +92,11 @@ export default function Reception() {
         "Số bảo hiểm": r.soBaoHiem || "-",
         "Địa điểm thông quan": getLocationName(r),
         "Ngày thực hiện": new Date(r.ngayThucHien).toLocaleDateString(),
+        "Điều kiện giao hàng":
+          incoterms.find((i) => i.id === r.dieuKienGiaoHangId)?.ten || "-",
+        "Trọng lượng": r.trongLuong || "-",
+        "Số kiện": r.soKien || "-",
+        "Giá trị hóa đơn": r.giaTriHoaDon || "-",
       };
     });
 
@@ -244,6 +252,15 @@ export default function Reception() {
         ? (formData.get("diaDiemThongQuanTuDo") as string) || undefined
         : undefined,
       ngayThucHien: formData.get("ngayThucHien") as string,
+      trongLuong: formData.get("trongLuong")
+        ? parseFloat(formData.get("trongLuong") as string)
+        : undefined,
+      soKien: formData.get("soKien")
+        ? parseInt(formData.get("soKien") as string)
+        : undefined,
+      giaTriHoaDon: formData.get("giaTriHoaDon")
+        ? parseFloat(formData.get("giaTriHoaDon") as string)
+        : undefined,
     };
 
     if (editingReception) {
@@ -412,7 +429,30 @@ export default function Reception() {
                           />
                         </div>
                       </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="trongLuong">Trọng lượng</Label>
+                          <Input
+                            id="trongLuong"
+                            name="trongLuong"
+                            type="number"
+                            step="0.01"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soKien">Số kiện</Label>
+                          <Input id="soKien" name="soKien" type="number" />
+                        </div>
+                      </div>
 
+                      <div className="space-y-2">
+                        <Label htmlFor="giaTriHoaDon">Giá trị hóa đơn</Label>
+                        <Input
+                          id="giaTriHoaDon"
+                          name="giaTriHoaDon"
+                          type="number"
+                        />
+                      </div>
                       <div className="space-y-4">
                         {useCustomLocation ? (
                           <div className="space-y-2">
@@ -489,6 +529,7 @@ export default function Reception() {
                         <TableHead>Tên hàng</TableHead>
                         <TableHead>Số tờ khai</TableHead>
                         <TableHead>Số vận đơn</TableHead>
+                        <TableHead>Giá trị hoá đơn</TableHead>
                         <TableHead>Địa điểm thông quan</TableHead>
                         <TableHead>Ngày thực hiện</TableHead>
                         <TableHead></TableHead>
@@ -519,6 +560,11 @@ export default function Reception() {
                                 {reception.soVanDon}
                               </Badge>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            {reception.giaTriHoaDon
+                              ? reception.giaTriHoaDon
+                              : "-"}
                           </TableCell>
                           <TableCell>
                             <Badge
@@ -695,7 +741,37 @@ export default function Reception() {
                           />
                         </div>
                       </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="trongLuong">Trọng lượng</Label>
+                          <Input
+                            id="trongLuong"
+                            name="trongLuong"
+                            type="number"
+                            step="0.01"
+                            defaultValue={editingReception.trongLuong}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="soKien">Số kiện</Label>
+                          <Input
+                            id="soKien"
+                            name="soKien"
+                            type="number"
+                            defaultValue={editingReception.soKien}
+                          />
+                        </div>
+                      </div>
 
+                      <div className="space-y-2">
+                        <Label htmlFor="giaTriHoaDon">Giá trị hóa đơn</Label>
+                        <Input
+                          id="giaTriHoaDon"
+                          name="giaTriHoaDon"
+                          type="number"
+                          defaultValue={editingReception.giaTriHoaDon}
+                        />
+                      </div>
                       <div className="space-y-4">
                         {useCustomLocation ? (
                           <div className="space-y-2">

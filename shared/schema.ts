@@ -176,6 +176,9 @@ export const tiepNhan = sqliteTable("tiep_nhan", {
   diaDiemThongQuanId: integer("dia_diem_thong_quan_id"),
   ngayThucHien: text("ngay_thuc_hien"),
   dieuKienGiaoHangId: integer("dieu_kien_giao_hang_id"),
+  trongLuong: real("trong_luong"),
+  soKien: real("so_kien"),
+  giaTriHoaDon: real("gia_tri_hoa_don"),
 });
 
 // Thanh toán

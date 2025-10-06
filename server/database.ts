@@ -205,6 +205,9 @@ function createTables() {
       dia_diem_thong_quan_tu_do TEXT,
       dieu_kien_giao_hang_id INTEGER,
       ngay_thuc_hien TEXT NOT NULL,
+      trong_luong REAL,
+      so_kien REAL,
+      gia_tri_hoa_don REAL,
       FOREIGN KEY (hop_dong_id) REFERENCES hop_dong(id),
       FOREIGN KEY (dia_diem_thong_quan_id) REFERENCES dia_diem_thong_quan(id)
       FOREIGN KEY (dieu_kien_giao_hang_id) REFERENCES dieu_kien_giao_hang(id)
