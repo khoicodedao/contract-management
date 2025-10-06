@@ -323,7 +323,7 @@ export default function Reception() {
                   </div>
                   <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                      <DialogTitle>Thêm bản ghi tiếp nhận mới</DialogTitle>
+                      <DialogTitle>Thêm tiếp nhận</DialogTitle>
                       <DialogDescription>
                         Nhập thông tin tiếp nhận hàng hóa và tài liệu thông quan
                       </DialogDescription>
@@ -403,7 +403,7 @@ export default function Reception() {
                           <Input id="soBaoHiem" name="soBaoHiem" />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="ngayThucHien">Ngày thực hiện</Label>
+                          <Label htmlFor="ngayThucHien">Ngày thông quan</Label>
                           <Input
                             id="ngayThucHien"
                             name="ngayThucHien"
@@ -486,7 +486,6 @@ export default function Reception() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Số Hợp đồng ngoại</TableHead>
-                        <TableHead>Hợp đồng</TableHead>
                         <TableHead>Tên hàng</TableHead>
                         <TableHead>Số tờ khai</TableHead>
                         <TableHead>Số vận đơn</TableHead>
@@ -501,9 +500,9 @@ export default function Reception() {
                           <TableCell>
                             {getContractNumber(reception.hopDongId)}
                           </TableCell>
-                          <TableCell>
+                          {/* <TableCell>
                             {getContractName(reception.hopDongId)}
-                          </TableCell>
+                          </TableCell> */}
                           <TableCell className="font-medium">
                             {reception.tenHang}
                           </TableCell>
