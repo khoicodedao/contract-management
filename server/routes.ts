@@ -938,7 +938,15 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
 
       // Lấy dữ liệu từ body
-      const { tenFile, loaiFile, hopDongId, nguoiTaiLen, ghiChu } = req.body;
+      const {
+        tenFile,
+        loaiFile,
+        hopDongId,
+        nguoiTaiLen,
+        ghiChu,
+        soVanBan,
+        ngayThucHien,
+      } = req.body;
 
       // Parse & validate bằng Zod
       const parsedData = insertFileHopDongSchema.parse({
@@ -948,6 +956,8 @@ export async function registerRoutes(app: Express): Promise<void> {
         hopDongId: toInt(hopDongId),
         nguoiTaiLen: toInt(nguoiTaiLen),
         ghiChu,
+        ngayThucHien,
+        soVanBan,
       });
 
       // Convert file.buffer thành base64

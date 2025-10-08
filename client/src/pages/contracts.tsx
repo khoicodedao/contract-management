@@ -106,9 +106,21 @@ export default function Contracts() {
   };
 
   const filteredContracts = contracts.filter((contract) => {
+    const term = searchTerm.trim().toLowerCase();
+
     const matchesSearch =
-      contract.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.soHdNoi?.toLowerCase().includes(searchTerm.toLowerCase());
+      term === ""
+        ? true
+        : [
+            contract.soHdNgoai, // ✅ số HĐ ngoài
+            contract.soHdNoi, // ✅ số HĐ nội
+            contract.ten,
+            contract.moTa,
+          ]
+            .filter(Boolean)
+            .map((v) => String(v).toLowerCase())
+            .some((v) => v.includes(term));
+
     const matchesStatus =
       statusFilter === "all" ||
       contract.trangThaiHopDongId?.toString() === statusFilter;
@@ -158,7 +170,7 @@ export default function Contracts() {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
-                    placeholder="Tìm kiếm hợp đồng..."
+                    placeholder="Tìm theo số HĐ (ngoài/nội), tên hoặc mô tả…"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -235,6 +247,7 @@ export default function Contracts() {
                           <TableCell>
                             <div>
                               <div className="font-medium text-slate-900">
+                                {/* @ts-ignore */}
                                 {chuDauTu.find(
                                   (cdt) => cdt.id == contract.chuDauTuId
                                 )?.ten || "Chưa có tên"}
@@ -244,6 +257,7 @@ export default function Contracts() {
                           <TableCell>{formatDate(contract.ngay)}</TableCell>
                           <TableCell>
                             <div className="font-medium text-slate-900">
+                              {/* @ts-ignore */}
                               {nhaCungCap.find(
                                 (ncc) => ncc.id === contract.nhaCungCapId
                               )?.ten || "Chưa có nhà cung cấp"}

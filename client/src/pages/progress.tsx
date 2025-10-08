@@ -114,7 +114,7 @@ export default function ProgressPage() {
     onError: () => {
       toast({
         variant: "destructive",
-        description: "Lỗi khi xóa bước tiến độ",
+        description: "Lỗi khi xóa theo dõi",
       });
     },
   });
@@ -157,7 +157,7 @@ export default function ProgressPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header
-          title="Quản lý tiến độ"
+          title="Theo dõi"
           subtitle="Theo dõi tiến độ thực hiện các bước trong hợp đồng"
           onCreateContract={() => {}}
         />
@@ -192,7 +192,7 @@ export default function ProgressPage() {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Tiến độ thực hiện</CardTitle>
+                <CardTitle>Các bước thực hiện</CardTitle>
                 <Button onClick={() => handleOpenModal("create")}>
                   <Plus className="w-4 h-4 mr-2" />
                   Thêm bước thực hiện

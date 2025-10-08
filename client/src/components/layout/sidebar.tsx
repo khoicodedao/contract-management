@@ -92,7 +92,7 @@ export function Sidebar() {
       current: false,
     },
     {
-      name: "Tiến độ",
+      name: "Theo dõi",
       href: "/tien-do",
       icon: CheckSquare,
       current: false,

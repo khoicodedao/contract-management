@@ -224,6 +224,8 @@ export const fileHopDong = sqliteTable("file_hop_dong", {
   ngayTaiLen: text("ngay_tai_len"),
   nguoiTaiLen: integer("nguoi_tai_len"),
   ghiChu: text("ghi_chu"),
+  soVanBan: text("so_van_ban"),
+  ngayThucHien: text("ngay_thuc_hien"),
 });
 
 // Bước thực hiện

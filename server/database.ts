@@ -183,7 +183,9 @@ function createTables() {
       kich_thuoc INTEGER,
       ngay_tai_len TEXT,
       nguoi_tai_len INTEGER,
-      ghi_chu TEXT
+      ghi_chu TEXT,
+      so_van_ban TEXT,
+      ngay_thuc_hien TEXT
     );
 
     CREATE TABLE IF NOT EXISTS dia_diem_thong_quan (
