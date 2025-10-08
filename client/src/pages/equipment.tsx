@@ -72,9 +72,26 @@ export default function Equipment() {
     }
   };
 
-  const filteredEquipment = equipment.filter((item) =>
-    item.ten?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredEquipment = equipment.filter((item) => {
+    const q = searchTerm.trim().toLowerCase();
+
+    if (!q) return true;
+
+    // tên trang bị
+    const matchName = item.ten?.toLowerCase().includes(q);
+
+    // tìm thông tin hợp đồng gắn với item
+    const contract = contracts.find((c: any) => c.id === item.hopDongId);
+
+    // so sánh theo số HĐ hiển thị (soHdNgoai) hoặc id hợp đồng
+    const matchContract =
+      (contract?.soHdNgoai?.toLowerCase().includes(q) ?? false) ||
+      String(item.hopDongId || "")
+        .toLowerCase()
+        .includes(q);
+
+    return matchName || matchContract;
+  });
 
   const formatCurrency = (amount: string | null, currencyId: number | null) => {
     if (!amount || !currencyId) return "-";
@@ -120,7 +137,7 @@ export default function Equipment() {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
-                    placeholder="Tìm kiếm trang bị..."
+                    placeholder="Tìm kiếm trang bị hoặc số HĐ..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"

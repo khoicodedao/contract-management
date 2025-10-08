@@ -5,6 +5,7 @@ server/public
 vite.config.ts.*
 *.tar.gz
 # Thư mục release và đóng gói Electron
+database.sqlite
 /out
 /build
 /release

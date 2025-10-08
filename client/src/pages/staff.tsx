@@ -31,10 +31,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Eye, Edit, Trash2, Search, Plus, User, Upload, X } from "lucide-react";
+import { Eye, Edit, Trash2, Search, Plus, User } from "lucide-react";
 import { CanBo, insertCanBoSchema, InsertCanBo } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
 function imageToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -43,6 +44,7 @@ function imageToBase64(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
 export default function Staff() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -62,6 +64,7 @@ export default function Staff() {
       ten: "",
       chucVu: "",
       anh: "",
+      soDienThoai: "", // ➜ đã có sẵn trong defaultValues
     },
   });
 
@@ -76,7 +79,7 @@ export default function Staff() {
             ...finalData,
             anh: base64Content,
           };
-        } catch (error) {
+        } catch {
           throw new Error("Không thể xử lý ảnh");
         }
       }
@@ -93,17 +96,16 @@ export default function Staff() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/can-bo"] });
-      toast({
-        title: "Thành công",
-        description: "Cán bộ đã được thêm thành công",
-      });
+      toast({ title: "Thành công", description: "Cán bộ đã được lưu" });
       form.reset();
       setIsCreateModalOpen(false);
+      setIsEditModalOpen(false);
+      setSelectedStaff(null);
     },
     onError: () => {
       toast({
         title: "Lỗi",
-        description: "Không thể thêm cán bộ",
+        description: "Không thể lưu cán bộ",
         variant: "destructive",
       });
     },
@@ -115,10 +117,7 @@ export default function Staff() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/can-bo"] });
-      toast({
-        title: "Thành công",
-        description: "Cán bộ đã được xóa",
-      });
+      toast({ title: "Thành công", description: "Cán bộ đã được xóa" });
     },
     onError: () => {
       toast({
@@ -129,10 +128,12 @@ export default function Staff() {
     },
   });
 
+  // ➜ Bổ sung tìm theo số điện thoại
   const filteredStaff = staff.filter(
     (member) =>
       member.ten?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.chucVu?.toLowerCase().includes(searchTerm.toLowerCase())
+      member.chucVu?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.soDienThoai?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleDeleteStaff = (id: number) => {
@@ -145,14 +146,13 @@ export default function Staff() {
     createStaffMutation.mutate(data);
   };
 
-  const getInitials = (name: string) => {
-    return name
+  const getInitials = (name: string) =>
+    name
       .split(" ")
-      .map((word) => word[0])
+      .map((w) => w[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -179,7 +179,7 @@ export default function Staff() {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
-                    placeholder="Tìm kiếm cán bộ..."
+                    placeholder="Tìm theo tên, chức vụ hoặc số điện thoại…"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -213,6 +213,7 @@ export default function Staff() {
                       <TableRow>
                         <TableHead>Cán bộ</TableHead>
                         <TableHead>Chức vụ</TableHead>
+                        <TableHead>Số điện thoại</TableHead> {/* ➜ Cột mới */}
                         <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -241,11 +242,20 @@ export default function Staff() {
                               </div>
                             </div>
                           </TableCell>
+
                           <TableCell>
                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                               {member.chucVu || "Chưa xác định"}
                             </span>
                           </TableCell>
+
+                          {/* ➜ Hiển thị số điện thoại */}
+                          <TableCell>
+                            <span className="text-slate-700">
+                              {member.soDienThoai || "—"}
+                            </span>
+                          </TableCell>
+
                           <TableCell>
                             <div className="flex items-center space-x-2">
                               <Button
@@ -254,7 +264,7 @@ export default function Staff() {
                                 className="h-8 w-8 text-primary hover:text-primary/80"
                                 onClick={() => {
                                   setSelectedStaff(member);
-                                  setIsEditModalOpen(true); // Mở cùng modal
+                                  setIsEditModalOpen(true);
                                 }}
                               >
                                 <Eye className="h-4 w-4" />
@@ -271,6 +281,7 @@ export default function Staff() {
                               >
                                 <Edit className="h-4 w-4" />
                               </Button>
+
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -330,6 +341,21 @@ export default function Staff() {
                 )}
               />
 
+              {/* ➜ Trường số điện thoại mới */}
+              <FormField
+                control={form.control}
+                name="soDienThoai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Số điện thoại</FormLabel>
+                    <FormControl>
+                      <Input placeholder="VD: 0912 345 678" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="anh"
@@ -357,7 +383,7 @@ export default function Staff() {
                 </Button>
                 <Button type="submit" disabled={createStaffMutation.isPending}>
                   {createStaffMutation.isPending
-                    ? "Đang thêm..."
+                    ? "Đang lưu..."
                     : "Thêm cán bộ"}
                 </Button>
               </div>
@@ -365,10 +391,14 @@ export default function Staff() {
           </Form>
         </DialogContent>
       </Dialog>
+
       {/* Edit Staff Modal */}
       <StaffModal
         isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedStaff(null);
+        }}
         staff={selectedStaff}
         onSubmit={(data) => {
           createStaffMutation.mutate(data);

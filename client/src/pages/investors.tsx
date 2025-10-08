@@ -266,9 +266,8 @@ export default function InvestorsPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Tên chủ đầu tư</TableHead>
-                      <TableHead>Số điện thoại</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Số hợp đồng</TableHead>
+                      <TableHead>Địa chỉ</TableHead>
+                      <TableHead>Số lượng hợp đồng</TableHead>
                       <TableHead className="text-right"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -299,8 +298,7 @@ export default function InvestorsPage() {
                               </div>
                             </div>
                           </TableCell>
-                          <TableCell>{investor.soDienThoai || "-"}</TableCell>
-                          <TableCell>{investor.email || "-"}</TableCell>
+                          <TableCell>{investor.diaChi || "-"}</TableCell>
                           <TableCell>
                             <Badge variant="outline" className="bg-blue-50">
                               {contractCount} hợp đồng

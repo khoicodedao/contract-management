@@ -531,7 +531,8 @@ export default function Reception() {
                         <TableHead>Số vận đơn</TableHead>
                         <TableHead>Giá trị hoá đơn</TableHead>
                         <TableHead>Địa điểm thông quan</TableHead>
-                        <TableHead>Ngày thực hiện</TableHead>
+                        <TableHead>Ngày thông quan</TableHead>
+                        <TableHead>Hạn hợp đồng</TableHead>
                         <TableHead></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -580,6 +581,13 @@ export default function Reception() {
                           <TableCell>
                             {new Date(
                               reception.ngayThucHien
+                            ).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            {new Date(
+                              contracts.find(
+                                (c) => c.id === reception.hopDongId
+                              ).ngay
                             ).toLocaleDateString()}
                           </TableCell>
                           <TableCell>

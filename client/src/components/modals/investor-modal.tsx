@@ -38,7 +38,7 @@ export function InvestorModal({
     defaultValues: {
       ten: "",
       diaChi: "",
-      soDienThoai: "",
+
       moTa: "",
       anh: "",
     },
@@ -49,7 +49,7 @@ export function InvestorModal({
       form.reset({
         ten: investor.ten || "",
         diaChi: investor.diaChi || "",
-        soDienThoai: investor.soDienThoai || "",
+
         moTa: investor.moTa || "",
         anh: investor.anh || "",
       });
@@ -60,7 +60,6 @@ export function InvestorModal({
       form.reset({
         ten: "",
         diaChi: "",
-        soDienThoai: "",
 
         moTa: "",
         anh: "",
@@ -144,7 +143,7 @@ export function InvestorModal({
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="ten">Tên chủ đầu tư *</Label>
               <Input
@@ -158,14 +157,14 @@ export function InvestorModal({
                 </p>
               )}
             </div>
-            <div className="space-y-2">
+            {/* <div className="space-y-2">
               <Label htmlFor="soDienThoai">Số điện thoại</Label>
               <Input
                 id="soDienThoai"
                 {...form.register("soDienThoai")}
                 placeholder="Nhập số điện thoại"
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="space-y-2">
