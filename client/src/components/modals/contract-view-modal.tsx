@@ -72,6 +72,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { format } from "date-fns";
 import ContractProgressTimeline from "./constract-timline";
 import { CapTienTimeline } from "./captien-timeline";
+import { File as FileIconBase, FileSpreadsheet } from "lucide-react";
+
+// ⬇️ THÊM vào import constants (nếu chưa có)
+import { FILE_TYPE_LABELS } from "@/lib/constants";
+
+// ⬇️ THÊM (nếu cần dùng cleanup effect cho blob URL)
+import { useEffect } from "react";
 interface ContractViewModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -83,6 +90,163 @@ export default function ContractViewModal({
   onClose,
   contract,
 }: ContractViewModalProps) {
+  // ⬇️ THÊM
+  const formatFileSize = (sizeInBytes: number | null | undefined) => {
+    if (!sizeInBytes) return "-";
+    const units = ["B", "KB", "MB", "GB"];
+    let size = sizeInBytes;
+    let unitIndex = 0;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+      size /= 1024;
+      unitIndex++;
+    }
+    return `${Math.round(size * 100) / 100} ${units[unitIndex]}`;
+  };
+
+  const getFileTypeLabel = (
+    fileName: string | null | undefined,
+    loaiFile?: string | null
+  ) => {
+    const name = fileName ?? "";
+    const hasDot = name.includes(".");
+    const ext = hasDot ? "." + name.split(".").pop()!.toLowerCase() : "";
+    if (ext) {
+      return FILE_TYPE_LABELS[ext as keyof typeof FILE_TYPE_LABELS] || "Khác";
+    }
+    if (loaiFile) {
+      const lf = loaiFile.toLowerCase();
+      if (lf.includes("pdf")) return "PDF";
+      if (lf.includes("word") || lf.includes("doc")) return "Word";
+      if (lf.includes("excel") || lf.includes("xls") || lf.includes("sheet"))
+        return "Excel";
+    }
+    return "Khác";
+  };
+
+  const getFileIcon = (fileType: string | null | undefined) => {
+    if (!fileType) return FileIconBase;
+    const type = fileType.toLowerCase();
+    if (type.includes("pdf")) return FileText;
+    if (type.includes("doc")) return FileText;
+    if (
+      type.includes("xls") ||
+      type.includes("sheet") ||
+      type.includes("excel")
+    )
+      return FileSpreadsheet;
+    return FileIconBase;
+  };
+  // ⬇️ THÊM
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<FileHopDong | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // ⬇️ THÊM – mở modal xem trước
+  const handleOpenViewer = async (doc: FileHopDong) => {
+    setViewingDoc(doc);
+    setIsViewerOpen(true);
+
+    try {
+      // 1) data URL có sẵn
+      if (doc.noiDungFile && doc.noiDungFile.startsWith("data:")) {
+        setPreviewUrl(doc.noiDungFile);
+        return;
+      }
+      // 2) duongDan tuyệt đối
+      if (doc.duongDan && /^https?:\/\//i.test(doc.duongDan)) {
+        const resp = await fetch(doc.duongDan);
+        if (!resp.ok) throw new Error("Không thể tải file để xem");
+        const blob = await resp.blob();
+        setPreviewUrl(URL.createObjectURL(blob));
+        return;
+      }
+      // 3) tải qua API
+      const response = await fetch(`/api/file-hop-dong/${doc.id}/download`);
+      if (!response.ok) throw new Error("Không thể tải file để xem");
+      const blob = await response.blob();
+      setPreviewUrl(URL.createObjectURL(blob));
+    } catch (e) {
+      console.error(e);
+      toast({
+        title: "Lỗi",
+        description: "Không thể mở xem tài liệu",
+        variant: "destructive",
+      });
+      setIsViewerOpen(false);
+      setViewingDoc(null);
+      setPreviewUrl(null);
+    }
+  };
+
+  // ⬇️ THÊM – tải xuống (đúng logic như trang Documents)
+  const handleDownloadDocument = async (document: FileHopDong) => {
+    try {
+      // data URL
+      if (document.noiDungFile && document.noiDungFile.startsWith("data:")) {
+        const link = document.createElement
+          ? document.createElement("a")
+          : globalThis.document.createElement("a");
+        link.href = document.noiDungFile;
+        link.download = document.tenFile || "document";
+        (globalThis.document.body || document.body).appendChild(link);
+        link.click();
+        link.remove();
+        toast({
+          title: "Thành công",
+          description: "Tài liệu đã được tải xuống",
+        });
+        return;
+      }
+      // URL tuyệt đối
+      if (document.duongDan && /^https?:\/\//i.test(document.duongDan)) {
+        const resp = await fetch(document.duongDan);
+        if (!resp.ok) throw new Error("Không thể tải file từ đường dẫn");
+        const blob = await resp.blob();
+        const url = URL.createObjectURL(blob);
+        const link = globalThis.document.createElement("a");
+        link.href = url;
+        link.download = document.tenFile || "document";
+        globalThis.document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        toast({
+          title: "Thành công",
+          description: "Tài liệu đã được tải xuống",
+        });
+        return;
+      }
+      // fallback: API download
+      const response = await fetch(
+        `/api/file-hop-dong/${document.id}/download`
+      );
+      if (!response.ok) throw new Error("Không thể tải file");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = globalThis.document.createElement("a");
+      link.href = url;
+      link.download = document.tenFile || "document";
+      globalThis.document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      toast({ title: "Thành công", description: "Tài liệu đã được tải xuống" });
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: "Lỗi",
+        description: "Không thể tải xuống tài liệu",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // ⬇️ THÊM – cleanup blob URL khi đóng/huỷ
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   const [isAddingProgress, setIsAddingProgress] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -327,7 +491,7 @@ export default function ContractViewModal({
 
         <Tabs defaultValue="info" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="info">Thông tin</TabsTrigger>
+            <TabsTrigger value="info">Theo dõi hợp đồng</TabsTrigger>
             <TabsTrigger value="payments">Tài chính</TabsTrigger>
             <TabsTrigger value="files">Tài liệu</TabsTrigger>
             <TabsTrigger value="reception">Tiếp nhận</TabsTrigger>
@@ -1033,19 +1197,17 @@ export default function ContractViewModal({
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => setSelectedFile(file)}
+                              onClick={() => handleOpenViewer(file)} // ⬅️ THAY vì setSelectedFile(file)
+                              title="Xem tài liệu"
                             >
                               <Eye className="w-4 h-4" />
                             </Button>
+
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() =>
-                                handleFileDownload(
-                                  file.id!,
-                                  file.tenFile || "file"
-                                )
-                              }
+                              onClick={() => handleDownloadDocument(file)} // ⬅️ GỌI hàm mới
+                              title="Tải xuống"
                             >
                               <Download className="w-4 h-4" />
                             </Button>
@@ -1126,6 +1288,113 @@ export default function ContractViewModal({
           </TabsContent>
         </Tabs>
       </DialogContent>
+      <Dialog
+        open={isViewerOpen}
+        onOpenChange={(open) => {
+          setIsViewerOpen(open);
+          if (!open) {
+            setViewingDoc(null);
+            if (previewUrl?.startsWith("blob:"))
+              URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+          }
+        }}
+      >
+        <DialogContent className="max-w-4xl h-[80vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Xem tài liệu</span>
+              {viewingDoc?.tenFile && (
+                <span className="text-sm font-normal text-slate-500 truncate ml-2">
+                  {viewingDoc.tenFile}
+                </span>
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          {!viewingDoc ? (
+            <div className="h-full flex items-center justify-center text-slate-500">
+              Không có tài liệu để hiển thị
+            </div>
+          ) : (
+            (() => {
+              const label = getFileTypeLabel(
+                viewingDoc.tenFile,
+                viewingDoc.loaiFile
+              );
+              const type = (viewingDoc.loaiFile || "").toLowerCase();
+
+              if (label === "Word" || label === "Excel") {
+                return (
+                  <div className="h-full flex flex-col items-center justify-center text-center space-y-3">
+                    <FileText className="w-10 h-10 text-slate-400" />
+                    <p className="text-slate-600">
+                      Loại tệp <b>{label}</b> không hỗ trợ xem trực tiếp. Vui
+                      lòng tải xuống để xem.
+                    </p>
+                    <Button
+                      onClick={() =>
+                        viewingDoc && handleDownloadDocument(viewingDoc)
+                      }
+                    >
+                      <Download className="w-4 h-4 mr-2" /> Tải xuống
+                    </Button>
+                  </div>
+                );
+              }
+
+              if (type.includes("image/")) {
+                return previewUrl ? (
+                  <div className="h-full overflow-auto">
+                    <img
+                      src={previewUrl}
+                      alt={viewingDoc.tenFile || "image"}
+                      className="max-h-[70vh] object-contain mx-auto"
+                    />
+                  </div>
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-500">
+                    Đang tải ảnh…
+                  </div>
+                );
+              }
+
+              if (type.includes("pdf")) {
+                return previewUrl ? (
+                  <iframe
+                    src={previewUrl}
+                    className="w-full h-[70vh] rounded border"
+                    title="PDF Preview"
+                  />
+                ) : (
+                  <div className="h-full flex items-center justify-center text-slate-500">
+                    Đang tải PDF…
+                  </div>
+                );
+              }
+
+              return previewUrl ? (
+                <iframe
+                  src={previewUrl}
+                  className="w-full h-[70vh] rounded border"
+                  title="File Preview"
+                />
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center text-center space-y-3">
+                  <p className="text-slate-600">Không thể xem trước tệp này.</p>
+                  <Button
+                    onClick={() =>
+                      viewingDoc && handleDownloadDocument(viewingDoc)
+                    }
+                  >
+                    <Download className="w-4 h-4 mr-2" /> Tải xuống
+                  </Button>
+                </div>
+              );
+            })()
+          )}
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

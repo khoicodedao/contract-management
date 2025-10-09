@@ -82,7 +82,7 @@ const ContractProgressTimeline: React.FC<Props> = ({
     <div>
       {/* Timeline bước thực hiện */}
       <h3 className="text-lg font-semibold mb-3 flex items-center">
-        🗂️ Tiến độ thực hiện ({contractProgressSteps.length} bước)
+        🗂️ Theo dõi ({contractProgressSteps.length} bước)
       </h3>
 
       <VerticalTimeline lineColor="#0ea5e9">
