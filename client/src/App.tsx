@@ -20,6 +20,7 @@ import Footer from "./components/layout/footer";
 import LoginPage from "@/pages/login"; // 👈 thêm trang login
 import ProtectedRoute from "./lib/protected-route";
 import Export from "@/pages/export";
+import WorkCalendar from "./pages/work-calendar";
 function Router() {
   console.log("Current pathname:", window.location.hash); // 👈 debug ở đây
   return (
@@ -128,6 +129,14 @@ function Router() {
         component={() => (
           <ProtectedRoute>
             <Export />
+          </ProtectedRoute>
+        )}
+      />
+      <Route
+        path="/lich"
+        component={() => (
+          <ProtectedRoute>
+            <WorkCalendar />
           </ProtectedRoute>
         )}
       />

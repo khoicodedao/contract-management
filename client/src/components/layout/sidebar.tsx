@@ -130,6 +130,12 @@ export function Sidebar() {
       icon: FileSpreadsheet,
       current: false,
     },
+    {
+      name: "Lịch làm việc",
+      href: "/lich",
+      icon: FileSpreadsheet,
+      current: false,
+    },
   ];
   const [location] = useLocation();
 
