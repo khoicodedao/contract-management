@@ -13,6 +13,31 @@ import listPlugin from "@fullcalendar/list";
 import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 
+// Ant Design
+import {
+  Button,
+  Card,
+  DatePicker,
+  Divider,
+  Form,
+  Input,
+  List,
+  Modal,
+  Select,
+  Space,
+  Tag,
+  Typography,
+  message,
+  Popconfirm,
+} from "antd";
+import { BellOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import dayjs, { Dayjs } from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
+const { Title, Text } = Typography;
+const { RangePicker } = DatePicker;
+
 /** ==============================
  * Config API
  * ============================== */
@@ -32,8 +57,8 @@ const API = {
  * Types
  * ============================== */
 type EventItem = {
-  id: string; // client id (uuid) – map với server id qua serverId
-  serverId?: string | number; // id trên BE
+  id: string; // client id
+  serverId?: string | number;
   title: string;
   notes?: string;
   start: string; // ISO
@@ -41,7 +66,7 @@ type EventItem = {
   allDay?: boolean;
   color?: string;
   reminderMinutes?: number;
-  notifiedAt?: string | null; // ISO
+  notifiedAt?: string | null;
 };
 
 type ServerEvent = {
@@ -142,7 +167,7 @@ function useReminders(events: EventItem[]) {
 }
 
 /** ==============================
- * UI
+ * UI constants
  * ============================== */
 const COLORS = [
   { label: "Xanh dương", value: "#3b82f6" },
@@ -160,16 +185,21 @@ export default function WorkCalendar() {
   const [events, setEvents] = useState<EventItem[]>(() => loadEvents());
   const [queue, setQueue] = useState<QueueItem[]>(() => loadQueue());
 
-  // form state
-  const [title, setTitle] = useState("");
-  const [notes, setNotes] = useState("");
-  const [start, setStart] = useState<string>(
-    new Date().toISOString().slice(0, 16)
-  );
-  const [end, setEnd] = useState<string>("");
-  const [allDay, setAllDay] = useState(false);
-  const [color, setColor] = useState(COLORS[0].value);
-  const [reminder, setReminder] = useState<number | undefined>(15);
+  // form state (AntD Form)
+  const [form] = Form.useForm<{
+    title: string;
+    notes?: string;
+    range?: [Dayjs, Dayjs];
+    allDay?: boolean;
+    color?: string;
+    reminder?: number | "none";
+  }>();
+
+  const defaultStart = dayjs();
+  const defaultEnd = dayjs().add(1, "hour");
+
+  // modal xem nhanh
+  const [viewing, setViewing] = useState<EventItem | null>(null);
 
   // persist
   useEffect(() => {
@@ -195,7 +225,6 @@ export default function WorkCalendar() {
         if (!res.ok) return;
         const data: ServerEvent[] = await res.json();
 
-        // hợp nhất: giữ client fields (notifiedAt) bằng cách map theo serverId
         const byServerId = new Map<string | number, EventItem>();
         for (const ev of events)
           if (ev.serverId) byServerId.set(ev.serverId, ev);
@@ -217,7 +246,6 @@ export default function WorkCalendar() {
         });
 
         setEvents((prev) => {
-          // bỏ các event đang không thuộc server (nhưng còn pending create)
           const pendingCreates = prev.filter((e) => !e.serverId);
           return [...merged, ...pendingCreates];
         });
@@ -227,7 +255,7 @@ export default function WorkCalendar() {
   );
 
   const flushQueue = useCallback(async () => {
-    if (!navigator.onLine) return; // chỉ sync khi online
+    if (!navigator.onLine) return;
     if (queue.length === 0) return;
 
     const rest: QueueItem[] = [];
@@ -241,7 +269,6 @@ export default function WorkCalendar() {
           });
           if (!res.ok) throw new Error("create failed");
           const created: ServerEvent = await res.json();
-          // gắn serverId vào event client
           setEvents((prev) =>
             prev.map((e) =>
               e.id === job.clientId ? { ...e, serverId: created.id } : e
@@ -261,7 +288,6 @@ export default function WorkCalendar() {
           if (!res.ok) throw new Error("update failed");
         }
       } catch {
-        // giữ lại job chưa xong
         rest.push(job);
       }
     }
@@ -271,48 +297,67 @@ export default function WorkCalendar() {
   useEffect(() => {
     const onOnline = () => flushQueue();
     window.addEventListener("online", onOnline);
-    // flushQueue();
     return () => window.removeEventListener("online", onOnline);
   }, [flushQueue]);
 
   /** ============ CRUD local + enqueue ============ */
-  const addEvent = useCallback(async () => {
-    if (!title.trim() || !start) return;
+  const addEvent = useCallback(
+    async (values: {
+      title: string;
+      notes?: string;
+      range?: [Dayjs, Dayjs];
+      allDay?: boolean;
+      color?: string;
+      reminder?: number | "none";
+    }) => {
+      const { title, notes, range, allDay, color, reminder } = values;
+      if (!title?.trim() || !range) return;
 
-    const clientId = crypto.randomUUID();
-    const newItem: EventItem = {
-      id: clientId,
-      title: title.trim(),
-      notes: notes.trim() || undefined,
-      start: allDay
-        ? new Date(start).toISOString().slice(0, 10) + "T00:00:00.000Z"
-        : new Date(start).toISOString(),
-      end: end ? new Date(end).toISOString() : undefined,
-      allDay,
-      color,
-      reminderMinutes: reminder,
-      notifiedAt: null,
-    };
-    setEvents((prev) => [...prev, newItem]);
+      const [startD, endD] = range;
+      const clientId = crypto.randomUUID();
 
-    // ✅ Sửa ở đây
-    const payload: Omit<ServerEvent, "id"> = {
-      title: newItem.title,
-      notes: newItem.notes,
-      start: newItem.start,
-      end: newItem.end,
-      allDay: newItem.allDay,
-      color: newItem.color,
-      reminderMinutes: newItem.reminderMinutes ?? null,
-    };
-    setQueue((prev) => [...prev, { type: "create", payload, clientId }]);
+      const startISO = allDay
+        ? startD.startOf("day").utc().toISOString()
+        : startD.utc().toISOString();
+      const endISO = endD ? endD.utc().toISOString() : undefined;
 
-    setTitle("");
-    setNotes("");
-    setEnd("");
+      const newItem: EventItem = {
+        id: clientId,
+        title: title.trim(),
+        notes: notes?.trim() || undefined,
+        start: startISO,
+        end: endISO,
+        allDay,
+        color: color || COLORS[0].value,
+        reminderMinutes: reminder === "none" ? undefined : (reminder as number),
+        notifiedAt: null,
+      };
+      setEvents((prev) => [...prev, newItem]);
 
-    if (navigator.onLine) flushQueue();
-  }, [title, notes, start, end, allDay, color, reminder, flushQueue]);
+      const payload: Omit<ServerEvent, "id"> = {
+        title: newItem.title,
+        notes: newItem.notes,
+        start: newItem.start,
+        end: newItem.end,
+        allDay: newItem.allDay,
+        color: newItem.color,
+        reminderMinutes: newItem.reminderMinutes ?? null,
+      };
+      setQueue((prev) => [...prev, { type: "create", payload, clientId }]);
+
+      form.resetFields();
+      form.setFieldsValue({
+        color: COLORS[0].value,
+        allDay: false,
+        reminder: 15,
+        range: [defaultStart, defaultEnd],
+      });
+
+      if (navigator.onLine) flushQueue();
+      message.success("Đã thêm lịch");
+    },
+    [flushQueue, form]
+  );
 
   const deleteEvent = useCallback(
     (id: string) => {
@@ -325,6 +370,7 @@ export default function WorkCalendar() {
           { type: "delete", serverId: ev.serverId! },
         ]);
       if (navigator.onLine) flushQueue();
+      message.success("Đã xóa");
     },
     [events, flushQueue]
   );
@@ -350,6 +396,36 @@ export default function WorkCalendar() {
     right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
   } as any;
 
+  // Khi drag chọn trên lịch => set ngay khoảng thời gian vào Form (chọn ngày kết thúc ngay trên lịch)
+  const handleSelect = useCallback(
+    (selInfo: any) => {
+      const start = dayjs(selInfo.start);
+      // FullCalendar exclusive end => lùi 1 phút nếu cùng ngày để trực quan hơn
+      const end = dayjs(selInfo.end);
+      form.setFieldsValue({
+        range: [start, end],
+        allDay: selInfo.allDay,
+      });
+      message.info("Đã lấy mốc thời gian từ lịch vào form.");
+    },
+    [form]
+  );
+
+  const [initialFormSet, setInitialFormSet] = useState(false);
+  useEffect(() => {
+    if (!initialFormSet) {
+      form.setFieldsValue({
+        title: "",
+        notes: "",
+        range: [defaultStart, defaultEnd],
+        allDay: false,
+        color: COLORS[0].value,
+        reminder: 15,
+      });
+      setInitialFormSet(true);
+    }
+  }, [form, initialFormSet]);
+
   return (
     <div className="flex h-screen overflow-hidden">
       <Sidebar />
@@ -359,249 +435,337 @@ export default function WorkCalendar() {
           subtitle="Quản lý lịch làm việc và nhắc việc"
           onCreateContract={() => {}}
         />
-
         <main className="flex-1 overflow-auto p-6">
-          <div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "2fr 1fr",
-                gap: 16,
-              }}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "2fr 1fr",
+              gap: 16,
+            }}
+          >
+            {/* Calendar */}
+            <Card
+              style={{ borderRadius: 12 }}
+              bodyStyle={{ padding: 12 }}
+              title={
+                <Title level={5} style={{ margin: 0 }}>
+                  Lịch công việc
+                </Title>
+              }
             >
-              <div>
-                <FullCalendar
-                  plugins={[
-                    dayGridPlugin,
-                    timeGridPlugin,
-                    interactionPlugin,
-                    listPlugin,
-                  ]}
-                  initialView="dayGridMonth"
-                  headerToolbar={headerToolbar}
-                  height={720}
-                  locale="vi"
-                  nowIndicator
-                  selectable
-                  events={fcEvents}
-                  datesSet={(arg) => {
-                    // mỗi khi chuyển view/tháng, nếu online thì kéo dữ liệu từ BE trong khoảng hiển thị
-                    if (navigator.onLine) {
-                      const fromISO = arg.start.toISOString();
-                      const toISO = arg.end.toISOString();
-                      syncFromServer(fromISO, toISO);
-                    }
-                  }}
-                  eventClick={(info) => {
-                    const ev = events.find((e) => e.id === info.event.id);
-                    if (!ev) return;
-                    const when = new Date(ev.start).toLocaleString();
-                    alert(
-                      `${ev.title}\n${when}${ev.notes ? `\n${ev.notes}` : ""}`
-                    );
-                  }}
-                  dateClick={(info) => {
-                    // đặt nhanh thời gian bắt đầu theo ô click
-                    const d = info.date as Date;
-                    const isoLocal = new Date(
-                      d.getTime() - d.getTimezoneOffset() * 60000
-                    )
-                      .toISOString()
-                      .slice(0, 16);
-                    setStart(isoLocal);
-                  }}
-                />
-              </div>
+              <FullCalendar
+                plugins={[
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  interactionPlugin,
+                  listPlugin,
+                ]}
+                initialView="dayGridMonth"
+                headerToolbar={headerToolbar}
+                height={720}
+                locale="vi"
+                nowIndicator
+                selectable
+                selectMirror
+                longPressDelay={200}
+                events={fcEvents}
+                select={handleSelect}
+                datesSet={(arg) => {
+                  if (navigator.onLine) {
+                    const fromISO = arg.start.toISOString();
+                    const toISO = arg.end.toISOString();
+                    syncFromServer(fromISO, toISO);
+                  }
+                }}
+                eventClick={(info) => {
+                  const ev = events.find((e) => e.id === info.event.id);
+                  if (!ev) return;
+                  setViewing(ev);
+                }}
+                dateClick={(info) => {
+                  // single click => set start nhanh + end = +1h
+                  const start = dayjs(info.date);
+                  const end = start.add(1, "hour");
+                  form.setFieldsValue({ range: [start, end], allDay: false });
+                }}
+              />
+            </Card>
 
-              <div>
-                <fieldset
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 16,
-                  }}
+            {/* Sidebar Form + Upcoming */}
+            <div style={{ display: "grid", gap: 16 }}>
+              <Card
+                style={{ borderRadius: 12 }}
+                title={
+                  <Space align="center">
+                    <PlusOutlined />
+                    <span>Thêm lịch / nhắc việc</span>
+                  </Space>
+                }
+              >
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={addEvent}
+                  requiredMark={false}
                 >
-                  <legend style={{ padding: "0 6px" }}>
-                    Thêm lịch/nhắc việc
-                  </legend>
-                  <div style={{ display: "grid", gap: 8 }}>
-                    <label>Tiêu đề</label>
-                    <input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Ví dụ: Họp team"
-                    />
+                  <Form.Item
+                    label="Tiêu đề"
+                    name="title"
+                    rules={[{ required: true, message: "Nhập tiêu đề" }]}
+                  >
+                    <Input placeholder="Ví dụ: Họp team" />
+                  </Form.Item>
 
-                    <label>Ghi chú</label>
-                    <textarea
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
+                  <Form.Item label="Ghi chú" name="notes">
+                    <Input.TextArea
+                      rows={3}
                       placeholder="Nội dung, link họp…"
                     />
+                  </Form.Item>
 
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: 8,
-                      }}
-                    >
-                      <div>
-                        <label>Bắt đầu</label>
-                        <input
-                          type="datetime-local"
-                          value={start}
-                          onChange={(e) => setStart(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label>Kết thúc (tuỳ chọn)</label>
-                        <input
-                          type="datetime-local"
-                          value={end}
-                          onChange={(e) => setEnd(e.target.value)}
-                        />
-                      </div>
-                    </div>
-
-                    <label
-                      style={{
-                        display: "flex",
-                        gap: 8,
-                        alignItems: "center",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={allDay}
-                        onChange={(e) => setAllDay(e.target.checked)}
-                      />
-                      Cả ngày
-                    </label>
-
-                    <div>
-                      <label>Màu</label>
-                      <select
-                        value={color}
-                        onChange={(e) => setColor(e.target.value)}
-                      >
-                        {COLORS.map((c) => (
-                          <option key={c.value} value={c.value}>
-                            {c.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div>
-                      <label>Nhắc trước</label>
-                      <select
-                        value={String(reminder ?? "none")}
-                        onChange={(e) =>
-                          setReminder(
-                            e.target.value === "none"
-                              ? undefined
-                              : Number(e.target.value)
-                          )
-                        }
-                      >
-                        <option value="none">Không nhắc</option>
-                        <option value="5">5 phút</option>
-                        <option value="10">10 phút</option>
-                        <option value="15">15 phút</option>
-                        <option value="30">30 phút</option>
-                        <option value="60">1 giờ</option>
-                        <option value="120">2 giờ</option>
-                        <option value="1440">1 ngày</option>
-                      </select>
-                    </div>
-
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button onClick={addEvent}>Thêm</button>
-                      <button
-                        onClick={() => {
-                          if ("Notification" in window)
-                            Notification.requestPermission();
-                        }}
-                      >
-                        Bật thông báo
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEvents(loadEvents());
-                          setQueue(loadQueue());
-                        }}
-                      >
-                        Tải lại dữ liệu offline
-                      </button>
-                    </div>
-                  </div>
-                </fieldset>
-
-                <fieldset
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 8,
-                    padding: 12,
-                  }}
-                >
-                  <legend style={{ padding: "0 6px" }}>Sự kiện sắp tới</legend>
-                  <div
-                    style={{
-                      maxHeight: 260,
-                      overflow: "auto",
-                      display: "grid",
-                      gap: 8,
-                    }}
+                  <Form.Item
+                    label="Thời gian (chọn trực tiếp trên lịch để điền nhanh)"
+                    name="range"
+                    rules={[{ required: true, message: "Chọn thời gian" }]}
                   >
-                    {events
-                      .slice()
-                      .sort(
-                        (a, b) =>
-                          new Date(a.start).getTime() -
-                          new Date(b.start).getTime()
-                      )
-                      .map((ev) => (
-                        <div
-                          key={ev.id}
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "start",
-                            gap: 8,
-                            borderBottom: "1px dashed #e5e7eb",
-                            paddingBottom: 8,
-                          }}
+                    <RangePicker
+                      showTime
+                      format="YYYY-MM-DD HH:mm"
+                      style={{ width: "100%" }}
+                    />
+                  </Form.Item>
+
+                  <Space size="middle" style={{ width: "100%" }} wrap>
+                    <Form.Item
+                      name="allDay"
+                      label="Cả ngày"
+                      valuePropName="checked"
+                    >
+                      <Select
+                        options={[
+                          { label: "Không", value: false },
+                          { label: "Có", value: true },
+                        ]}
+                        style={{ width: 120 }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Màu"
+                      name="color"
+                      initialValue={COLORS[0].value}
+                    >
+                      <Select
+                        style={{ width: 160 }}
+                        options={COLORS.map((c) => ({
+                          label: (
+                            <Space>
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  width: 12,
+                                  height: 12,
+                                  borderRadius: 12,
+                                  background: c.value,
+                                }}
+                              />
+                              {c.label}
+                            </Space>
+                          ),
+                          value: c.value,
+                        }))}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      label="Nhắc trước"
+                      name="reminder"
+                      initialValue={15}
+                    >
+                      <Select
+                        style={{ width: 140 }}
+                        options={[
+                          { label: "Không nhắc", value: "none" },
+                          { label: "5 phút", value: 5 },
+                          { label: "10 phút", value: 10 },
+                          { label: "15 phút", value: 15 },
+                          { label: "30 phút", value: 30 },
+                          { label: "1 giờ", value: 60 },
+                          { label: "2 giờ", value: 120 },
+                          { label: "1 ngày", value: 1440 },
+                        ]}
+                      />
+                    </Form.Item>
+                  </Space>
+
+                  <Space>
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      icon={<PlusOutlined />}
+                    >
+                      Thêm
+                    </Button>
+                    <Button
+                      icon={<BellOutlined />}
+                      onClick={() => {
+                        if ("Notification" in window)
+                          Notification.requestPermission();
+                      }}
+                    >
+                      Bật thông báo
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setEvents(loadEvents());
+                        setQueue(loadQueue());
+                        message.success("Đã tải lại dữ liệu offline");
+                      }}
+                    >
+                      Tải dữ liệu offline
+                    </Button>
+                  </Space>
+                </Form>
+              </Card>
+
+              <Card
+                style={{ borderRadius: 12 }}
+                title="Sự kiện sắp tới"
+                extra={<Text type="secondary">Sắp xếp theo thời gian</Text>}
+              >
+                <List
+                  dataSource={[...events].sort(
+                    (a, b) =>
+                      new Date(a.start).getTime() - new Date(b.start).getTime()
+                  )}
+                  renderItem={(ev) => (
+                    <List.Item
+                      actions={[
+                        <Popconfirm
+                          title="Xóa sự kiện?"
+                          okText="Xóa"
+                          cancelText="Hủy"
+                          onConfirm={() => deleteEvent(ev.id)}
+                          key="del"
                         >
-                          <div>
-                            <div style={{ fontWeight: 600, color: ev.color }}>
+                          <Button size="small" danger icon={<DeleteOutlined />}>
+                            Xóa
+                          </Button>
+                        </Popconfirm>,
+                      ]}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Space>
+                            <span style={{ fontWeight: 600, color: ev.color }}>
                               {ev.title}
-                            </div>
-                            <div style={{ fontSize: 12, color: "#6b7280" }}>
-                              {new Date(ev.start).toLocaleString()}
-                            </div>
+                            </span>
                             {ev.reminderMinutes ? (
-                              <div style={{ fontSize: 12, color: "#6b7280" }}>
-                                Nhắc trước: {ev.reminderMinutes} phút
-                              </div>
+                              <Tag icon={<BellOutlined />}>
+                                {ev.reminderMinutes}’
+                              </Tag>
                             ) : null}
+                          </Space>
+                        }
+                        description={
+                          <div>
+                            <div style={{ fontSize: 12, color: "#6b7280" }}>
+                              {dayjs(ev.start).format("DD/MM/YYYY HH:mm")}
+                              {ev.end
+                                ? ` → ${dayjs(ev.end).format(
+                                    "DD/MM/YYYY HH:mm"
+                                  )}`
+                                : ""}
+                              {ev.allDay ? " (Cả ngày)" : ""}
+                            </div>
                             {ev.notes ? (
                               <div style={{ fontSize: 12 }}>{ev.notes}</div>
                             ) : null}
                           </div>
-                          <button onClick={() => deleteEvent(ev.id)}>
-                            Xóa
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </fieldset>
-              </div>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              </Card>
             </div>
           </div>
         </main>
       </div>
+
+      {/* Modal xem nhanh sự kiện */}
+      <Modal
+        open={!!viewing}
+        onCancel={() => setViewing(null)}
+        title="Chi tiết sự kiện"
+        footer={
+          <Space>
+            {viewing?.serverId ? (
+              <Text type="secondary">
+                Server ID: {String(viewing?.serverId)}
+              </Text>
+            ) : (
+              <Tag color="blue">Pending Sync</Tag>
+            )}
+            <Button onClick={() => setViewing(null)}>Đóng</Button>
+            <Popconfirm
+              title="Xóa sự kiện?"
+              okText="Xóa"
+              cancelText="Hủy"
+              onConfirm={() => {
+                if (viewing) deleteEvent(viewing.id);
+                setViewing(null);
+              }}
+            >
+              <Button danger>Xóa</Button>
+            </Popconfirm>
+          </Space>
+        }
+      >
+        {viewing && (
+          <div>
+            <Title level={5} style={{ marginTop: 0 }}>
+              {viewing.title}
+            </Title>
+            <Divider style={{ margin: "8px 0" }} />
+            <Space direction="vertical" size={6} style={{ width: "100%" }}>
+              <Text>
+                <b>Thời gian:</b>{" "}
+                {dayjs(viewing.start).format("DD/MM/YYYY HH:mm")}
+                {viewing.end
+                  ? ` → ${dayjs(viewing.end).format("DD/MM/YYYY HH:mm")}`
+                  : ""}
+                {viewing.allDay ? " (Cả ngày)" : ""}
+              </Text>
+              {viewing.notes && (
+                <Text>
+                  <b>Ghi chú:</b> {viewing.notes}
+                </Text>
+              )}
+              <Space align="center">
+                <Text>
+                  <b>Màu:</b>
+                </Text>
+                <span
+                  style={{
+                    display: "inline-block",
+                    width: 12,
+                    height: 12,
+                    borderRadius: 12,
+                    background: viewing.color,
+                  }}
+                />
+              </Space>
+              <Text>
+                <b>Nhắc trước:</b>{" "}
+                {viewing.reminderMinutes
+                  ? `${viewing.reminderMinutes} phút`
+                  : "Không"}
+              </Text>
+            </Space>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
