@@ -13,6 +13,7 @@ import {
   Inbox,
   DollarSign,
   FileSpreadsheet,
+  CalendarDays,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { HopDong } from "@shared/schema";
@@ -133,7 +134,7 @@ export function Sidebar() {
     {
       name: "Lịch làm việc",
       href: "/lich",
-      icon: FileSpreadsheet,
+      icon: CalendarDays,
       current: false,
     },
   ];
