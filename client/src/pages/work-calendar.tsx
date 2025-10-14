@@ -615,7 +615,7 @@ export default function WorkCalendar() {
                     >
                       Bật thông báo
                     </Button>
-                    <Button
+                    {/* <Button
                       onClick={() => {
                         setEvents(loadEvents());
                         setQueue(loadQueue());
@@ -623,7 +623,7 @@ export default function WorkCalendar() {
                       }}
                     >
                       Tải dữ liệu offline
-                    </Button>
+                    </Button> */}
                   </Space>
                 </Form>
               </Card>

@@ -4,7 +4,6 @@ import Sidebar from "@/components/layout/sidebar";
 import Header from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -14,29 +13,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Eye,
   Edit,
   Trash2,
-  Search,
   Plus,
   CheckSquare,
   AlertTriangle,
   Clock,
+  RefreshCw,
+  Download,
 } from "lucide-react";
 import { BuocThucHien, HopDong } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ProgressModal from "@/components/modals/progress-modal";
 import React from "react";
+import * as XLSX from "xlsx";
 
 export default function ProgressPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,11 +44,16 @@ export default function ProgressPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: progressSteps = [], isLoading } = useQuery<BuocThucHien[]>({
+  const {
+    data: progressSteps = [],
+    isLoading,
+    refetch,
+    isFetching,
+  } = useQuery<BuocThucHien[]>({
     queryKey: ["/api/buoc-thuc-hien"],
   });
 
-  const { data: contracts = [] } = useQuery({
+  const { data: contracts = [] } = useQuery<HopDong[]>({
     queryKey: ["/api/hop-dong"],
   });
 
@@ -151,6 +149,71 @@ export default function ProgressPage() {
       </div>
     );
   };
+  const handleExportExcel = () => {
+    if (!filteredSteps.length) {
+      toast({
+        title: "Không có dữ liệu",
+        description:
+          "Không có bước thực hiện nào để xuất theo bộ lọc hiện tại.",
+      });
+      return;
+    }
+
+    // Chuẩn hóa dữ liệu => mỗi bước là 1 dòng
+    const rows = filteredSteps
+      .slice()
+      .sort((a, b) => {
+        // Sắp xếp theo hợp đồng và ngày bắt đầu
+        const ca = contracts.find((c) => c.id === a.hopDongId);
+        const cb = contracts.find((c) => c.id === b.hopDongId);
+        const sa = (ca?.soHdNgoai || "").localeCompare(cb?.soHdNgoai || "");
+        if (sa !== 0) return sa;
+        const da = a.ngayBatDau ? new Date(a.ngayBatDau).getTime() : 0;
+        const db = b.ngayBatDau ? new Date(b.ngayBatDau).getTime() : 0;
+        return da - db;
+      })
+      .map((step) => ({
+        "Tên bước": step.ten || "Không tên",
+        "Hợp đồng":
+          contracts.find((c) => c.id === step.hopDongId)?.soHdNgoai ||
+          "Không liên kết",
+        "Ngày bắt đầu": formatDate(step.ngayBatDau),
+        "Ngày kết thúc": formatDate(step.ngayKetThuc),
+        "Trạng thái": step.trangThai || "Chưa có trạng thái",
+        "Mô tả": step.moTa || "Không có mô tả",
+      }));
+
+    // Tạo workbook & worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows, {
+      header: [
+        "Tên bước",
+        "Hợp đồng",
+        "Ngày bắt đầu",
+        "Ngày kết thúc",
+        "Trạng thái",
+        "Mô tả",
+      ],
+    });
+
+    // Auto width cột đơn giản
+    const cols = Object.keys(rows[0] || {}).map((k) => ({
+      wch: Math.max(k.length + 2, 18),
+    }));
+    (ws as any)["!cols"] = cols;
+
+    XLSX.utils.book_append_sheet(wb, ws, "Tiến độ thực hiện");
+    const fileName = `tien-do-thuc-hien_${new Date()
+      .toISOString()
+      .slice(0, 19)
+      .replace(/[:T]/g, "-")}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+
+    toast({
+      title: "Đã xuất Excel",
+      description: "Xuất tiến độ thực hiện thành công.",
+    });
+  };
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -191,39 +254,38 @@ export default function ProgressPage() {
 
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <CardTitle>Các bước thực hiện</CardTitle>
-                <Button onClick={() => handleOpenModal("create")}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Thêm bước thực hiện
-                </Button>
-              </div>
-              <div className="flex items-center space-x-4 mt-4">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <Input
-                    placeholder="Tìm kiếm bước thực hiện..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => refetch()}
+                    disabled={isFetching}
+                    title="Làm mới"
+                  >
+                    <RefreshCw
+                      className={`w-4 h-4 mr-2 ${
+                        isFetching ? "animate-spin" : ""
+                      }`}
+                    />
+                    Làm mới
+                  </Button>
+
+                  {/* Nút Export Excel */}
+                  <Button
+                    variant="secondary"
+                    onClick={handleExportExcel}
+                    title="Xuất Excel"
+                  >
+                    <Download className="w-4 h-4 mr-2" />
+                    Xuất Excel
+                  </Button>
+
+                  <Button onClick={() => handleOpenModal("create")}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Thêm bước thực hiện
+                  </Button>
                 </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Lọc theo trạng thái" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tất cả trạng thái</SelectItem>
-                    <SelectItem value="chưa thực hiện">
-                      Chưa thực hiện
-                    </SelectItem>
-                    <SelectItem value="đang thực hiện">
-                      Đang thực hiện
-                    </SelectItem>
-                    <SelectItem value="hoàn thành">Hoàn thành</SelectItem>
-                    <SelectItem value="quá hạn">Quá hạn</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </CardHeader>
 
@@ -270,7 +332,7 @@ export default function ProgressPage() {
                               {formatDate(step.ngayKetThuc)}
                             </TableCell>
                             <TableCell>
-                              {getStatusBadge(step.trangThai, step.canhBao)}
+                              {getStatusBadge(step.trangThai, step?.canhBao)}
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-2">

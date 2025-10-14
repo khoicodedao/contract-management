@@ -419,7 +419,7 @@ export default function ContractModal({
                       <Input
                         type="number"
                         min={0}
-                        step={100000}
+                        step={1}
                         placeholder="VD: 100000000"
                         {...field}
                         onChange={(e) => {
