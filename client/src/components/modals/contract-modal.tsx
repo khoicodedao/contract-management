@@ -365,7 +365,7 @@ export default function ContractModal({
                       <Input
                         type="number"
                         min={0}
-                        step={100000}
+                        step="any" // cho phép nhập số lẻ
                         placeholder="VD: 100000000"
                         {...field}
                         onChange={(e) => {
@@ -374,6 +374,7 @@ export default function ContractModal({
                         }}
                       />
                     </FormControl>
+
                     <FormMessage />
                   </FormItem>
                 )}

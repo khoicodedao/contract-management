@@ -525,7 +525,7 @@ export default function ContractViewModal({
                   </label>
                   <p className="mt-1 text-sm text-gray-900">
                     {contract.giaTriHopDong || "-"}{" "}
-                    {getCurrencyName(contract.loaiTienId)}
+                    {/* {getCurrencyName(contract.loaiTienId)} */}
                   </p>
                 </div>
                 <div>
@@ -549,8 +549,10 @@ export default function ContractViewModal({
                     Phí ủy thác
                   </label>
                   <p className="mt-1 text-sm text-gray-900">
-                    {parseFloat(contract?.phiUyThac?.toString() || "1") *
-                      parseFloat(contract?.tyGia?.toString() || "1")}{" "}
+                    {(
+                      Number(contract?.phiUyThac || 1) *
+                      Number(contract?.tyGia || 1)
+                    ).toLocaleString("vi-VN")}{" "}
                     VND
                   </p>
                 </div>
@@ -798,7 +800,7 @@ export default function ContractViewModal({
                         (item: any) => item.id === contract.nhaCungCapId
                       )?.diaChi || ""}
                     </p>
-                    {nhaCungCap.find(
+                    {/* {nhaCungCap.find(
                       (item: any) => item.id === contract.nhaCungCapId
                     )?.soDienThoai && (
                       <p className="text-xs text-gray-600">
@@ -809,7 +811,7 @@ export default function ContractViewModal({
                           )?.soDienThoai
                         }
                       </p>
-                    )}
+                    )} */}
                   </div>
                 </div>
                 <div>

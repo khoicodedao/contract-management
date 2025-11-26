@@ -171,13 +171,9 @@ function useReminders(events: EventItem[]) {
  * ============================== */
 const COLORS = [
   { label: "Xanh dương", value: "#3b82f6" },
-  { label: "Xanh lá", value: "#22c55e" },
   { label: "Cam", value: "#f97316" },
   { label: "Đỏ", value: "#ef4444" },
-  { label: "Tím", value: "#a855f7" },
-  { label: "Xám", value: "#64748b" },
 ];
-
 /** ==============================
  * Component
  * ============================== */

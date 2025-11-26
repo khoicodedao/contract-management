@@ -68,3 +68,7 @@ Lưu ý: **Thư viện được cài đặt ở Node.js version 18**, vì vậy 
 
 Hướng dẫn này sẽ giúp bạn cài đặt thư viện với Node.js version 18, sau đó xây dựng ứng dụng và chạy dev trên Node.js version 20.
 ```
+
+```
+**Su dung npm rebuild better-sqlite3** De thuc hien chay khi bi loi version
+```

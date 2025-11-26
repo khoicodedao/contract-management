@@ -97,7 +97,6 @@ export default function Equipment() {
     if (!amount || !currencyId) return "-";
     const value = parseFloat(amount);
 
-    // map id sang mã tiền tệ ISO 4217
     const currencyMap: Record<number, string> = {
       1: "USD",
       2: "EUR",
@@ -106,10 +105,10 @@ export default function Equipment() {
 
     const currencyCode = currencyMap[currencyId] || "VND";
 
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: currencyCode,
-    }).format(value);
+    // format số bình thường, không ép currency
+    const formatted = new Intl.NumberFormat("vi-VN").format(value);
+
+    return `${formatted} ${currencyCode}`;
   };
 
   return (
