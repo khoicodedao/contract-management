@@ -186,7 +186,7 @@ export default function CapTienModal({
                     <Input
                       type="number"
                       min={0}
-                      step="0.01"
+                      step="any"
                       {...field}
                       onChange={(e) =>
                         field.onChange(parseFloat(e.target.value))

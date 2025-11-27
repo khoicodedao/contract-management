@@ -40,7 +40,7 @@ const fieldOptions = [
     fields: [
       { key: "ten", label: "Tên nhà cung cấp" },
       { key: "diaChi", label: "Địa chỉ" },
-      { key: "soDienThoai", label: "Số điện thoại" },
+      // { key: "soDienThoai", label: "Số điện thoại" },
     ],
   },
   {
